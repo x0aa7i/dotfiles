@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json.schemastore.org/markdownlint.json",
+
+  "default": true,
+  "whitespace": false,
+  "line_length": false,
+  "ul-indent": true,
+  "no-inline-html": false,
+  "no-bare-urls": false,
+  "fenced-code-language": false,
+  "first-line-h1": false,
+  "blanks-around-fences": {
+    "list_items": false
+  }
+}

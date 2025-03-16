@@ -1,0 +1,6 @@
+[submodule "mpv/submodules/uosc"]
+	path = mpv/submodules/uosc
+	url = https://github.com/tomasklaen/uosc.git
+[submodule "mpv/submodules/thumbfast"]
+	path = mpv/submodules/thumbfast
+	url = https://github.com/po5/thumbfast.git

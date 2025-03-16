@@ -1,0 +1,89 @@
+# Get editor completions based on the config schema
+"$schema" = 'https://starship.rs/config-schema.json'
+
+# Disable the blank line at the start of the prompt
+add_newline = true
+
+# Timeout for commands executed by starship (in milliseconds).
+command_timeout = 1000
+
+format = """$directory\
+$git_branch\
+$git_commit\
+$git_state\
+$git_metrics\
+$git_status\
+$package\
+$fill\
+$python\
+$nodejs\
+$cmd_duration\
+$time\
+$line_break\
+$character"""
+
+[fill]
+symbol = " "
+
+[os.symbols]
+Windows = ""
+Arch = "󰣇"
+Ubuntu = ""
+Macos = "󰀵"
+
+[time]
+disabled = false
+format = "[ $time]($style)"
+style = "blue"
+time_format = "%T"
+
+[cmd_duration]
+min_time = 500
+format = "[󱎫 $duration](yellow) "
+
+
+[directory]
+fish_style_pwd_dir_length = 1
+truncation_length = 5
+truncation_symbol = "…/"
+home_symbol = '~'
+format = "[$path]($style)[$lock_symbol]($lock_style) "
+style = "bold blue"
+
+[git_branch]
+format = "[$symbol$branch]($style) "
+symbol = "󰘬 "
+style = "white"
+truncation_length = 4
+truncation_symbol = ""
+# ignore_branches = ["master", "main"]
+
+[git_status]
+disabled = false
+style = "fg:white"
+conflicted = "󰞇"
+behind = "󱦳${count} "
+ahead = "󱦲${count}"
+staged = '[+$count](green) '
+up_to_date = "󰄬"
+untracked = "?${count} "
+stashed = ""
+modified = ""
+renamed = ""
+deleted = " 󰍴${count} "
+
+[git_metrics]
+disabled = false
+
+
+[python]
+python_binary = ["./.venv/bin/python", "python", "python3"]
+symbol = " "
+
+[nodejs]
+symbol = "󰎙 "
+
+[package]
+symbol = " "
+display_private = false
+style = "bold blue"

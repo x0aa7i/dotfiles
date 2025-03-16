@@ -1,0 +1,57 @@
+[settings]
+default_target_type = "symbolic"
+
+[git.files]
+"git/.gitconfig" = "~/.gitconfig"
+"git/gitui" = "~/.config/gitui"
+
+[fish.files]
+"fish" = "~/.config/fish"
+
+[starship.files]
+"starship/starship.toml" = "~/.config/starship.toml"
+
+# Terminals
+[ghostty.files]
+"ghostty" = "~/.config/ghostty"
+
+[kitty.files]
+"kitty" = "~/.config/kitty"
+
+[wezterm.files]
+"wezterm" = "~/.config/wezterm"
+
+[tmux.files]
+"tmux" = "~/.config/tmux"
+
+# Editors
+[nvim.files]
+"nvim" = "~/.config/nvim"
+
+# Scripts
+[scripts.files]
+"scripts" = "~/.config/scripts"
+
+[bin.files]
+"bin" = "~/.local/bin"
+
+# tools
+[yazi.files]
+"yazi" = "~/.config/yazi"
+
+[mpv.files]
+"mpv" = "~/.config/mpv"
+
+[lazygit.files]
+"lazygit" = "~/.config/lazygit"
+
+[lf.files]
+"lf" = "~/.config/lf"
+
+[vscode.files]
+"vscode/settings.json" = "~/.config/Code/User/settings.json"
+"vscode/keybindings.json" = "~/.config/Code/User/keybindings.json"
+
+# systemd
+[systemd.files]
+"systemd" = "~/.config/systemd"

@@ -1,0 +1,20 @@
+[alias]
+	hs = log --pretty='%C(yellow)%h %<(18) %C(cyan)%cd %Cblue%aN%C(auto)%d %Creset%s' --date=relative
+	hss = log --pretty='%n%C(auto)%h%d %C(green)%cr %Creset %s %C(bold blue)<%an>%Creset' --stat
+[safe]
+	directory = *
+[user]
+	name = ABDO
+	email = abdo.jpeg@gmail.com
+[init]
+	defaultBranch = main
+[core]
+	filemode = false
+	autocrlf = false
+	pager = delta
+[interactive]
+	diffFilter = delta --color-only
+[delta]
+	navigate = true
+[merge]
+	conflictStyle = zdiff3

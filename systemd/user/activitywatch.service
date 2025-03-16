@@ -1,0 +1,15 @@
+[Unit]
+Description=Activity Watch
+After=network.target
+
+[Service]
+Type=simple
+ExecStart=/opt/activitywatch/aw-server/aw-server
+# Make sure it is up and running for the watcher clients
+ExecStartPost=/bin/sleep 10
+Restart=always
+RestartSec=1
+TimeoutStopSec=infinity
+
+[Install]
+WantedBy=default.target

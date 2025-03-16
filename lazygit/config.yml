@@ -1,0 +1,63 @@
+# yaml-language-server: $schema=https://raw.githubusercontent.com/jesseduffield/lazygit/master/schema/config.json
+notARepository: "skip" # one of: 'prompt' | 'create' | 'skip'
+promptToReturnFromSubprocess: false
+git:
+  paging:
+    colorArg: always
+    pager: delta --dark --paging=never
+os:
+  editPreset: "nvim" # see 'Configuring File Editing' section
+  edit: nvim {{filename}}
+  editAtLine: nvim {{filename}} +{{line}}
+  editInTerminal: true
+gui:
+  nerdFontsVersion: "3"
+  showIcons: true
+  showFileTree: true
+  scrollHeight: 6
+  scrollPastBottom: true
+  mouseEvents: true
+  skipDiscardChangeWarning: false
+  skipStashWarning: true
+  sidePanelWidth: 0.3
+  expandFocusedSidePanel: true
+  mainPanelSplitMode: flexible
+  showRandomTip: false
+  showCommandLog: false
+  commandLogSize: 8
+  theme:
+    activeBorderColor:
+      - "#bb9af7"
+      - bold
+    inactiveBorderColor:
+      - "#737aa2"
+    optionsTextColor:
+      - "#89b4fa"
+    selectedLineBgColor:
+      - "#313244"
+    cherryPickedCommitBgColor:
+      - "#45475a"
+    cherryPickedCommitFgColor:
+      - "#b4befe"
+    unstagedChangesColor:
+      - "#f7768e"
+    defaultFgColor:
+      - "#a9b1d6"
+    searchingActiveBorderColor:
+      - "#f9e2af"
+  commitLength:
+    show: true
+  skipNoStagedFilesWarning: false
+  spinner:
+    frames:
+      - "⠋"
+      - "⠙"
+      - "⠹"
+      - "⠸"
+      - "⠼"
+      - "⠴"
+      - "⠦"
+      - "⠧"
+      - "⠇"
+      - "⠏"
+    rate: 50 # The "speed" of the spinner in milliseconds.

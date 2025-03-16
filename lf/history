@@ -1,0 +1,220 @@
+$ mkdir global
+& cd E:
+$ cd E:\
+& mkdir hello
+: delete
+% mkdir kystrok
+% mkdir images
+: createfile file.txt
+: createdir testing
+% mkdir nfs
+% New-Item file.txt
+% New-Item previewer.ps1
+% New-Item previewer.py
+% New-Item previewer.bat
+% mkdir Guides
+% code.
+% code. 
+% code .
+% mkdir documents
+% mkdir assets
+% mkdir others
+% mkdir creator
+% cd 'D:\\'
+% cd D:\\
+% New-Item lsd
+% mkdir lsd
+% New-Item config.yaml
+$ code .
+% New-Item resolve_import.py
+% mkdir scripts
+% New-Item resolve_import.bat
+: reload 
+& yt-dlp https://www.youtube.com/shorts/Lhz8MDszyTQ
+$ yt-dlp https://www.youtube.com/shorts/Lhz8MDszyTQ
+% yt-dlp https://www.youtube.com/shorts/Lhz8MDszyTQ
+% echo 1
+$ yt-dlp https://www.youtube.com/shorts/Lhz8MDszyTQ
+$ yt-dlp https://www.youtube.com/shorts/Lhz8MDszyTQ
+$ yt-dlp https://www.youtube.com/shorts/Lhz8MDszyTQ
+% yt-dlp https://www.youtube.com/shorts/Lhz8MDszyTQ
+% yt-dlp https://www.youtube.com/shorts/Lhz8MDszyTQ
+% yt-dlp https://www.youtube.com/shorts/Lhz8MDszyTQ
+% yt-dlp https://www.youtube.com/shorts/Lhz8MDszyTQ
+% yt-dlp -P . https://www.youtube.com/shorts/Lhz8MDszyTQ
+% yt-dlp -P $env:pwd https://www.youtube.com/shorts/Lhz8MDszyTQ
+% yt-dlp -P . https://www.youtube.com/shorts/Lhz8MDszyTQ
+% yt-dlp https://www.youtube.com/shorts/Lhz8MDszyTQ -x
+! yt-dlp https://www.youtube.com/shorts/Tu5OOvjX5oQ
+& yt-dlp https://www.youtube.com/shorts/Tu5OOvjX5oQ
+% 7z x $env:f
+& yt-dlp https://www.youtube.com/shorts/TJprtVeMbtg
+% mkdir espanso
+% 7z x $env:f
+% mkdir videos
+% mkdir 220929_afro_class
+& code . 
+& code . 
+: set colors
+: colors
+% yt-dlp -P . https://www.youtube.com/watch?v=D-jdRDOVabw -x
+! exiftool $env:f
+% mkdir landscape
+$ new-project
+% mkdir audio
+$ New-Project ll
+% mkfile file.txt
+% mkfile file.txt
+% mkfile "text file"
+% mkfile "file ex"
+% mkfile "new ff"
+% mkfile "anoth ff"
+$ explorer
+$ explorer .
+& new-project redlab
+! 7z l $env:f
+% mkfile beet_config.yaml
+% mkdir beets
+! beet import .
+! beet import .
+! beet import .
+: cd G:\\
+: filter
+% mkdir ash
+& code . 
+% mkdir scripts
+% mkfile description_tracks.ipynb
+& code . 
+% mkdir sources
+% yt-dlp -P . --write-description --no-download https://www.youtube.com/watch?v=FMuBxRC6nIE
+% yt-dlp -P . --no-download --write-metadata https://www.youtube.com/c/BLUME_Music/videos
+$ yt-dlp -P . --no-download --write-description https://www.youtube.com/c/BLUME_Music/videos
+% mkdir pixlart
+% yt-dlp -P . https://www.reddit.com/r/PixelArt/comments/xvcwyw/purple_night/
+% yt-dlp -P . https://www.reddit.com/r/PixelArt/comments/xpdfah/island_in_the_sky/
+$ gallery-dl https://www.behance.net/gallery/126487093/Loading
+$ gallery-dl https://www.behance.net/gallery/140178953/Windy-Night
+$ hx powershell.ps1
+: cd F:\empire\kystrok\content\videos\pixlart
+: cd "F:\empire\kystrok\content\videos\pixlart"
+: cd "F:\empire\kystrok"
+& gdl https://www.behance.net/gallery/137119811/Office-Day
+$ gdl https://www.behance.net/gallery/139668821/Wallpaper-engine
+$ gdl https://www.behance.net/gallery/136343837/Midnight-Meal
+$ gdl https://www.behance.net/gallery/133419867/Cold-Day
+$ gdl https://www.behance.net/gallery/134152947/Lonely-Rain
+$ gdl https://www.behance.net/gallery/129988995/Pastime
+$ gdl https://www.behance.net/gallery/119664681/Escapism
+$ gdl https://www.behance.net/gallery/85301511/Midnight-Thoughts/modules/493887801
+% mkdir helix
+% mkfile config.toml
+$ git clone https://github.com/helix-editor/helix
+% mkdir blume
+% mkdir filfar
+% mkfile list.txt
+% mkdir youtube
+% yt-dlp https://www.youtube.com/watch?v=8Y76W9ClfWI
+% mkdir pytools
+& code . 
+& code . 
+& code . 
+% mkdir yt-dlp
+% mkfile config.txt
+% mkdir beet spotdl
+% mkdir lofi_girl
+! spotdl download https://open.spotify.com/playlist/0vvXsWCC9xrXsKd4FyS8kM
+! spotdl download https://open.spotify.com/playlist/0vvXsWCC9xrXsKd4FyS8kM
+! spotdl meta
+: cd 'E:\software\applications\pytools\.venv\lib\site-packages\spotdl\console\meta.py'
+! spotdl meta . --lyrics
+% mkdir dreamhop
+% mkdir scripts
+% mkfile text_source_file.py
+% mkfile text_file.py
+& code . 
+& code . 
+& code . 
+& code . 
+% mkdir alacritty
+% mkfile alacritty.yml
+: cd D:\\
+% mkdir rick_and_morty
+% mkdir web_dev
+% mkdir live_chat
+& code . 
+% mkdir mob_psycho_100
+& code . 
+% mkdir romana
+% mkdir kabour
+% mkdir dar_lwarata
+% mkdir frontendmasters
+& code . 
+% mkdir static
+& code . 
+: cd C:\Users\ABDO\Desktop\redlab\projects\challenge
+% mkdir penpot
+% mkdir local
+% mkdir penpot
+% mkdir The Pripheral
+% mkdir Upload
+% mkdir v1 v2
+% mkdir scrimba - the frontend developer
+% mkdir 1899
+& code . 
+& code . 
+% mkdir react_projects
+% mkdir canvas
+% mkdir chrome
+% mkfile userChrome.css
+% mkdir input
+% mkdir qee_borg
+& code . 
+& code . 
+% mkdir cs50_ai
+% mkdir stable_diffusion
+% mkdir invokeAI
+% mkdir invokeAI
+& code . 
+% mkfile winget.txt
+& code . 
+& code . 
+& code . 
+& code . 
+% mkdir inspiration
+& code . 
+: explorer .
+$ explorer .
+: help
+% mkdir mauve
+& code . 
+& code . 
+% mkdir Software
+% mkdir ai
+% mkdir tech_blog
+% mkdir tts
+: cd D:\
+% mkfile txt.txt
+% mkdir clepto
+& 7z x $env:f
+% mkdir gerhaus sacco
+% mkdir sacco
+% mkdir gerhaus
+% mkdir grotesque
+& 7z x $env:f
+& 7z x $env:f
+$ mkd new
+& mkd new
+% mkdir new
+% mkdir image
+% mkdir video
+% mkdir project
+% mkdir wallpapers
+% mkdir portrait
+% mkdir landscape
+% mkdir archive
+% mkdir wezterm
+% mkdir gallery-dl
+% mkdir starship
+% mkdir hosts
+% mkdir hosts
+% mkdir host

@@ -1,0 +1,16 @@
+packages = [
+  "fish",
+  "ghostty",
+  "git",
+  "kitty",
+  "lazygit",
+  "mpv",
+  "nvim",
+  "scripts",
+  "starship",
+  "systemd",
+  "tmux",
+  "vscode",
+  "wezterm",
+  "yazi",
+]

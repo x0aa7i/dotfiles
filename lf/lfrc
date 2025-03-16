@@ -1,0 +1,194 @@
+# interpreter for shell commands
+set shell fish
+
+# set shellopts '-eu'
+# set ifs "\n"
+
+set hidden
+set scrolloff 7 # leave some space at the top and the bottom of the screen
+set ignorecase true                # Ignore case when searching
+set smartcase true                 # Override 'ignorecase' when search include uppercase
+set icons
+# set number
+# set relativenumber
+# set drawbox
+# set info size
+set preview
+set promptfmt "\033[32;1m%u\033[0m:\033[34;1m%d\033[0m\033[1m%f\033[0m"
+set timefmt "2006-01-02 15:04:05"
+set previewer ~/.config/lf/preview
+set cleaner ~/.config/lf/cleaner
+#set ratios '1:3:4'
+
+# change the shell used in default shell keybinding
+map w $fish
+
+# preview textfiles with pager
+# map i $cat $f | less
+map i $bat $f | less
+
+# show hidden files 
+map . set hidden!
+
+map <esc> quit
+
+map <delete> delete
+map <enter> &open $fx
+
+# copy files to clipboard
+map Y $printf "%s" "$fx" | xclip -selection clipboard
+
+# Create files and directories
+map a push :touch<space>
+map A push :mkdir<space>
+
+map <delete> delete
+map D trash
+
+# editor
+map e
+map ee $nvim $f
+map ec &code $f
+# map ex $hx $f
+
+# unzip files
+map xx extract $fx
+
+# New folder with selected item(s)
+map <c-g> groupfiles
+
+#####################################
+
+# move current file or selected files to trash folder
+# (also see 'man mv' for backup/overwrite options)
+
+cmd fzf_jump ${{
+  set res "$(find . -maxdepth 3 | fzf --reverse --header='Jump to location')"
+  if [ -f "$res" ];
+    set cmd "select"
+  else if [ -d "$res" ];
+    set cmd "cd"
+  end
+  lf -remote "send $id $cmd \"$res\""
+}}
+
+
+# Fuzzy find a file/directory and select/enter it
+cmd fuzzy_find ${{
+    set -l current_dir (pwd)                    # Get current directory path
+    set -l fzf_header (basename "$current_dir") # Get current directory name to be the header
+    set -l has_fd (command -v fd)               # Check if fd command has been installed
+    set -l find_cmd                             # Declare find_cmd
+    set -l flags                                # Declare flags
+
+    # Check if we should use find or fd
+    if [ -n "$has_fd" ]
+        set find_cmd fd
+        set -a flags --hidden --max-depth 3
+    else
+        set find_cmd find
+        set -a flags -maxdepth 3
+    end
+
+    # Check if we should recursively find files and directories
+    # if count $argv > /dev/null
+    #     and [ "$argv[1]" = "--non-recursive" ]
+    #     if [ -n "$has_fd" ]
+    #         set -a flags --hidden --max-depth 3
+    #     else
+    #         set -a flags -maxdepth 3
+    #     end
+    # end
+
+    # Find files/directories from current directory pipe remaining output to fzf
+    set -l preview bat {-1} --number --color=always # Set the preview command of fzf
+    set -l res ($find_cmd . $flags | fzf --ansi --header=$fzf_header --preview="$preview")
+
+    # If result is a directory, enter it.
+    # Add it in the zoxide database as well
+    # Else, go to the file's directory and highlight it
+    if count $res > /dev/null
+        and [ -d $res ]
+        lf -remote "send $id cd \"$res\""
+        # zoxide add $res
+    else
+        lf -remote "send $id select \"$res\""
+    end
+
+}}
+
+# map <c-j> fzf_jump
+map <c-j> fuzzy_find
+
+# cmd trash %trash $fx
+
+cmd touch &{{
+    set IFS " "
+    touch "$argv"
+    lf -remote "send $id select \"$argv\""
+}}
+
+cmd mkdir &{{
+    set IFS " "
+    mkdir -p -- "$argv"
+    lf -remote "send $id select \"$argv\""
+    echo yeet
+}}
+
+cmd edit ${{
+    set IFS " "
+    $EDITOR "$argv" && lf -remote "send $id select \"$argv\""
+}}
+
+cmd trash ${{
+  set -l files $(printf "$fx" | tr '\n' ';')
+  while [ "$files" ];
+    # extract the substring from start of string up to delimiter.
+    # this is the first "element" of the string.
+    set file ${files%%;*}
+
+    trash "$(basename "$file")"
+    # if there's only one element left, set `files` to an empty string.
+    # this causes us to exit this `while` loop.
+    # else, we delete the first "element" of the string from files, and move onto the next.
+    if [ "$files" = "$file" ];
+      set files ""
+    else
+      set files "${files#*;}"
+    end
+  end
+}}
+
+
+
+# https://github.com/gokcehan/lf/wiki/Tips#show-current-directory-in-window-title
+cmd on-cd &{{
+    # '&' commands run silently in background (which is what we want here),
+    # but are not connected to stdout.
+    # To make sure our escape sequence still reaches stdout we pipe it to /dev/tty
+    printf "\033]0; $(pwd | sed "s|$HOME|~|")\007" > /dev/tty
+}}
+
+# also run at startup
+on-cd
+
+cmd extract ${{
+    set -f
+    case $f in
+        *.tar.bz|*.tar.bz2|*.tbz|*.tbz2) tar xjvf $f;;
+        *.tar.gz|*.tgz) tar xzvf $f;;
+        *.tar.xz|*.txz) tar xJvf $f;;
+        *.zip) unzip $f;;
+        *.rar) unrar x $f;;
+        *.7z) 7z x $f;;
+    esac
+}}
+
+cmd groupfiles ${{
+     set -f
+     read newd
+     printf "Directory name: "
+     mkdir -- "$newd"
+     mv -- $fx "$newd"
+}}
+

@@ -1,0 +1,54 @@
+{
+  "daily_note": {
+    "prefix": "daily",
+    "body": [
+      "---",
+      "tags: [daily-notes]",
+      "created: ${CURRENT_YEAR}-${CURRENT_MONTH}-${CURRENT_DATE} ${CURRENT_HOUR}:${CURRENT_MINUTE}",
+      "---",
+      "",
+      "```dataviewjs",
+      "customJS.daily.nav(dv)",
+      "```",
+      "",
+      "---",
+      "",
+      "# ${CURRENT_DAY_NAME}, ${CURRENT_MONTH_NAME} ${CURRENT_DATE} ${CURRENT_YEAR}",
+      "",
+      "## Journal",
+      "",
+      "### ${CURRENT_HOUR}:${CURRENT_MINUTE}",
+      "",
+      "${1:}",
+      "",
+      "## Notes Tracker",
+      "",
+      "### Tasks Completed",
+      "",
+      "```tasks",
+      "done on ${CURRENT_YEAR}-${CURRENT_MONTH}-${CURRENT_DATE}",
+      "short mode",
+      "```",
+      "",
+      "### Notes Created",
+      "",
+      "```dataviewjs",
+      "customJS.dv.created(dv, dv.current().file.name)",
+      "```"
+    ],
+    "description": "Template for daily notes with timestamps and dataviewjs queries."
+  },
+
+  "basic_note": {
+    "prefix": "basic",
+    "body": [
+      "---",
+      "tags: [{1:}]",
+      "created: ${CURRENT_YEAR}-${CURRENT_MONTH}-${CURRENT_DATE} ${CURRENT_HOUR}:${CURRENT_MINUTE}",
+      "---",
+      "",
+      "${2:}"
+    ],
+    "description": "Template for basic notes with tags and timestamp."
+  }
+}

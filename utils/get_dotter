@@ -1,0 +1,4 @@
+#!/bin/sh
+
+curl -L https://github.com/SuperCuber/dotter/releases/latest/download/dotter-linux-x64-musl -o dotter
+chmod +x dotter
