@@ -113,8 +113,8 @@ return {
         },
       },
       formatters_by_ft = {
-        ["markdown"] = { "dprint", "markdownlint-cli2", "markdown-toc" },
-        ["mdx"] = { "prettierd", "markdownlint-cli2", "markdown-toc" },
+        ["markdown"] = { "dprint", "markdown-toc" },
+        ["mdx"] = { "prettierd", "markdown-toc" },
       },
     },
   },

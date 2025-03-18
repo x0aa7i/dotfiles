@@ -9,6 +9,7 @@
   "no-bare-urls": false,
   "fenced-code-language": false,
   "first-line-h1": false,
+  "blanks-around-lists": false,
   "blanks-around-fences": {
     "list_items": false
   }
