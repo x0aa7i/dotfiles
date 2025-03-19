@@ -54,7 +54,7 @@ return {
         -- The hover window configuration for the diagnostics is done in
         -- ~/github/dotfiles-latest/neovim/neobean/lua/config/autocmds.lua
         harper_ls = {
-          autostart = true,
+          autostart = false,
           enabled = true,
           filetypes = { "markdown" },
           settings = {
