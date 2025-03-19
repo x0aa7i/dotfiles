@@ -2,7 +2,8 @@ return {
   {
     "vuki656/package-info.nvim",
     dependencies = { "folke/which-key.nvim", "MunifTanjim/nui.nvim" },
-    ft = { "json" },
+    event = { "BufRead package.json" },
+    ft = "json",
     opts = {
       colors = {
         up_to_date = "#B1D99C", -- Text color for up to date dependency virtual text
@@ -17,12 +18,8 @@ return {
         },
       },
       autostart = true, -- Whether to autostart when `package.json` is opened
-      hide_up_to_date = false, -- It hides up to date versions when displaying virtual text
+      hide_up_to_date = true, -- It hides up to date versions when displaying virtual text
       hide_unstable_versions = false, -- It hides unstable versions from version list e.g next-11.1.3-canary3
-      -- Can be `npm`, `yarn`, or `pnpm`. Used for `delete`, `install` etc...
-      -- The plugin will try to auto-detect the package manager based on
-      -- `yarn.lock` or `package-lock.json`. If none are found it will use the
-      -- provided one, if nothing is provided it will use `yarn`
       package_manager = "pnpm",
     },
     keys = {
