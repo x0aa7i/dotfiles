@@ -78,6 +78,14 @@ return {
       end,
       desc = "Find Files (Root Dir)",
     },
+    {
+      "<leader>k",
+      ft = { "txt", "markdown" },
+      function()
+        Snacks.image.hover()
+      end,
+      desc = "Preview image under cursor",
+    },
     { "<leader>gd", false }, -- used by diffview
   },
 }
