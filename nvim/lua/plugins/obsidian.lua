@@ -1,4 +1,4 @@
-local vault_path = "/mnt/buckup/documents/obsidian"
+local vault_path = "/mnt/backup/documents/obsidian"
 
 return {
   {
