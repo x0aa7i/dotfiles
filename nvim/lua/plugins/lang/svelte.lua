@@ -10,6 +10,13 @@ return {
     },
   },
   {
+    "nvim-svelte/nvim-svelte-check",
+    cmd = { "SvelteCheck" },
+    opts = {
+      command = "pnpm run check",
+    },
+  },
+  {
     "stevearc/conform.nvim",
     opts = {
       formatters_by_ft = {
