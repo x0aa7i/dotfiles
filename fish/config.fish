@@ -24,6 +24,7 @@ end
 if command -v exa >/dev/null
     alias ls="exa --all --icons --group-directories-first --color=always"
     alias ll="exa --long --no-user --all --icons --group-directories-first --color=always"
+    alias tree="exa --tree --all --icons --group-directories-first --color=always"
 end
 
 alias v="$EDITOR"
