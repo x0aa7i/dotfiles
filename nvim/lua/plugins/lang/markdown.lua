@@ -195,6 +195,14 @@ return {
           progress4 = { raw = "[4]", rendered = " ", highlight = "RenderMarkdownProgress", scope_highlight = nil },
         },
       },
+      html = {
+        -- Turn on / off all HTML rendering.
+        enabled = true,
+        comment = {
+          -- Turn on / off HTML comment concealing.
+          conceal = false,
+        },
+      },
     },
     config = function(_, opts)
       require("render-markdown").setup(opts)

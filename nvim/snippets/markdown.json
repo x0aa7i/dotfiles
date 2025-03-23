@@ -46,8 +46,7 @@
       "tags: [${1:}]",
       "created: ${CURRENT_YEAR}-${CURRENT_MONTH}-${CURRENT_DATE} ${CURRENT_HOUR}:${CURRENT_MINUTE}",
       "---",
-      "",
-      "${2:}"
+      ""
     ],
     "description": "Template for basic notes with tags and timestamp."
   }
