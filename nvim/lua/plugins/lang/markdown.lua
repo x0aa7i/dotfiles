@@ -132,6 +132,11 @@ return {
     },
   },
   {
+    "bullets-vim/bullets.vim",
+    event = "VeryLazy",
+    ft = { "markdown", "text", "gitcommit" },
+  },
+  {
     "MeanderingProgrammer/render-markdown.nvim",
     enabled = true,
     ft = { "markdown", "norg", "rmd", "org" },
