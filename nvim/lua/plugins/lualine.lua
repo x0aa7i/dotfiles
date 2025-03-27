@@ -1,3 +1,7 @@
+local function total_lines()
+  return "󰦨 " .. vim.api.nvim_buf_line_count(0)
+end
+
 return {
   "nvim-lualine/lualine.nvim",
   event = "VeryLazy",
@@ -6,10 +10,8 @@ return {
     vim.g.trouble_lualine = false
   end,
   opts = function(_, opts)
-    local function total_lines()
-      return "󰦨 " .. vim.api.nvim_buf_line_count(0)
-    end
     opts.options.component_separators = ""
+    opts.options.globalstatus = true
 
     opts.sections.lualine_a = {
       {
@@ -40,8 +42,6 @@ return {
 
     opts.sections.lualine_y = {}
     opts.sections.lualine_z = {
-      -- location replaced with scrollbar
-      -- { "progress", padding = { left = 1, right = 0 } },
       { "location", padding = { left = 1, right = 1 } },
     }
   end,
