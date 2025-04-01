@@ -15,6 +15,7 @@ return {
           filetypes_include = {},
           settings = {
             tailwindCSS = {
+              classAttributes = { "class", "className" },
               experimental = {
                 classRegex = {
                   { "clsx\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)" },
