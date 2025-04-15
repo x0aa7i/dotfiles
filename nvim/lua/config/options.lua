@@ -4,6 +4,7 @@
 
 vim.opt.breakindent = true -- Every wrapped line will continue visually indented
 vim.opt.breakindentopt = "list:-1"
+vim.opt.spelloptions = "camel"
 
 vim.opt.pumblend = 0 -- make popup menu transparent, value range [0,100]
 
@@ -32,3 +33,7 @@ vim.filetype.add({ extension = { vert = "glsl" } })
 vim.filetype.add({ extension = { frag = "glsl" } })
 vim.filetype.add({ extension = { glsl = "glsl" } })
 vim.filetype.add({ extension = { wgsl = "glsl" } })
+
+-- Global variables
+-- vim.g.ai_groq_model = "llama-3.3-70b-versatile"
+vim.g.ai_groq_model = "meta-llama/llama-4-scout-17b-16e-instruct"

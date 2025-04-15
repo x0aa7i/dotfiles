@@ -12,10 +12,8 @@ local base_configs = {
 }
 
 local groq_configs = {
-  model = "qwen-2.5-coder-32b",
-  -- model = "llama-3.3-70b-versatile",
-  -- model = "deepseek-r1-distill-llama-70b",
-  body = { max_tokens = 4096, temperature = 0.8, top_p = 0.95, stop = nil },
+  model = vim.g.ai_groq_model,
+  body = { max_tokens = 1024, temperature = 1, top_p = 1, stop = nil },
   command = function()
     local api_endpoint = "https://api.groq.com/openai/v1/chat/completions"
     local api_key = os.getenv("GROQ_API_KEY")

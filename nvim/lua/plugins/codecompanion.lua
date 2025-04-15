@@ -57,8 +57,7 @@ return {
             name = "groq",
             schema = {
               model = {
-                -- default = "llama-3.3-70b-versatile",
-                default = "qwen-2.5-coder-32b",
+                default = vim.g.ai_groq_model,
               },
               num_ctx = {
                 default = 131072,
@@ -70,17 +69,31 @@ return {
             },
           })
         end,
+        openrouter = function()
+          return require("codecompanion.adapters").extend("openai_compatible", {
+            name = "openrouter",
+            formatted_name = "OpenRouter",
+            url = "https://openrouter.ai/api/v1/chat/completions",
+            env = {
+              api_key = "OPENROUTER_API_KEY",
+            },
+            schema = {
+              model = {
+                default = "google/gemini-2.5-pro-exp-03-25:free",
+                choices = {
+                  ["deepseek/deepseek-r1:free"] = { opts = { can_reason = true } }, -- context: 164K
+                  ["google/gemini-2.0-flash-exp:free"] = { opts = { can_reason = true } }, -- context: 1.05M
+                  ["google/gemini-2.5-pro-exp-03-25:free"] = { opts = { can_reason = true } }, -- context: 2M
+                },
+              },
+            },
+          })
+        end,
       },
       strategies = {
         chat = {
           adapter = "groq",
           slash_commands = slash_commands(),
-          keymaps = {
-            close = {
-              modes = { n = "q", i = "<C-c>" },
-              description = "Close Chat",
-            },
-          },
         },
         inline = {
           adapter = "groq",
