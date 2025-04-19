@@ -15,6 +15,10 @@ return {
       ["<C-u>"] = { "scroll_documentation_up", "fallback" },
       ["<C-d>"] = { "scroll_documentation_down", "fallback" },
 
+      ["<Tab>"] = {
+        LazyVim.cmp.map({ "ai_accept", "snippet_forward" }),
+        "fallback",
+      },
       -- stylua: ignore start
       ['<A-1>'] = { function(cmp) cmp.accept({ index = 1 }) end },
       ['<A-2>'] = { function(cmp) cmp.accept({ index = 2 }) end },
@@ -49,6 +53,7 @@ return {
       },
       ghost_text = { enabled = false },
     },
+
     sources = {
       providers = {
         lsp = {
