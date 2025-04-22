@@ -18,13 +18,7 @@ K.map("g*", "g*zz")
 K.map("g#", "g#zz")
 
 -- Press jk fast to enter normal mode
-K.map("jk", "<ESC>", { mode = "i" })
-
--- inset empty blank line above/below
-K.map("<C-CR>", "m`o<esc>``", { mode = "n", desc = "Insert new line above" })
-K.map("<S-CR>", "m`O<esc>``", { mode = "n", desc = "Insert new line below" })
-K.map("<C-CR>", "<esc>m`o<esc>``gi", { mode = "i", desc = "Insert new line above" })
-K.map("<S-CR>", "<esc>m`O<esc>``gi", { mode = "i", desc = "Insert new line below" })
+K.map("jk", "<ESC>", { mode = "i", desc = "Exit insert mode" })
 
 K.map("<A-d>", [[m`"yyy"yp``j]], { mode = "n", desc = "Duplicate line" })
 K.map("<A-d>", [[<Esc>"yyy"ypgi]], { mode = "i", desc = "Duplicate line" })
@@ -39,7 +33,7 @@ K.map("L", "$", { mode = { "n", "x" } })
 
 -- Delete word with backspace
 K.map("<C-BS>", "<C-w>", { mode = "i" })
-K.map("<C-Del>", "<esc>cw", { mode = "i" })
+K.map("<C-Del>", [[<esc>"xcw]], { mode = "i" })
 
 K.map("<CR>", [["xciw]], { mode = "n", desc = "Change inner word" })
 K.map("<CR>", [["xc]], { mode = "v", desc = "Change selection" })
