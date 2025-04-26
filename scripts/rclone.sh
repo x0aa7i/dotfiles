@@ -43,6 +43,9 @@ rclone_sync "$HOME/dev/" /mnt/media/dev/
 rclone_sync "$HOME/.dotfiles/" /mnt/backup/dotfiles/
 rclone_sync "$HOME/.dotfiles/" /mnt/media/dotfiles/
 
+rclone_sync "/opt/wakapi/wakapi_db.db" /mnt/backup/data/wakapi_db.db
+rclone_sync "/opt/wakapi/wakapi_db.db" /mnt/media/data/wakapi_db.db
+
 echo "$(date '+%Y-%m-%d %H:%M:%S') - Finished rclone sync" >>"$LOGFILE"
 
 rm "$LOCKFILE"
