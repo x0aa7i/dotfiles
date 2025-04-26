@@ -148,7 +148,9 @@ return {
         width = "block",
         right_pad = 2,
         left_pad = 2,
+        min_width = 48,
         position = "right",
+        border = "thick",
       },
       heading = {
         sign = false,
