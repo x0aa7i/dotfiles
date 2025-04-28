@@ -6,47 +6,44 @@ default_target_type = "symbolic"
 "git/gitui" = "~/.config/gitui"
 
 [fish.files]
-"fish" = "~/.config/fish"
+"fish" = { target = "~/.config/fish", type = "symbolic", recurse = false }
 
 [starship.files]
 "starship/starship.toml" = "~/.config/starship.toml"
 
 # Terminals
 [ghostty.files]
-"ghostty" = "~/.config/ghostty"
+"ghostty" = { target = "~/.config/ghostty", type = "symbolic", recurse = false }
 
 [kitty.files]
-"kitty" = "~/.config/kitty"
+"kitty" = { target = "~/.config/kitty", type = "symbolic", recurse = false }
 
 [wezterm.files]
-"wezterm" = "~/.config/wezterm"
+"wezterm" = { target = "~/.config/wezterm", type = "symbolic", recurse = false }
 
 [tmux.files]
-"tmux" = "~/.config/tmux"
+"tmux" = { target = "~/.config/tmux", type = "symbolic", recurse = false }
 
 # Editors
 [nvim.files]
-"nvim" = "~/.config/nvim"
+"nvim" = { target = "~/.config/nvim", type = "symbolic", recurse = false }
 
 # Scripts
 [scripts.files]
 "scripts" = "~/.config/scripts"
 
-[bin.files]
-"bin" = "~/.local/bin"
-
 # tools
 [yazi.files]
-"yazi" = "~/.config/yazi"
+"yazi" = { target = "~/.config/yazi", type = "symbolic", recurse = false }
 
 [mpv.files]
-"mpv" = "~/.config/mpv"
+"mpv" = { target = "~/.config/mpv", type = "symbolic", recurse = false }
 
 [lazygit.files]
-"lazygit" = "~/.config/lazygit"
+"lazygit" = { target = "~/.config/lazygit", type = "symbolic", recurse = false }
 
 [lf.files]
-"lf" = "~/.config/lf"
+"lf" = { target = "~/.config/lf", type = "symbolic", recurse = false }
 
 [vscode.files]
 "vscode/settings.json" = "~/.config/Code/User/settings.json"
