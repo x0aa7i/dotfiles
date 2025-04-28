@@ -41,6 +41,8 @@ alias mkdir="mkdir -p"
 alias cp="cp -r"
 alias rm="safe-rm"
 
+alias yanki="pnpm dlx yanki sync"
+
 #abbreviations
 abbr -a d sudo docker
 abbr -a db sudo docker build
