@@ -43,6 +43,7 @@ local ollama_configs = {
 
 return {
   "David-Kunz/gen.nvim",
+  enabled = false,
   cmd = { "Gen" },
   dependencies = {
     {

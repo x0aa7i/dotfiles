@@ -36,4 +36,5 @@ vim.filetype.add({ extension = { wgsl = "glsl" } })
 
 -- Global variables
 -- vim.g.ai_groq_model = "llama-3.3-70b-versatile"
-vim.g.ai_groq_model = "meta-llama/llama-4-scout-17b-16e-instruct"
+-- vim.g.ai_groq_model = "meta-llama/llama-4-scout-17b-16e-instruct"
+vim.g.ai_groq_model = "meta-llama/llama-4-maverick-17b-128e-instruct"
