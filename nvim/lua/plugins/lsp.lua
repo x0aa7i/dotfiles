@@ -21,7 +21,8 @@ return {
     },
   },
   {
-    "williamboman/mason.nvim",
+    "mason-org/mason.nvim",
+    version = "1.*",
     opts = {
       ui = {
         border = "rounded",
@@ -33,5 +34,9 @@ return {
         "taplo", -- toml lsp
       },
     },
+  },
+  {
+    "mason-org/mason-lspconfig.nvim",
+    version = "1.*",
   },
 }
