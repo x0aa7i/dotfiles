@@ -4,6 +4,16 @@
 
 [manager]
 ratio = [2, 3, 4]
-linemode = "size"
+linemode = "none"
 show_hidden = true
 show_symlink = true
+
+[[plugin.prepend_fetchers]]
+id = "git"
+name = "*"
+run = "git"
+
+[[plugin.prepend_fetchers]]
+id = "git"
+name = "*/"
+run = "git"
