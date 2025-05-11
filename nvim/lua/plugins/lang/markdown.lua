@@ -1,6 +1,8 @@
 vim.filetype.add({ extension = { mdx = "markdown.mdx" } })
 vim.filetype.add({ extension = { svx = "markdown.svx" } })
 
+local vault_path = "/mnt/backup/documents/obsidian"
+
 --Retrieves an LSP client by name
 ---@param name string
 ---@return vim.lsp.Client | nil
@@ -25,12 +27,10 @@ return {
   {
     "folke/which-key.nvim",
     optional = true,
-    keys = {
-      { "<leader>oj", "<cmd>Today<cr>", desc = "Journal note" }, -- markdown-oxide
-    },
     opts = {
       spec = {
-        { "<leader>o", group = "obsidian", icon = "" },
+        { "<leader>o", group = "markdown", icon = { icon = "󰍔 ", color = "white" } },
+        { "<leader>op", icon = { icon = " ", color = "blue" } }, -- HakonHarnes/img-clip.nvim
       },
     },
   },
@@ -48,6 +48,9 @@ return {
   },
   {
     "neovim/nvim-lspconfig",
+    keys = {
+      { "<leader>oj", "<cmd>Today<cr>", desc = "Journal note" }, -- markdown-oxide
+    },
     opts = {
       servers = {
         markdown_oxide = { capabilities = { workspace = { didChangeWatchedFiles = { dynamicRegistration = true } } } },
@@ -139,7 +142,7 @@ return {
   {
     "MeanderingProgrammer/render-markdown.nvim",
     enabled = true,
-    ft = { "markdown", "norg", "rmd", "org" },
+    ft = { "markdown", "norg", "org" },
     opts = {
       file_types = { "markdown", "norg", "rmd", "org" },
       latex = { enabled = false, position = "below" },
@@ -238,14 +241,63 @@ return {
     end,
     keys = {
       {
-        "<leader>cp",
-        ft = "markdown",
+        "<leader>oo",
         "<cmd>MarkdownPreviewToggle<cr>",
-        desc = "Markdown Preview",
+        ft = "markdown",
+        desc = "Open Markdown Preview",
       },
     },
     config = function()
       vim.cmd([[do FileType]])
+    end,
+  },
+  {
+    "HakonHarnes/img-clip.nvim",
+    event = "VeryLazy",
+    ft = "markdown",
+    keys = {
+      { "<leader>op", "<cmd>PasteImage<cr>", desc = "Paste image from system clipboard" },
+    },
+    opts = {
+      default = {
+        dir_path = "images",
+        process_cmd = "convert - -quality 80 -",
+        show_dir_path_in_prompt = true,
+      },
+      dirs = {
+        [vault_path] = {
+          file_name = function()
+            local time = "_%Y-%m-%d-%H-%M-%S"
+            return vim.fn.expand("%:t:r") .. time
+          end,
+          dir_path = function()
+            return "Assets/Attachments"
+          end,
+        },
+      },
+    },
+  },
+  {
+    -- toggle lists
+    "hamidi-dev/org-list.nvim",
+    ft = { "norg", "org", "markdown" },
+    event = "VeryLazy",
+    dependencies = {
+      "tpope/vim-repeat", -- for repeatable actions with '.'
+    },
+    config = function()
+      require("org-list").setup({
+        mapping = {
+          key = "<leader>ol",
+          desc = "Toggle: Cycle through list types",
+        },
+        checkbox_toggle = {
+          enabled = true,
+          key = "<leader>ok", -- Change the checkbox toggle key
+          desc = "Toggle checkbox state",
+          filetypes = { "org", "markdown" }, -- Add more filetypes as needed
+        },
+      })
     end,
   },
 }
