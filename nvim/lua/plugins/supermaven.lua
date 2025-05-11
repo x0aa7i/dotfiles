@@ -5,7 +5,7 @@ return {
     enabled = true,
     build = ":SupermavenUseFree",
     keys = {
-      { "<leader>at", mode = "n", vim.cmd.SupermavenToggle, desc = "Toggle suggestions" },
+      -- { "<leader>at", mode = "n", vim.cmd.SupermavenToggle, desc = "Toggle suggestions" },
     },
     opts = {
       keymaps = {
@@ -29,6 +29,16 @@ return {
       end
 
       table.insert(opts.sections.lualine_x, { is_supermaven_active, color = { fg = "#f7768e" } })
+
+      Snacks.toggle({
+        name = "Supermaven",
+        get = function()
+          return is_supermaven_active() == ""
+        end,
+        set = function()
+          vim.cmd("SupermavenToggle")
+        end,
+      }):map("<leader>at")
     end,
   },
 }
