@@ -4,6 +4,11 @@ local function format_code_block(context)
   return "\n```" .. lang .. "\n" .. code .. "\n```\n\n"
 end
 
+local function multiline(lines, sep)
+  sep = sep or "\n"
+  return table.concat(lines, sep)
+end
+
 local PROMPT_LIBRARY = {
   ["Document"] = {
     strategy = "chat",
@@ -19,8 +24,11 @@ local PROMPT_LIBRARY = {
       {
         role = "user",
         content = function(context)
-          return "Document the following code with inline comments explaining the purpose, parameters, and return values of each function and class. Suggest clearer, more descriptive names to improve readability.\n"
-            .. format_code_block(context)
+          return multiline({
+            "Document the following code with inline comments explaining the purpose, parameters, and return values of each function and class.",
+            "Suggest clearer, more descriptive names to improve readability.",
+            format_code_block(context),
+          })
         end,
         opts = {
           contains_code = true,
@@ -41,25 +49,27 @@ local PROMPT_LIBRARY = {
     prompts = {
       {
         role = "system",
-        content = table.concat({
-          "You are an expert code reviewer focused on improving code readability, maintainability, and clarity.",
-          "Your goal is to help developers write understandable, modifiable, and debuggable code through constructive feedback and specific suggestions.",
-          "Your task is to analyze the provided code snippet and identify issues such as:",
-          "",
-          "- Naming: Unclear, misleading, inconsistent, or excessively long names for variables, functions, or classes.",
-          "- Comments: Unnecessary comments, missing contextual explanations, or lack of clarity.",
-          "- Complexity: Overly complex logic, deep nesting, or convoluted expressions that could be simplified.",
-          "- Structure: Poor modularity or organization that hinders understanding and future changes.",
-          "- Style: Inconsistent formatting or deviations from best practices.",
-          "- Redundancy: Repetitive code that could be abstracted or optimized.",
-          "",
+        content = multiline({
+          "You are an expert code reviewer focused on improving readability, maintainability, and clarity.",
+          "Your goal is to help developers write clean, understandable, and efficient code through constructive feedback.",
+          "Analyze the provided code and identify issues such as:",
+
+          "- Naming: Unclear, misleading, or inconsistent names for variables, functions, or classes.",
+          "- Comments: Unnecessary, unclear, or missing explanations.",
+          "- Complexity: Overly complex logic or convoluted expressions.",
+          "- Structure: Poor modularity or organization.",
+          "- Style: Inconsistent formatting or deviations from conventions.",
+          "- Redundancy: Duplicated logic or patterns that can be optimized.",
+          "- Correctness: Potential bugs or unhandled edge cases.",
+          "- Performance: Inefficient operations or poor data structure choices.",
+
           "For each issue, provide:",
           "1. A brief description of the problem.",
           "2. A specific, actionable suggestion for improvement.",
-          "",
-          "If the code is already clean and well-written, state that explicitly.",
-          "Keep feedback concise, constructive, and focused on tangible improvements.",
-        }, "\n"),
+
+          "If the code is clean and well-written, state that explicitly.",
+          "Keep feedback concise, constructive, and focused on improvements.",
+        }),
         opts = {
           visible = false,
         },
@@ -89,17 +99,17 @@ local PROMPT_LIBRARY = {
     prompts = {
       {
         role = "system",
-        content = table.concat({
+        content = multiline({
           "You are an expert code optimizer focused on improving efficiency, clarity, and adherence to best practices.",
           "Analyze the provided code and enhance it by:",
-          "",
+
           "1. Improving performance through efficient algorithms and data structures.",
           "2. Enhancing maintainability through better organization, naming, and structure. ",
           "3. Increasing readability with clear and concise code.",
           "4. Ensuring consistency with coding best practices for the given language.",
-          "",
+
           "Output only the optimized code in the original format, with no additional explanations.",
-        }, "\n"),
+        }),
         opts = {
           visible = false,
         },
@@ -107,8 +117,30 @@ local PROMPT_LIBRARY = {
       {
         role = "user",
         content = function(context)
-          return "Optimize the following code for performance, readability, and best practices. Return only the improved code in the same format.\n"
+          return "Optimize the following code for performance, readability, and best practices.\n"
             .. format_code_block(context)
+        end,
+        opts = {
+          contains_code = true,
+        },
+      },
+    },
+  },
+  ["Naming"] = {
+    strategy = "chat",
+    description = "Give better names for the provided code snippet.",
+    opts = {
+      modes = { "v" },
+      short_name = "naming",
+      auto_submit = true,
+      user_prompt = false,
+      stop_context_insertion = true,
+    },
+    prompts = {
+      {
+        role = "user",
+        content = function(context)
+          return "Provide better names for the following variables and functions:\n" .. format_code_block(context)
         end,
         opts = {
           contains_code = true,
@@ -162,14 +194,24 @@ return {
     },
     opts = {
       prompt_library = PROMPT_LIBRARY,
+      display = {
+        chat = { start_in_insert_mode = true },
+        action_palette = { provider = "default" },
+        diff = {
+          enabled = true,
+          provider = "default",
+        },
+      },
       adapters = {
         groq = function()
-          return require("codecompanion.adapters").extend("openai", {
+          return require("codecompanion.adapters").extend("openai_compatible", {
             name = "groq",
             formatted_name = "Groq",
-            url = "https://api.groq.com/openai/v1/chat/completions",
             env = {
+              url = "https://api.groq.com/openai",
               api_key = "GROQ_API_KEY",
+              chat_url = "/v1/chat/completions", -- optional: default value, override if different
+              models_endpoint = "/v1/models", -- optional: attaches to the end of the URL to form the endpoint to retrieve models
             },
             schema = {
               model = {
