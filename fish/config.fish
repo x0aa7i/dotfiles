@@ -2,6 +2,9 @@ if status is-interactive
     # Commands to run in interactive sessions can go here
 end
 
+# Disable the startup message
+set fish_greeting
+
 starship init fish | source
 zoxide init fish | source
 fish_config theme choose tokyonight
@@ -95,3 +98,7 @@ end
 # bun
 set --export BUN_INSTALL "$HOME/.bun"
 set --export PATH $BUN_INSTALL/bin $PATH
+
+# dprint
+set -x DPRINT_INSTALL "/home/abdo/.dprint"
+fish_add_path $DPRINT_INSTALL/bin
