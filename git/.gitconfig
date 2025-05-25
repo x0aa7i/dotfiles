@@ -18,3 +18,8 @@
 	navigate = true
 [merge]
 	conflictStyle = zdiff3
+  tool = nvim
+[mergetool "nvim"]
+  cmd = nvim -c "DiffviewOpen"
+[mergetool]
+  prompt = false
