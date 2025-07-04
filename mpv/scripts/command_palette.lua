@@ -127,9 +127,22 @@ local originalFontSize = o.font_size
 
 mp.commandv("script-message", "command-palette-version", command_palette_version)
 
-local is_older_than_v0_36 = string.find(mp.get_property("mpv-version"), "mpv v0%.[1-3][0-5]%.") == 1
+function get_mpv_version()
+	local version = mp.get_property("mpv-version")
+	local major, minor = version:match("^mpv v(%d+)%.(%d+)%.")
 
-if not is_older_than_v0_36 then
+	if major and minor then
+		return tonumber(major), tonumber(minor)
+	end
+end
+
+local major, minor = get_mpv_version()
+
+if major == nil or minor == nil then
+	msg.error("Failed getting mpv version.")
+end
+
+if major == nil or minor == nil or (major > 0 or (major == 0 and minor > 35)) then
 	mp.set_property_native("user-data/command-palette/version", command_palette_version)
 end
 
@@ -515,64 +528,64 @@ local function get_language(lng)
 	end
 
 	if lng == "ara" then
-		lng = "Arabic"
+		return "Arabic"
 	end
 	if lng == "ben" then
-		lng = "Bangla"
+		return "Bangla"
 	end
 	if lng == "bng" then
-		lng = "Bangla"
+		return "Bangla"
 	end
 	if lng == "chi" then
-		lng = "Chinese"
+		return "Chinese"
 	end
 	if lng == "zho" then
-		lng = "Chinese"
+		return "Chinese"
 	end
 	if lng == "eng" then
-		lng = "English"
+		return "English"
 	end
 	if lng == "fre" then
-		lng = "French"
+		return "French"
 	end
 	if lng == "fra" then
-		lng = "French"
+		return "French"
 	end
 	if lng == "ger" then
-		lng = "German"
+		return "German"
 	end
 	if lng == "deu" then
-		lng = "German"
+		return "German"
 	end
 	if lng == "hin" then
-		lng = "Hindi"
+		return "Hindi"
 	end
 	if lng == "ita" then
-		lng = "Italian"
+		return "Italian"
 	end
 	if lng == "jpn" then
-		lng = "Japanese"
+		return "Japanese"
 	end
 	if lng == "kor" then
-		lng = "Korean"
+		return "Korean"
 	end
 	if lng == "msa" then
-		lng = "Malay"
+		return "Malay"
 	end
 	if lng == "por" then
-		lng = "Portuguese"
+		return "Portuguese"
 	end
 	if lng == "pan" then
-		lng = "Punjabi"
+		return "Punjabi"
 	end
 	if lng == "rus" then
-		lng = "Russian"
+		return "Russian"
 	end
 	if lng == "spa" then
-		lng = "Spanish"
+		return "Spanish"
 	end
 	if lng == "und" then
-		lng = "Undetermined"
+		return "Undetermined"
 	end
 
 	return lng
