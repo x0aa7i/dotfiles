@@ -69,6 +69,12 @@ return {
         },
       },
     },
+    scratch = {
+      win = {
+        width = 130,
+        height = 40,
+      },
+    },
   },
   keys = {
     {

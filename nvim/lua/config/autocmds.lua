@@ -21,11 +21,24 @@ vim.api.nvim_create_autocmd({ "BufEnter", "BufReadPost" }, {
 
 -- Trim whitespaces
 vim.api.nvim_create_autocmd({ "BufWritePre" }, {
-  group = vim.api.nvim_create_augroup("trim_whitespaces", {}),
+  group = vim.api.nvim_create_augroup("trim_whitespaces", { clear = true }),
   pattern = { "*" },
+  desc = "Trim trailing whitespaces",
   callback = function()
     local save_cursor = vim.fn.getpos(".")
     vim.cmd([[%s/\s\+$//e]])
+    vim.fn.setpos(".", save_cursor)
+  end,
+})
+
+-- Replace curly single quotes with straight single quotes in Markdown files
+vim.api.nvim_create_autocmd({ "BufWritePre" }, {
+  group = vim.api.nvim_create_augroup("replace_curly_single_quotes", { clear = true }),
+  pattern = { "*.md", "*.markdown" },
+  desc = "Replace curly single quotes in markdown files",
+  callback = function()
+    local save_cursor = vim.fn.getpos(".")
+    vim.cmd([[silent! %s/’/'/ge]])
     vim.fn.setpos(".", save_cursor)
   end,
 })
