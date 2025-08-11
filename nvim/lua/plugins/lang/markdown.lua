@@ -29,7 +29,7 @@ return {
     optional = true,
     opts = {
       spec = {
-        { "<leader>o", group = "markdown", icon = { icon = "󰍔 ", color = "white" } },
+        -- { "<leader>o", group = "markdown", icon = { icon = "󰍔 ", color = "white" } },
         { "<leader>op", icon = { icon = " ", color = "blue" } }, -- HakonHarnes/img-clip.nvim
       },
     },
@@ -49,11 +49,14 @@ return {
   {
     "neovim/nvim-lspconfig",
     keys = {
-      { "<leader>oj", "<cmd>Today<cr>", desc = "Journal note" }, -- markdown-oxide
+      -- { "<leader>oj", "<cmd>Today<cr>", desc = "Journal note" }, -- markdown-oxide
     },
     opts = {
       servers = {
-        markdown_oxide = { capabilities = { workspace = { didChangeWatchedFiles = { dynamicRegistration = true } } } },
+        markdown_oxide = {
+          enabled = true,
+          capabilities = { workspace = { didChangeWatchedFiles = { dynamicRegistration = true } } },
+        },
         -- The hover window configuration for the diagnostics is done in
         -- ~/github/dotfiles-latest/neovim/neobean/lua/config/autocmds.lua
         harper_ls = {
@@ -142,6 +145,7 @@ return {
   {
     "MeanderingProgrammer/render-markdown.nvim",
     enabled = true,
+    version = "*",
     ft = { "markdown", "norg", "org" },
     opts = {
       file_types = { "markdown", "norg", "rmd", "org" },
