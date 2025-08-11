@@ -73,6 +73,7 @@ return {
       win = {
         width = 130,
         height = 40,
+        zindex = 50,
       },
     },
   },

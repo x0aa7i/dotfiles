@@ -32,11 +32,17 @@ autocmd("BufWritePre", {
 })
 
 autocmd("BufWritePre", {
-  desc = "Replace smart quotes and apostrophes in Markdown files",
-  pattern = { "*.md" },
+  desc = "Markdown file cleanup",
+  pattern = { "*.md", "*.markdown" },
   callback = function()
     local save_cursor = vim.fn.getpos(".")
-    vim.cmd([[%s/[“”]/"/ge | %s/’/'/ge]])
+    -- Replace smart quotes and apostrophes in Markdown files
+    vim.cmd([[silent! %s/[“”]/"/ge | silent! %s/’/'/ge]])
+    -- Remove ** from Markdown headings
+    vim.cmd([[silent! g/^\s*#\{1,6}\s.*/s/\*\*//g]])
+    -- Transform list items starting with '*' to '-'
+    vim.cmd([[silent! g/^\s*\*\s\+/s/\*/-/]])
+    --
     vim.fn.setpos(".", save_cursor)
   end,
   group = augroup("MarkdownCleanupGrp", { clear = true }),

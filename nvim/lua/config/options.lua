@@ -5,6 +5,7 @@
 vim.opt.breakindent = true -- Every wrapped line will continue visually indented
 vim.opt.breakindentopt = "list:-1"
 vim.opt.spelloptions = "camel"
+vim.opt.swapfile = false
 
 vim.opt.pumblend = 0 -- make popup menu transparent, value range [0,100]
 

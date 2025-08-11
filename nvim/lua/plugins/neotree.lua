@@ -1,5 +1,6 @@
 return {
   "nvim-neo-tree/neo-tree.nvim",
+  enabled = true,
   opts = function(_, opts)
     opts.close_if_last_window = true
     opts.hide_root_node = true

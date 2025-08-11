@@ -19,7 +19,7 @@ return {
         -- colors.bg_dark = "#101317"
         -- colors.bg = "#16161e"
         -- colors.bg_highlight = "#212231"
-        colors.bg_light = "#2a2d3f"
+        colors.bg_light = "#2f3246"
         -- colors.terminal_black = "#414868"
         -- colors.bg_visual = "#2a2d3f"
         colors.fg = "#a9b1d6"

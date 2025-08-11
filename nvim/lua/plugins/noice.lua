@@ -14,9 +14,10 @@ return {
             { event = "msg_show", find = "%d+L, %d+B" },
             { event = "msg_show", find = "^Hunk %d+ of %d" },
             { event = "msg_show", find = "%d+ change" },
-            { event = "msg_show", find = "%d+ line" },
+            -- { event = "msg_show", find = "%d+ line" },
+            { event = "msg_show", find = "%d+ fewer line" },
             { event = "msg_show", find = "%d+ more line" },
-            { event = "notify", find = "completion request failed" }, -- Codeium
+            { event = "msg_show", find = "^Error in decoration provider" }, -- tree-sitter highlight errors
             { event = "notify", find = "No information available" }, -- Hover doc
           },
         },

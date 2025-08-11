@@ -2,10 +2,10 @@ return {
   "stevearc/oil.nvim",
   enabled = true,
   -- Optional dependencies
-  dependencies = { { "echasnovski/mini.icons", opts = {} } },
+  dependencies = { "echasnovski/mini.icons" },
   keys = {
     { "<leader>-", false },
-    { "<leader>-", "<CMD>Oil<CR>", desc = "Open file explorer (Oil)" },
+    { "<leader>-", "<CMD>Oil --float<CR>", desc = "Open file explorer (Oil)" },
   },
   opts = {
     columns = {
@@ -16,8 +16,9 @@ return {
     },
     delete_to_trash = true,
     keymaps = {
-      -- ["q"] = "actions.close",
+      ["Q"] = "actions.close",
       ["<C-s>"] = false,
+
       --   ["<C-v>"] = "actions.select_vsplit",
       --   ["<C-x>"] = "actions.select_split",
       --   ["<C-y>"] = "actions.copy_entry_path",
@@ -28,7 +29,7 @@ return {
     float = {
       padding = 2,
       max_width = 100,
-      max_height = 40,
+      max_height = 36,
     },
   },
 }
