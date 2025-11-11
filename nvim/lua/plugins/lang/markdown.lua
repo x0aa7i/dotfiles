@@ -42,14 +42,14 @@ return {
         "markdownlint-cli2", -- markdown linter
         "markdown-toc", -- markdown table of contents
         -- "marksman", -- markdown lsp
-        "harper-ls", -- grammar checker
+        -- "harper-ls", -- grammar checker
       },
     },
   },
   {
     "neovim/nvim-lspconfig",
     keys = {
-      -- { "<leader>oj", "<cmd>Today<cr>", desc = "Journal note" }, -- markdown-oxide
+      { "<leader>oj", "<cmd>Today<cr>", desc = "Journal note" }, -- markdown-oxide
     },
     opts = {
       servers = {
@@ -61,7 +61,7 @@ return {
         -- ~/github/dotfiles-latest/neovim/neobean/lua/config/autocmds.lua
         harper_ls = {
           autostart = false,
-          enabled = true,
+          enabled = false,
           filetypes = { "markdown" },
           settings = {
             ["harper-ls"] = {
@@ -146,10 +146,11 @@ return {
     "MeanderingProgrammer/render-markdown.nvim",
     enabled = true,
     version = "*",
-    ft = { "markdown", "norg", "org" },
+    ft = { "markdown", "norg", "org", "codecompanion" },
     opts = {
-      file_types = { "markdown", "norg", "rmd", "org" },
+      file_types = { "markdown", "codecompanion", "nvim-pack" },
       latex = { enabled = false, position = "below" },
+      completions = { lsp = { enabled = true } },
       code = {
         sign = false,
         width = "block",
@@ -170,12 +171,13 @@ return {
         custom = {
           incomplete = {
             raw = "[/]",
-            rendered = "󰦖 ",
+            rendered = " ",
             highlight = "RenderMarkdownIncomplete",
             scope_highlight = nil,
           },
-          canceled = { raw = "[-]", rendered = "󰜺 ", highlight = "RenderMarkdownCanceled", scope_highlight = nil },
-          forwarded = { raw = "[>]", rendered = " ", highlight = "RenderMarkdownForwarded", scope_highlight = nil },
+          canceled = { raw = "[-]", rendered = "󰂭 ", highlight = "RenderMarkdownCanceled", scope_highlight = nil },
+          waiting = { raw = "[=]", rendered = "󰏤 ", highlight = "RenderMarkdownWaiting", scope_highlight = nil },
+          forwarded = { raw = "[>]", rendered = " ", highlight = "RenderMarkdownForwarded", scope_highlight = nil },
           schedule = { raw = "[<]", rendered = " ", highlight = "RenderMarkdownSchedule", scope_highlight = nil },
 
           info = { raw = "[i]", rendered = " ", highlight = "RenderMarkdownInfo", scope_highlight = nil },
@@ -260,7 +262,7 @@ return {
     event = "VeryLazy",
     ft = "markdown",
     keys = {
-      { "<leader>op", "<cmd>PasteImage<cr>", desc = "Paste image from system clipboard" },
+      { "<leader>op", "<cmd>PasteImage<cr>", desc = "Paste image from clipboard" },
     },
     opts = {
       default = {
