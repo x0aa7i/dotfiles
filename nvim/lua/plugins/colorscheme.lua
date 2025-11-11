@@ -105,6 +105,10 @@ return {
 
         -- Folds
         H.Folded = { fg = C.blue, bg = C.bg_light }
+
+        -- Treesitter
+        H.TreesitterContext = { bg = "#212231" }
+        H.TreesitterContextLineNumber = { fg = C.terminal_black, bg = "#212231" }
       end
     end,
   },

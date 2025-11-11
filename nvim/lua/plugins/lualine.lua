@@ -72,11 +72,11 @@ return {
       { "grapple" },
     }
 
-    table.insert(opts.sections.lualine_c, { "filesize", color = { fg = "#737aa2" }, icon = "" })
-    table.insert(opts.sections.lualine_c, { "lsp_status", color = { fg = "#737aa2" } })
+    -- table.insert(opts.sections.lualine_c, { "filesize", color = { fg = "#737aa2" }, icon = "" })
 
     table.remove(opts.sections.lualine_x, 3) -- remove noice status mode https://www.lazyvim.org/plugins/ui#lualinenvim
     table.insert(opts.sections.lualine_x, 1, { text_count, color = { fg = "#a9b1d6" } })
+    table.insert(opts.sections.lualine_x, 1, { "lsp_status", color = { fg = "#737aa2" } })
 
     opts.sections.lualine_y = {}
     opts.sections.lualine_z = {
