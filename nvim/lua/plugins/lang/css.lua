@@ -30,9 +30,10 @@ return {
       },
       setup = {
         tailwindcss = function(_, opts)
-          local tw = LazyVim.lsp.get_raw_config("tailwindcss")
+          local tw = require("lspconfig.configs.tailwindcss")
           opts.filetypes = opts.filetypes or {}
 
+          -- Add additional filetypes
           -- Add default filetypes
           vim.list_extend(opts.filetypes, tw.default_config.filetypes)
 

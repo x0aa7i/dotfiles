@@ -2,7 +2,7 @@ return {
   "stevearc/oil.nvim",
   enabled = true,
   -- Optional dependencies
-  dependencies = { "echasnovski/mini.icons" },
+  dependencies = { "nvim-mini/mini.icons" },
   keys = {
     { "<leader>-", false },
     { "<leader>-", "<CMD>Oil --float<CR>", desc = "Open file explorer (Oil)" },

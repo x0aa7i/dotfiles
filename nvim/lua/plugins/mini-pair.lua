@@ -1,7 +1,7 @@
 -- source: https://gist.github.com/tmerse/dc21ec932860013e56882f23ee9ad8d2
 
 return {
-  "echasnovski/mini.pairs",
+  "nvim-mini/mini.pairs",
   enabled = true,
   event = { "VeryLazy" },
   version = "*",
