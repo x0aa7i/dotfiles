@@ -1,155 +1,3 @@
-local function format_code_block(context)
-  local code = require("codecompanion.helpers.actions").get_code(context.start_line, context.end_line)
-  local lang = context.filetype or ""
-  return "\n```" .. lang .. "\n" .. code .. "\n```\n\n"
-end
-
-local function multiline(lines, sep)
-  sep = sep or "\n"
-  return table.concat(lines, sep)
-end
-
-local PROMPT_LIBRARY = {
-  ["Document"] = {
-    strategy = "chat",
-    description = "Write documentation for code.",
-    opts = {
-      modes = { "v" },
-      short_name = "doc",
-      auto_submit = true,
-      user_prompt = false,
-      stop_context_insertion = true,
-    },
-    prompts = {
-      {
-        role = "user",
-        content = function(context)
-          return multiline({
-            "Document the following code with inline comments explaining the purpose, parameters, and return values of each function and class.",
-            "Suggest clearer, more descriptive names to improve readability.",
-            format_code_block(context),
-          })
-        end,
-        opts = {
-          contains_code = true,
-        },
-      },
-    },
-  },
-  ["Review"] = {
-    strategy = "chat",
-    description = "Review the provided code snippet.",
-    opts = {
-      modes = { "v" },
-      short_name = "review",
-      auto_submit = true,
-      user_prompt = false,
-      stop_context_insertion = true,
-    },
-    prompts = {
-      {
-        role = "system",
-        content = multiline({
-          "You are an expert code reviewer focused on improving readability, maintainability, and clarity.",
-          "Your goal is to help developers write clean, understandable, and efficient code through constructive feedback.",
-          "Analyze the provided code and identify issues such as:",
-
-          "- Naming: Unclear, misleading, or inconsistent names for variables, functions, or classes.",
-          "- Comments: Unnecessary, unclear, or missing explanations.",
-          "- Complexity: Overly complex logic or convoluted expressions.",
-          "- Structure: Poor modularity or organization.",
-          "- Style: Inconsistent formatting or deviations from conventions.",
-          "- Redundancy: Duplicated logic or patterns that can be optimized.",
-          "- Correctness: Potential bugs or unhandled edge cases.",
-          "- Performance: Inefficient operations or poor data structure choices.",
-
-          "For each issue, provide:",
-          "1. A brief description of the problem.",
-          "2. A specific, actionable suggestion for improvement.",
-
-          "If the code is clean and well-written, state that explicitly.",
-          "Keep feedback concise, constructive, and focused on improvements.",
-        }),
-        opts = {
-          visible = false,
-        },
-      },
-      {
-        role = "user",
-        content = function(context)
-          return "Review the following code, suggest improvements, and refactor it to enhance clarity and readability.\n"
-            .. format_code_block(context)
-        end,
-        opts = {
-          contains_code = true,
-        },
-      },
-    },
-  },
-  ["Enhance"] = {
-    strategy = "chat",
-    description = "Enhance the provided code snippet.",
-    opts = {
-      modes = { "v" },
-      short_name = "enhance",
-      auto_submit = true,
-      user_prompt = false,
-      stop_context_insertion = true,
-    },
-    prompts = {
-      {
-        role = "system",
-        content = multiline({
-          "You are an expert code optimizer focused on improving efficiency, clarity, and adherence to best practices.",
-          "Analyze the provided code and enhance it by:",
-
-          "1. Improving performance through efficient algorithms and data structures.",
-          "2. Enhancing maintainability through better organization, naming, and structure. ",
-          "3. Increasing readability with clear and concise code.",
-          "4. Ensuring consistency with coding best practices for the given language.",
-
-          "Output only the optimized code in the original format, with no additional explanations.",
-        }),
-        opts = {
-          visible = false,
-        },
-      },
-      {
-        role = "user",
-        content = function(context)
-          return "Optimize the following code for performance, readability, and best practices.\n"
-            .. format_code_block(context)
-        end,
-        opts = {
-          contains_code = true,
-        },
-      },
-    },
-  },
-  ["Naming"] = {
-    strategy = "chat",
-    description = "Give better names for the provided code snippet.",
-    opts = {
-      modes = { "v" },
-      short_name = "naming",
-      auto_submit = true,
-      user_prompt = false,
-      stop_context_insertion = true,
-    },
-    prompts = {
-      {
-        role = "user",
-        content = function(context)
-          return "Provide better names for the following variables and functions:\n" .. format_code_block(context)
-        end,
-        opts = {
-          contains_code = true,
-        },
-      },
-    },
-  },
-}
-
 return {
   {
     "folke/which-key.nvim",
@@ -182,18 +30,24 @@ return {
   },
   {
     "olimorris/codecompanion.nvim",
+    version = "*",
     enabled = true,
     dependencies = {
       "nvim-lua/plenary.nvim",
       "nvim-treesitter/nvim-treesitter",
+      "folke/noice.nvim",
     },
     keys = {
       { "<leader>aa", "<cmd>CodeCompanionActions<cr>", mode = { "n", "v" }, desc = "Companion Actions" },
       { "<leader>ac", "<cmd>CodeCompanionChat Toggle<cr>", mode = { "n", "v" }, desc = "Companion Toggle Chat" },
       { "<leader>ae", "<cmd>CodeCompanion<cr>", mode = { "n", "v" }, desc = "Companion Edit Code" },
     },
+    init = function()
+      require("plugins.codecompanion.notification").init()
+    end,
     opts = {
-      prompt_library = PROMPT_LIBRARY,
+      prompt_library = require("plugins.codecompanion.prompts"),
+      system_prompt = false,
       display = {
         chat = { start_in_insert_mode = true },
         action_palette = { provider = "default" },
@@ -218,8 +72,8 @@ return {
                 default = vim.g.ai_groq_model,
               },
             },
-            max_tokens = { default = 8192 },
-            temperature = { default = 1 },
+            max_tokens = { default = 4096 },
+            temperature = { default = 0.6 }, --
           })
         end,
         openrouter = function()
@@ -245,7 +99,7 @@ return {
       },
       strategies = {
         chat = {
-          adapter = "groq",
+          adapter = "gemini",
           keymaps = {
             send = {
               callback = function(chat)
