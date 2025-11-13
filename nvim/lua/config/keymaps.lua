@@ -102,3 +102,10 @@ local searching_google_in_visual =
   [[<ESC>gv"gy<ESC>:lua vim.fn.system({'xdg-open', 'https://google.com/search?q=' .. vim.fn.getreg('g')})<CR>]]
 
 K.map("v", "gx", searching_google_in_visual, { silent = true, noremap = true })
+
+-- bold, and italic shortcuts
+K.map("x", "gb", [["zc**<C-r>z**<Esc>]], { noremap = true, silent = true, desc = "Bold selection (wrap with **)" })
+K.map("x", "gi", [["zc_<C-r>z_<Esc>]], { noremap = true, silent = true, desc = "Italic selection (wrap with _)" })
+
+K.map("n", "gb", [[viw"zc**<C-r>z**<Esc>]], { noremap = true, silent = true, desc = "Bold word (wrap with **)" })
+K.map("n", "gi", [[viw"zc_<C-r>z_<Esc>]], { noremap = true, silent = true, desc = "Italic word (wrap with _)" })

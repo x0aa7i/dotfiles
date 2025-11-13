@@ -40,8 +40,12 @@ autocmd("BufWritePre", {
     vim.cmd([[silent! %s/[“”]/"/ge | silent! %s/’/'/ge]])
     -- Remove ** from Markdown headings
     vim.cmd([[silent! g/^\s*#\{1,6}\s.*/s/\*\*//g]])
+    -- Remove trailing punctuation from Markdown headings
+    vim.cmd([[silent! g/^\s*#\{1,6}\s\+.*[.,;:!。，；：！]\+$/s/\s*[.,;:!。，；：！]\+$//e]])
     -- Transform list items starting with '*' to '-'
     vim.cmd([[silent! g/^\s*\*\s\+/s/\*/-/]])
+    -- Replace non-breaking spaces with normal spaces
+    vim.cmd([[silent! %s/\%xA0/ /g]])
     --
     vim.fn.setpos(".", save_cursor)
   end,
