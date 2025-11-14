@@ -119,8 +119,8 @@ return {
         },
       },
       formatters_by_ft = {
-        ["markdown"] = { "dprint", "markdown-toc" },
-        ["mdx"] = { "prettierd", "markdown-toc" },
+        ["markdown"] = { "prettierd" },
+        ["mdx"] = { "prettierd" },
       },
     },
   },

@@ -14,11 +14,14 @@ return {
         },
         prettierd = {
           require_cwd = false,
+          env = {
+            PRETTIERD_DEFAULT_CONFIG = vim.fn.stdpath("config") .. "/rules/.prettierrc.json",
+          },
         },
       },
       formatters_by_ft = {
         ["html"] = { "prettierd" },
-        ["yaml"] = { "dprint" },
+        ["yaml"] = { "prettierd" },
       },
     },
   },
@@ -26,7 +29,7 @@ return {
     "mason-org/mason.nvim",
     opts = {
       ensure_installed = {
-        "dprint",
+        -- "dprint",
         "prettierd",
         "stylua",
       },
