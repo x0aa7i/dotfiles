@@ -6,6 +6,7 @@ packages = [
   "lazygit",
   "mpv",
   "nvim",
+  "opencode",
   "scripts",
   "starship",
   "systemd",

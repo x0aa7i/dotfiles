@@ -102,3 +102,10 @@ set --export PATH $BUN_INSTALL/bin $PATH
 # dprint
 set -x DPRINT_INSTALL "/home/abdo/.dprint"
 fish_add_path $DPRINT_INSTALL/bin
+
+# pyenv
+set -Ux PYENV_ROOT $HOME/.pyenv
+test -d $PYENV_ROOT/bin; and fish_add_path $PYENV_ROOT/bin
+
+# opencode
+fish_add_path /home/abdo/.opencode/bin

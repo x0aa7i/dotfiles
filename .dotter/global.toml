@@ -42,6 +42,15 @@ default_target_type = "symbolic"
 [lazygit.files]
 "lazygit" = { target = "~/.config/lazygit", type = "symbolic", recurse = false }
 
+[opencode.files]
+"opencode/opencode.json" = "~/.config/opencode/opencode.json"
+"opencode/antigravity-accounts.json" = "~/.config/opencode/antigravity-accounts.json"
+
+"opencode/agent" = { target = "~/.config/opencode/agent", type = "symbolic", recurse = false }
+"opencode/command" = { target = "~/.config/opencode/command", type = "symbolic", recurse = false }
+"opencode/skill" = { target = "~/.config/opencode/skill", type = "symbolic", recurse = false }
+
+
 [lf.files]
 "lf" = { target = "~/.config/lf", type = "symbolic", recurse = false }
 
