@@ -5,9 +5,9 @@ return {
     event = { "BufRead package.json" },
     ft = "json",
     opts = {
-      colors = {
-        up_to_date = "#B1D99C", -- Text color for up to date dependency virtual text
-        outdated = "#EAAC86", -- Text color for outdated dependency virtual text
+      highlights = {
+        up_to_date = { fg = "#B1D99C" }, -- Text color for up to date dependency virtual text
+        outdated = { fg = "#EAAC86" }, -- Text color for outdated dependency virtual text
       },
 
       icons = {

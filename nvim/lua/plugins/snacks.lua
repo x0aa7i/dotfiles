@@ -94,6 +94,6 @@ return {
       end,
       desc = "Preview image under cursor",
     },
-    { "<leader>gd", false }, -- used by diffview
+    { "<leader>gd", false }, -- used for diff view
   },
 }

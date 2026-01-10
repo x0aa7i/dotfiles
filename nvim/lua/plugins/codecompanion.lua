@@ -57,49 +57,62 @@ return {
         },
       },
       adapters = {
-        groq = function()
-          return require("codecompanion.adapters").extend("openai_compatible", {
-            name = "groq",
-            formatted_name = "Groq",
-            env = {
-              url = "https://api.groq.com/openai",
-              api_key = "GROQ_API_KEY",
-              chat_url = "/v1/chat/completions", -- optional: default value, override if different
-              models_endpoint = "/v1/models", -- optional: attaches to the end of the URL to form the endpoint to retrieve models
-            },
-            schema = {
-              model = {
-                default = vim.g.ai_groq_model,
-              },
-            },
-            max_tokens = { default = 4096 },
-            temperature = { default = 0.6 }, --
-          })
-        end,
-        openrouter = function()
-          return require("codecompanion.adapters").extend("openai_compatible", {
-            name = "openrouter",
-            formatted_name = "OpenRouter",
-            url = "https://openrouter.ai/api/v1/chat/completions",
-            env = {
-              api_key = "OPENROUTER_API_KEY",
-            },
-            schema = {
-              model = {
-                default = "google/gemini-2.5-pro-exp-03-25:free",
-                choices = {
-                  ["deepseek/deepseek-r1:free"] = { opts = { can_reason = true } }, -- context: 164K
-                  ["google/gemini-2.0-flash-exp:free"] = { opts = { can_reason = true } }, -- context: 1.05M
-                  ["google/gemini-2.5-pro-exp-03-25:free"] = { opts = { can_reason = true } }, -- context: 2M
+        http = {
+          gemini = function()
+            return require("codecompanion.adapters").extend("gemini", {
+              schema = {
+                model = {
+                  default = "gemini-3-flash-preview",
                 },
               },
-            },
-          })
-        end,
+            })
+          end,
+          groq = function()
+            return require("codecompanion.adapters").extend("openai_compatible", {
+              name = "groq",
+              formatted_name = "Groq",
+              env = {
+                url = "https://api.groq.com/openai",
+                api_key = "GROQ_API_KEY",
+                chat_url = "/v1/chat/completions", -- optional: default value, override if different
+                models_endpoint = "/v1/models", -- optional: attaches to the end of the URL to form the endpoint to retrieve models
+              },
+              schema = {
+                model = {
+                  default = vim.g.ai_groq_model,
+                },
+              },
+              max_tokens = { default = 4096 },
+              temperature = { default = 0.6 }, --
+            })
+          end,
+          openrouter = function()
+            return require("codecompanion.adapters").extend("openai_compatible", {
+              name = "openrouter",
+              formatted_name = "OpenRouter",
+              url = "https://openrouter.ai/api/v1/chat/completions",
+              env = {
+                api_key = "OPENROUTER_API_KEY",
+              },
+              schema = {
+                model = {
+                  default = "google/gemini-2.5-pro-exp-03-25:free",
+                  choices = {
+                    ["deepseek/deepseek-r1:free"] = { opts = { can_reason = true } }, -- context: 164K
+                    ["google/gemini-2.0-flash-exp:free"] = { opts = { can_reason = true } }, -- context: 1.05M
+                    ["google/gemini-2.5-pro-exp-03-25:free"] = { opts = { can_reason = true } }, -- context: 2M
+                  },
+                },
+              },
+            })
+          end,
+        },
       },
       strategies = {
         chat = {
           adapter = "gemini",
+          -- adapter = "opencode",
+          model = "gemini-3-flash",
           keymaps = {
             send = {
               callback = function(chat)

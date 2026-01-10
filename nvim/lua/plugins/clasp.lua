@@ -1,6 +1,6 @@
 return {
   "xzbdmw/clasp.nvim",
-  enabled = true,
+  enabled = false,
   event = "InsertEnter",
   opts = {
     pairs = { ["{"] = "}", ['"'] = '"', ["'"] = "'", ["("] = ")", ["["] = "]", ["<"] = ">" },
