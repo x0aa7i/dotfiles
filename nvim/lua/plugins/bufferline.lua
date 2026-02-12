@@ -1,5 +1,6 @@
 return {
   "akinsho/bufferline.nvim",
+  event = "BufEnter",
   keys = {
     { "<S-h>", false },
     { "<S-l>", false },
@@ -7,10 +8,6 @@ return {
     { "<S-tab>", "<cmd>BufferLineCyclePrev<cr>", desc = "Prev buffer" },
   },
   opts = function(_, opts)
-    opts.options.always_show_bufferline = false
-    -- opts.options.offsets = {
-    --   { filetype = "snacks_explorer" },
-    --   { filetype = "snacks_layout_box" },
-    -- }
+    opts.options.always_show_bufferline = true
   end,
 }
