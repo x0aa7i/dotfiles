@@ -260,6 +260,7 @@ return {
   {
     "HakonHarnes/img-clip.nvim",
     event = "VeryLazy",
+    enabled = false,
     ft = "markdown",
     keys = {
       { "<leader>op", "<cmd>PasteImage<cr>", desc = "Paste image from clipboard" },

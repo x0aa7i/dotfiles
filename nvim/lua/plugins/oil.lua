@@ -1,6 +1,6 @@
 return {
   "stevearc/oil.nvim",
-  enabled = true,
+  enabled = false,
   -- Optional dependencies
   dependencies = { "nvim-mini/mini.icons" },
   keys = {
