@@ -14,18 +14,37 @@ return {
       servers = {
         vtsls = {
           settings = {
-            javascript = {
-              preferences = {
-                importModuleSpecifier = "non-relative",
+            vtsls = {
+              experimental = {
+                completion = {
+                  enableServerSideFuzzyMatch = true,
+                  entriesLimit = 30,
+                },
               },
             },
             typescript = {
               preferences = {
-                importModuleSpecifier = "non-relative",
+                includePackageJsonAutoImports = "off",
+              },
+              tsserver = {
+                maxTsServerMemory = 8192,
               },
             },
           },
         },
+      },
+    },
+  },
+  {
+    "pmizio/typescript-tools.nvim",
+    dependencies = { "nvim-lua/plenary.nvim", "neovim/nvim-lspconfig" },
+    opts = {},
+  },
+  {
+    "mason-org/mason.nvim",
+    opts = {
+      ensure_installed = {
+        "vtsls",
       },
     },
   },
