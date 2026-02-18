@@ -1,0 +1,25 @@
+# Project Bloat
+node_modules/
+build/
+dist/
+out/
+.svelte-kit/
+.vercel/
+.venv/
+__pycache__/
+.pytest_cache/
+.turbo/
+
+# OS Trash
+.DS_Store
+Thumbs.db
+.Spotlight-V100
+.Trashes
+
+# Logs and Caches
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+.npm/
+.eslintcache/

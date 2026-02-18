@@ -31,7 +31,7 @@ rclone_sync() {
   SOURCE="$1"
   DEST="$2"
   echo "$(date '+%Y-%m-%d %H:%M:%S') - Syncing $SOURCE to $DEST" >>"$LOGFILE"
-  rclone sync "$SOURCE" "$DEST" --log-file="$LOGFILE" --log-level=ERROR --exclude-from "$EXCLUDE" --exclude-if-present .rcloneignore
+  rclone sync "$SOURCE" "$DEST" --log-file="$LOGFILE" --log-level=ERROR --exclude-from "$EXCLUDE" --exclude-if-present .rcloneignore --exclude-if-present .syncignore
   echo "$(date '+%Y-%m-%d %H:%M:%S') - Finished syncing $SOURCE to $DEST" >>"$LOGFILE"
 }
 
