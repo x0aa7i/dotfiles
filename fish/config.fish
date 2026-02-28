@@ -20,6 +20,7 @@ set -gx PNPM_HOME "/home/abdo/.local/share/pnpm"
 if not string match -q -- $PNPM_HOME $PATH
     set -gx PATH "$PNPM_HOME" $PATH
 end
+# pnpm end
 
 # Aliases
 # alias nvim="~/.local/bin/nvim"
@@ -38,6 +39,8 @@ alias dev="pnpm run dev"
 
 alias c="clear"
 alias lg="lazygit"
+
+alias oc="opencode"
 
 #overrides
 alias mkdir="mkdir -p"
