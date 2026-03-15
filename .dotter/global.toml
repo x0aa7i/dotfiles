@@ -24,40 +24,37 @@ default_target_type = "symbolic"
 [tmux.files]
 "tmux" = { target = "~/.config/tmux", type = "symbolic", recurse = false }
 
-# Editors
 [nvim.files]
 "nvim" = { target = "~/.config/nvim", type = "symbolic", recurse = false }
 
-# Scripts
 [scripts.files]
 "scripts" = "~/.config/scripts"
 
-# tools
 [yazi.files]
 "yazi" = { target = "~/.config/yazi", type = "symbolic", recurse = false }
 
-[mpv.files]
-"mpv" = { target = "~/.config/mpv", type = "symbolic", recurse = false }
+[lf.files]
+"lf" = { target = "~/.config/lf", type = "symbolic", recurse = false }
 
 [lazygit.files]
 "lazygit" = { target = "~/.config/lazygit", type = "symbolic", recurse = false }
 
+[mpv.files]
+"mpv" = { target = "~/.config/mpv", type = "symbolic", recurse = false }
+
 [opencode.files]
 "opencode/opencode.json" = "~/.config/opencode/opencode.json"
-"opencode/antigravity-accounts.json" = "~/.config/opencode/antigravity-accounts.json"
+"opencode/skills" = { target = "~/.config/opencode/skills", type = "symbolic", recurse = false }
+"opencode/agents" = { target = "~/.config/opencode/agents", type = "symbolic", recurse = false }
+"opencode/commands" = { target = "~/.config/opencode/commands", type = "symbolic", recurse = false }
 
-"opencode/agent" = { target = "~/.config/opencode/agent", type = "symbolic", recurse = false }
-"opencode/command" = { target = "~/.config/opencode/command", type = "symbolic", recurse = false }
-"opencode/skill" = { target = "~/.config/opencode/skill", type = "symbolic", recurse = false }
+# "opencode/skills" = { target = "~/.gemini/antigravity/skills", type = "symbolic", recurse = false }
+# "opencode/skills" = { target = "~/.gemini/skills", type = "symbolic", recurse = false }
 
-
-[lf.files]
-"lf" = { target = "~/.config/lf", type = "symbolic", recurse = false }
 
 [vscode.files]
 "vscode/settings.json" = "~/.config/Code/User/settings.json"
 "vscode/keybindings.json" = "~/.config/Code/User/keybindings.json"
 
-# systemd
 [systemd.files]
 "systemd" = "~/.config/systemd"
