@@ -1,18 +1,10 @@
-local ts_filetypes = {
-  "typescript",
-  "typescriptreact",
-  "javascript",
-  "javascriptreact",
-  "vue",
-  "svelte",
-}
-
 return {
   {
     "neovim/nvim-lspconfig",
     opts = {
       servers = {
         vtsls = {
+          enabled = false,
           settings = {
             vtsls = {
               experimental = {
@@ -28,6 +20,40 @@ return {
               },
               tsserver = {
                 maxTsServerMemory = 8192,
+              },
+            },
+          },
+        },
+        tsgo = {
+          enabled = true,
+          -- cmd = { "tsgo", "--lsp", "--stdio" },
+          filetypes = {
+            "javascript",
+            "javascriptreact",
+            "javascript.jsx",
+            "typescript",
+            "typescriptreact",
+            "typescript.tsx",
+          },
+          root_markers = {
+            "package-lock.json",
+            "yarn.lock",
+            "pnpm-lock.yaml",
+            "bun.lockb",
+            "bun.lock",
+          },
+          settings = {
+            typescript = {
+              inlayHints = {
+                enumMemberValues = { enabled = true },
+                functionLikeReturnTypes = { enabled = false },
+                parameterNames = {
+                  enabled = "literals",
+                  suppressWhenArgumentMatchesName = true,
+                },
+                parameterTypes = { enabled = true },
+                propertyDeclarationTypes = { enabled = true },
+                variableTypes = { enabled = false },
               },
             },
           },
@@ -66,30 +92,6 @@ return {
         javascript = { "eslint_d" },
         typescript = { "eslint_d" },
       },
-    },
-  },
-  {
-    "dmmulroy/tsc.nvim",
-    enabled = false,
-    event = "VeryLazy",
-    dependencies = { "neovim/nvim-lspconfig" },
-    ft = ts_filetypes,
-    keys = {
-      { "<leader>ct", "<cmd>TSC<cr>", desc = "Type Check" },
-      { "<leader>xy", "<cmd>TSCOpen<cr>", desc = "Type Check Quickfix" },
-    },
-    opts = {
-      auto_start_watch_mode = false,
-      use_trouble_qflist = true,
-      flags = {
-        watch = false,
-      },
-    },
-    cmd = {
-      "TSC",
-      "TSCOpen",
-      "TSCClose",
-      "TSStop",
     },
   },
 }
