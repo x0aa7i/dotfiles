@@ -1,0 +1,48 @@
+# espanso match file
+# For more information, visit the docs: https://espanso.org/docs/
+
+global_vars:
+  - name: mydate
+    type: date
+    params:
+      format: "%Y-%m-%d"
+
+  - name: mytime
+    type: date
+    params:
+      format: "%H:%M"
+
+matches:
+  # Simple text replacement
+  - trigger: ":espanso"
+    replace: "Hi there!"
+
+  # Print the current date
+  - trigger: ";date"
+    replace: "{{mydate}}"
+
+  - trigger: ";time"
+    replace: "{{mytime}}"
+
+  - trigger: ";dt"
+    replace: "{{mydate}} {{mytime}}"
+
+  # Print alphabets
+  - trigger: ";abc"
+    replace: "abcdefghijklmnopqrstuvwxyz"
+
+  - trigger: ";2abc"
+    replace: "abcdefghijklmnopqrstuvwxyzabcdefghijklmnopqrstuvwxyz"
+
+  - trigger: ";ABC"
+    replace: "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+
+  # En Dash (–)
+  - triggers: [";en"]
+    replace: "\u2013"
+    force_mode: keys
+
+  # Em Dash (—)
+  - triggers: [";em"]
+    replace: "\u2014"
+    force_mode: keys

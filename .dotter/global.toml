@@ -51,6 +51,8 @@ default_target_type = "symbolic"
 # "opencode/skills" = { target = "~/.gemini/antigravity/skills", type = "symbolic", recurse = false }
 # "opencode/skills" = { target = "~/.gemini/skills", type = "symbolic", recurse = false }
 
+[espanso.files]
+"espanso" = { target = "~/.config/espanso", type = "symbolic", recurse = false }
 
 [vscode.files]
 "vscode/settings.json" = "~/.config/Code/User/settings.json"
