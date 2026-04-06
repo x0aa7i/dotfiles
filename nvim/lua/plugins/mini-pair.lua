@@ -2,7 +2,7 @@
 
 return {
   "nvim-mini/mini.pairs",
-  enabled = false,
+  enabled = true,
   event = { "VeryLazy" },
   version = "*",
   opts = {
