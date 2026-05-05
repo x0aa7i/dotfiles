@@ -60,3 +60,6 @@ default_target_type = "symbolic"
 
 [systemd.files]
 "systemd" = "~/.config/systemd"
+
+[zed.files]
+"zed" = "~/.config/zed"

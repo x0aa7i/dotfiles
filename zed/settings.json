@@ -1,0 +1,251 @@
+// Zed settings
+//
+// For information on how to configure Zed, see the Zed
+// documentation: https://zed.dev/docs/configuring-zed
+//
+// To see all of Zed's default settings without changing your
+// custom settings, run the `open default settings` command
+// from the command palette or from `Zed` application menu.
+{
+  // ── Appearance
+  "theme": {
+    "mode": "dark",
+    "light": "Tokyo Night Light",
+    "dark": "Tokyo Night",
+  },
+  "theme_overrides": {
+    "Tokyo Night": {
+      // "border": "#1A1B26",
+      // "border.variant": "#1A1B26",
+      "text.accent": "#9381ff",
+      "icon.accent": "#9381ff",
+      "panel.background": "#1A1B26",
+      "panel.focused_border": "#414868",
+      "tab_bar.background": "#1A1B26",
+      "tab.active_background": "#16161e",
+      "tab.inactive_background": "#1A1B26",
+      "status_bar.background": "#1A1B26",
+      "title_bar.background": "#1A1B26",
+      "scrollbar.track.border": "#1A1B26",
+      // "element.hover": "#16161e",
+      "element.hover": "#2f324655",
+      "element.active": "#2f3246",
+      "element.selected": "#2f3246",
+
+      "ghost_element.background": "#00000000",
+      // "ghost_element.hover": "#212231",
+      "ghost_element.hover": "#2f324655",
+      "ghost_element.active": "#2f3246",
+      "ghost_element.selected": "#2f3246",
+      "version_control.added": "#179c78",
+      "version_control.modified": "#c6904e",
+      "version_control.deleted": "#d6606a",
+      "editor.indent_guide": "#2f3246",
+      "editor.document_highlight.read_background": "#2f3246",
+      "editor.document_highlight.write_background": "#2f3246",
+      "created": "#22d0a2",
+      "deleted": "#e06c76",
+      "error": "#e06c76",
+      "modified": "#e0af68",
+      "terminal.foreground": "#b3bac6",
+      "terminal.bright_foreground": "#e2e5e9",
+      "syntax": {
+        "property": {
+          "color": "#bac0de",
+          "font_style": null,
+          "font_weight": null,
+        },
+        "variable": {
+          "color": "#bac0de",
+          "font_style": null,
+          "font_weight": null,
+        },
+        "string": {
+          "color": "#4ac9a1",
+          "font_style": null,
+          "font_weight": null,
+        },
+        "string.doc": {
+          "color": "#4ac9a1",
+          "font_style": null,
+          "font_weight": null,
+        },
+        "text.literal": {
+          "color": "#22d0a2",
+          "font_style": null,
+          "font_weight": null,
+        },
+        "constant": {
+          "color": "#db9351",
+          "font_style": null,
+          "font_weight": null,
+        },
+        "constant.builtin": {
+          "color": "#db9351",
+          "font_style": null,
+          "font_weight": null,
+        },
+      },
+    },
+  },
+  "icon_theme": {
+    "mode": "dark",
+    "light": "Zed (Default)",
+    "dark": "Zed (Default)",
+  },
+  "ui_font_size": 17.0,
+  "buffer_font_size": 15.0,
+  "buffer_font_family": ".ZedMono",
+  "buffer_font_fallbacks": [".ZedMono", "JetBrainsMono Nerd Font"],
+
+  // ── Editor
+  "vim_mode": true,
+  "relative_line_numbers": "enabled",
+  "show_whitespaces": "trailing",
+  "multi_cursor_modifier": "alt",
+  "scroll_beyond_last_line": "vertical_scroll_margin",
+  "diff_view_style": "split",
+  "code_lens": "on",
+  "inlay_hints": {
+    "enabled": false,
+  },
+  "gutter": {
+    "min_line_number_digits": 3,
+  },
+  "scrollbar": {
+    "git_diff": false,
+  },
+  "git": {
+    "path_style": "file_path_first",
+    "inline_blame": {
+      "enabled": false,
+    },
+  },
+  "which_key": {
+    "enabled": true,
+  },
+
+  // ── Agent / AI
+  "agent": {
+    "dock": "right",
+    "sidebar_side": "right",
+    "favorite_models": [],
+    "model_parameters": [],
+    "inline_assistant_model": {
+      "provider": "opencode",
+      "model": "free/minimax-m2.5-free",
+    },
+    "default_model": {
+      "enable_thinking": true,
+      "provider": "google",
+      "model": "gemini-2.5-flash",
+    },
+  },
+  "agent_buffer_font_size": 14.0,
+  "agent_ui_font_size": 17.0,
+  "agent_servers": {
+    "claude-acp": {
+      "type": "registry",
+    },
+    "gemini": {
+      "type": "registry",
+    },
+    "opencode": {
+      "type": "registry",
+    },
+  },
+  "edit_predictions": {
+    "mode": "eager",
+    "provider": "codestral",
+    "disabled_globs": [
+      "**/.env*",
+      "**/*.pem",
+      "**/*.key",
+      "**/*.cert",
+      "**/*.crt",
+      "**/.dev.vars",
+      "**/secrets.yml",
+      "/**/zed/settings.json",
+      "/**/zed/keymap.json",
+    ],
+  },
+
+  // ── Panels
+  "project_panel": {
+    "entry_spacing": "standard",
+    "default_width": 360,
+    "dock": "left",
+  },
+  "git_panel": {
+    "tree_view": true,
+    "default_width": 360,
+    "dock": "left",
+  },
+  "outline_panel": {
+    "button": false,
+    "dock": "right",
+  },
+  "collaboration_panel": {
+    "button": false,
+    "dock": "right",
+  },
+
+  // ── Terminal
+  "terminal": {
+    "dock": "bottom",
+    "copy_on_select": true,
+    "default_height": 360,
+    "env": {
+      "EDITOR": "zed --wait",
+    },
+    "detect_venv": {
+      "on": {
+        "directories": [".venv", "venv"],
+        "activate_script": "default",
+      },
+    },
+  },
+
+  // ── Languages
+  "languages": {
+    // Not ready yet
+    // "TypeScript": {
+    //   "language_servers": ["tsgo", "!vtsls"],
+    // },
+    "Python": {
+      "language_servers": [
+        "ty",
+        "ruff",
+        "!basedpyright",
+        "!pyrefly",
+        "!pyright",
+        "!pylsp",
+      ],
+    },
+  },
+
+  // ── File Indexing
+  "file_scan_exclusions": [
+    "**/.git",
+    "**/.svn",
+    "**/.hg",
+    "**/CVS",
+    "**/.DS_Store",
+    "**/Thumbs.db",
+    "**/.classpath",
+    "**/.settings",
+    // above is default from Zed
+    // "**/out",
+    // "**/dist",
+    "**/.husky",
+    "**/.turbo",
+    "**/.vscode-test",
+    "**/.vscode",
+    "**/.next",
+    "**/.storybook",
+    "**/.tap",
+    "**/.nyc_output",
+    "**/report",
+    "**/node_modules",
+  ],
+}
