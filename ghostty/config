@@ -1,15 +1,15 @@
 # theme settings
 theme = "/home/abdo/.config/ghostty/theme"
-font-family = "JetBrainsMono Nerd Font"
+# font-family = "JetBrainsMono Nerd Font"
+font-family = "Lilex"
+# font-style = medium
 # background-opacity = 0.8
 
 # window settings
 window-theme = ghostty
 window-decoration = none
-window-height = 44
-window-width = 170
-window-padding-x = 6
-window-padding-y = 4,0
+window-height = 50
+window-width = 200
 window-padding-balance = true
 resize-overlay = never
 
@@ -31,6 +31,7 @@ copy-on-select = clipboard
 shell-integration-features = cursor,sudo,no-title
 
 initial-command = tmux new-session -A -s main
+# initial-command = "fish -c 'tmux new-session -A -s main; exec fish'"
 
 # keybindings
 keybind = clear
@@ -43,6 +44,14 @@ keybind = ctrl+shift+t=new_tab
 keybind = ctrl+shift+tab=previous_tab
 keybind = ctrl+tab=next_tab
 keybind = ctrl+shift+w=close_surface
+
+# keybind = alt+l=next_tab
+# keybind = alt+h=previous_tab
+
+# keybind = ctrl+shift+enter=new_split:auto
+# keybind = ctrl+-=new_split:down
+# keybind = ctrl+|=new_split:up
+# keybind = ctrl+==equalize_splits
 
 keybind = ctrl+shift+c=copy_to_clipboard
 keybind = ctrl+shift+v=paste_from_clipboard
