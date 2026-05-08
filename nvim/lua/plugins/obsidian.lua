@@ -7,6 +7,17 @@ return {
     lazy = true,
     enabled = false,
     ft = "markdown",
+    dependencies = {
+      {
+        "folke/which-key.nvim",
+        optional = true,
+        opts = {
+          spec = {
+            { "<leader>o", group = "obsidian", icon = "" },
+          },
+        },
+      },
+    },
     -- Replace the above line with this if you only want to load obsidian.nvim for markdown files in your vault:
     event = {
       -- If you want to use the home shortcut '~' here you need to call 'vim.fn.expand'.
@@ -172,15 +183,6 @@ return {
             { noremap = true, silent = true, buffer = note.bufnr, desc = "Follow link" }
           )
         end,
-      },
-    },
-  },
-  {
-    "folke/which-key.nvim",
-    optional = true,
-    opts = {
-      spec = {
-        { "<leader>o", group = "obsidian", icon = "" },
       },
     },
   },

@@ -62,7 +62,12 @@ return {
             return require("codecompanion.adapters").extend("gemini", {
               schema = {
                 model = {
-                  default = "gemini-3-flash-preview",
+                  default = "gemma-4-26b-a4b-it",
+                  choices = {
+                    "gemma-4-31b-it",
+                    "gemma-4-26b-a4b-it",
+                    "gemini-3.1-flash-lite-preview",
+                  },
                 },
               },
             })
@@ -79,7 +84,13 @@ return {
               },
               schema = {
                 model = {
-                  default = vim.g.ai_groq_model,
+                  default = "openai/gpt-oss-120b",
+                  choices = {
+                    "openai/gpt-oss-120b",
+                    "llama-3.3-70b-versatile",
+                    "qwen/qwen3-32b",
+                    "groq/compound",
+                  },
                 },
               },
               max_tokens = { default = 4096 },
@@ -96,11 +107,13 @@ return {
               },
               schema = {
                 model = {
-                  default = "google/gemini-2.5-pro-exp-03-25:free",
+                  default = "google/gemma-4-26b-a4b-it:free",
                   choices = {
-                    ["deepseek/deepseek-r1:free"] = { opts = { can_reason = true } }, -- context: 164K
-                    ["google/gemini-2.0-flash-exp:free"] = { opts = { can_reason = true } }, -- context: 1.05M
-                    ["google/gemini-2.5-pro-exp-03-25:free"] = { opts = { can_reason = true } }, -- context: 2M
+                    "nvidia/nemotron-3-nano-30b-a3b:free",
+                    "openai/gpt-oss-120b:free",
+                    "google/gemma-4-26b-a4b-it:free",
+                    "minimax/minimax-m2.5:free",
+                    "google/gemma-4-31b-it:free",
                   },
                 },
               },
@@ -110,9 +123,9 @@ return {
       },
       strategies = {
         chat = {
+          -- adapter = "groq",
           adapter = "gemini",
-          -- adapter = "opencode",
-          model = "gemini-3-flash",
+          -- adapter = "openrouter",
           keymaps = {
             send = {
               callback = function(chat)

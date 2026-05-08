@@ -10,6 +10,7 @@ return {
   },
   {
     "neovim/nvim-lspconfig",
+    version = "*",
     keys = {
       { "<leader>cli", "<cmd>LspInfo<cr>", desc = "Info" },
       { "<leader>clr", "<cmd>LspRestart<cr>", desc = "Restart" },
@@ -27,10 +28,10 @@ return {
         border = "rounded",
       },
       ensure_installed = {
-        "glsl_analyzer", -- glsl lsp
+        -- "glsl_analyzer", -- glsl lsp
         "json-lsp",
         "lua-language-server",
-        "taplo", -- toml lsp
+        -- "taplo", -- toml lsp
       },
     },
   },

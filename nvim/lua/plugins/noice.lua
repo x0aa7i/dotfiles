@@ -19,6 +19,7 @@ return {
             { event = "msg_show", find = "%d+ more line" },
             { event = "msg_show", find = "^Error in decoration provider" }, -- tree-sitter highlight errors
             { event = "notify", find = "No information available" }, -- Hover doc
+            { event = "notify", find = "WakaTime" }, -- WakaTime
           },
         },
       },

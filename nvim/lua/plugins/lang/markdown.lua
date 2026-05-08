@@ -25,16 +25,6 @@ end
 
 return {
   {
-    "folke/which-key.nvim",
-    optional = true,
-    opts = {
-      spec = {
-        -- { "<leader>o", group = "markdown", icon = { icon = "󰍔 ", color = "white" } },
-        { "<leader>op", icon = { icon = " ", color = "blue" } }, -- HakonHarnes/img-clip.nvim
-      },
-    },
-  },
-  {
     "mason-org/mason.nvim",
     opts = {
       ensure_installed = {
@@ -49,7 +39,7 @@ return {
   {
     "neovim/nvim-lspconfig",
     keys = {
-      { "<leader>oj", "<cmd>Today<cr>", desc = "Journal note" }, -- markdown-oxide
+      -- { "<leader>oj", "<cmd>Today<cr>", desc = "Journal note" }, -- markdown-oxide
     },
     opts = {
       servers = {
@@ -57,8 +47,6 @@ return {
           enabled = true,
           capabilities = { workspace = { didChangeWatchedFiles = { dynamicRegistration = true } } },
         },
-        -- The hover window configuration for the diagnostics is done in
-        -- ~/github/dotfiles-latest/neovim/neobean/lua/config/autocmds.lua
         harper_ls = {
           autostart = false,
           enabled = false,
@@ -148,9 +136,13 @@ return {
     version = "*",
     ft = { "markdown", "norg", "org", "codecompanion" },
     opts = {
-      file_types = { "markdown", "codecompanion", "nvim-pack" },
+      file_types = { "markdown", "codecompanion", "nvim-pack", "opencode" },
       latex = { enabled = false, position = "below" },
       completions = { lsp = { enabled = true } },
+      anti_conceal = {
+        -- This enables hiding added text on the line the cursor is on.
+        enabled = true,
+      },
       code = {
         sign = false,
         width = "block",
@@ -247,7 +239,7 @@ return {
     end,
     keys = {
       {
-        "<leader>oo",
+        "<leader>mo",
         "<cmd>MarkdownPreviewToggle<cr>",
         ft = "markdown",
         desc = "Open Markdown Preview",
@@ -263,7 +255,7 @@ return {
     enabled = false,
     ft = "markdown",
     keys = {
-      { "<leader>op", "<cmd>PasteImage<cr>", desc = "Paste image from clipboard" },
+      -- { "<leader>mp", "<cmd>PasteImage<cr>", desc = "Paste image from clipboard" },
     },
     opts = {
       default = {
@@ -285,6 +277,16 @@ return {
     },
   },
   {
+    "folke/which-key.nvim",
+    optional = true,
+    opts = {
+      spec = {
+        { "<leader>m", group = "markdown", icon = { icon = "󰍔 ", color = "white" } },
+        -- { "<leader>mp", icon = { icon = " ", color = "blue" } }, -- HakonHarnes/img-clip.nvim
+      },
+    },
+  },
+  {
     -- toggle lists
     "hamidi-dev/org-list.nvim",
     ft = { "norg", "org", "markdown" },
@@ -295,12 +297,12 @@ return {
     config = function()
       require("org-list").setup({
         mapping = {
-          key = "<leader>ol",
-          desc = "Toggle: Cycle through list types",
+          key = "<leader>ml",
+          desc = "Cycle through list types",
         },
         checkbox_toggle = {
           enabled = true,
-          key = "<leader>ok", -- Change the checkbox toggle key
+          key = "<leader>mk", -- Change the checkbox toggle key
           desc = "Toggle checkbox state",
           filetypes = { "org", "markdown" }, -- Add more filetypes as needed
         },

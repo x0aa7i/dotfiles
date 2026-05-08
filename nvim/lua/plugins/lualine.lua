@@ -22,14 +22,15 @@ local function text_count()
   }
 
   local linecount = visual_mode and get_vlinecount_str() or vim.api.nvim_buf_line_count(0)
+  local chars = visual_mode and table.concat({ " ", wc.visual_chars, hl_str("Comment", " chars") }) or ""
 
   if not filetypes[vim.bo.filetype] or not wc then
-    return table.concat({ prefix, linecount })
+    return table.concat({ prefix, linecount, chars })
   end
 
   local lines = table.concat({ prefix, linecount, hl_str("Comment", " lines") })
   local words = table.concat({ " ", wc.visual_words or wc.words, hl_str("Comment", " words") })
-  local chars = visual_mode and table.concat({ " ", wc.visual_chars, hl_str("Comment", " chars") }) or ""
+  -- local chars = visual_mode and table.concat({ " ", wc.visual_chars, hl_str("Comment", " chars") }) or ""
 
   return table.concat({
     lines,

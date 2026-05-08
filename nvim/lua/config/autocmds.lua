@@ -37,7 +37,7 @@ autocmd("BufWritePre", {
   callback = function()
     local save_cursor = vim.fn.getpos(".")
     -- Replace smart quotes and apostrophes in Markdown files
-    vim.cmd([[silent! %s/[“”]/"/ge | silent! %s/’/'/ge]])
+    -- vim.cmd([[silent! %s/[“”]/"/ge | silent! %s/’/'/ge]])
     -- Remove ** from Markdown headings
     vim.cmd([[silent! g/^\s*#\{1,6}\s.*/s/\*\*//g]])
     -- Remove trailing punctuation from Markdown headings

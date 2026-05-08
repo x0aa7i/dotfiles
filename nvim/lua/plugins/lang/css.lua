@@ -15,13 +15,26 @@ return {
           filetypes_include = {},
           settings = {
             tailwindCSS = {
-              classAttributes = { "class", "className" },
+              validate = true,
+              lint = {
+                cssConflict = "warning",
+                invalidApply = "error",
+                invalidScreen = "error",
+                invalidVariant = "error",
+                invalidConfigPath = "error",
+                invalidTailwindDirective = "error",
+                recommendedVariantOrder = "warning",
+              },
+              classAttributes = {
+                "class",
+                "className",
+              },
               experimental = {
                 classRegex = {
                   { "clsx\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)" },
-                  { "cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]" },
+                  -- { "cva\\(([^)]*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]" },
                   { "cn\\(([^)]*)\\)", "(?:'|\"|`)([^']*)(?:'|\"|`)" },
-                  { "tv\\((([^()]*|\\([^()]*\\))*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]" },
+                  -- { "tv\\((([^()]*|\\([^()]*\\))*)\\)", "[\"'`]([^\"'`]*).*?[\"'`]" },
                 },
               },
             },
@@ -30,12 +43,10 @@ return {
       },
       setup = {
         tailwindcss = function(_, opts)
-          local tw = require("lspconfig.configs.tailwindcss")
           opts.filetypes = opts.filetypes or {}
 
-          -- Add additional filetypes
           -- Add default filetypes
-          vim.list_extend(opts.filetypes, tw.default_config.filetypes)
+          vim.list_extend(opts.filetypes, vim.lsp.config.tailwindcss.filetypes)
 
           -- Remove excluded filetypes
           --- @param ft string

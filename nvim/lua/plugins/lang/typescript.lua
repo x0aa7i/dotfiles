@@ -26,21 +26,12 @@ return {
         },
         tsgo = {
           enabled = true,
-          -- cmd = { "tsgo", "--lsp", "--stdio" },
+          cmd = { "tsgo", "--lsp", "--stdio" },
           filetypes = {
             "javascript",
             "javascriptreact",
-            "javascript.jsx",
             "typescript",
             "typescriptreact",
-            "typescript.tsx",
-          },
-          root_markers = {
-            "package-lock.json",
-            "yarn.lock",
-            "pnpm-lock.yaml",
-            "bun.lockb",
-            "bun.lock",
           },
           settings = {
             typescript = {

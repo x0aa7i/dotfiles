@@ -11,10 +11,16 @@ return {
   },
   {
     "folke/tokyonight.nvim",
-    lazy = true,
+    lazy = false,
     -- enabled = false,
     opts = function(_, opts)
       opts.style = "night"
+      opts.styles = {
+        -- Style to be applied to different syntax groups
+        -- Value is any valid attr-list value for `:help nvim_set_hl`
+        comments = { italic = true },
+        keywords = { italic = false },
+      }
       opts.on_colors = function(colors)
         -- colors.bg_dark = "#101317"
         -- colors.bg = "#16161e"
@@ -23,6 +29,7 @@ return {
         -- colors.terminal_black = "#414868"
         -- colors.bg_visual = "#2a2d3f"
         colors.fg = "#a9b1d6"
+        colors.fg = "#bac0de"
         colors.red = "#f7768e"
         colors.red1 = "#db4b4b"
         colors.green = "#22d0a2"
