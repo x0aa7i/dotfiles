@@ -25,10 +25,10 @@ end
 # Aliases
 # alias nvim="~/.local/bin/nvim"
 
-if command -v exa >/dev/null
-    alias ls="exa --all --icons --group-directories-first --color=always"
-    alias ll="exa --long --no-user --all --icons --group-directories-first --color=always"
-    alias tree="exa --tree --all --icons --group-directories-first --color=always"
+if command -v eza >/dev/null
+    alias ls="eza --all --icons --group-directories-first --color=always"
+    alias ll="eza --long --no-user --all --icons --group-directories-first --color=always"
+    alias tree="eza --tree --all --icons --group-directories-first --color=always"
 end
 
 alias v="$EDITOR"
