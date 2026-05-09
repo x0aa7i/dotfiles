@@ -132,6 +132,9 @@ perform_rsync() {
     rsync_opts="${rsync_opts} --exclude-from=${RSYNC_EXCLUDE}"
   fi
 
+  # Exclude files and directories in .gitignore
+  rsync_opts="${rsync_opts} --filter='dir-merge,- .gitignore'"
+
   # Exclude directories containing .rsyncignore (similar to .rcloneignore)
   rsync_opts="${rsync_opts} --filter='dir-merge,e- .syncignore'"
   rsync_opts="${rsync_opts} --filter='dir-merge,e- .rsyncignore'"
