@@ -5,7 +5,7 @@
 add_newline = true
 
 # Timeout for commands executed by starship (in milliseconds).
-command_timeout = 1000
+command_timeout = 3600
 
 format = """$directory\
 $git_branch\
@@ -65,7 +65,7 @@ conflicted = "󰞇"
 behind = "󱦳${count} "
 ahead = "󱦲${count}"
 staged = '[+$count](green) '
-up_to_date = "󰄬"
+up_to_date = ""
 untracked = "?${count} "
 stashed = ""
 modified = ""
