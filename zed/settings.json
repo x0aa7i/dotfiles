@@ -9,9 +9,9 @@
 {
   // ── Appearance
   "theme": {
-    "mode": "dark",
+    "mode": "system",
     "light": "Tokyo Night Light",
-    "dark": "Tokyo Night",
+    "dark": "Tokyo Night"
   },
   "theme_overrides": {
     "Tokyo Night": {
@@ -19,6 +19,7 @@
       // "border.variant": "#1A1B26",
       "text.accent": "#9381ff",
       "icon.accent": "#9381ff",
+      "toolbar.background": "#1a1b26",
       "panel.background": "#1A1B26",
       "panel.focused_border": "#414868",
       "tab_bar.background": "#1A1B26",
@@ -38,91 +39,105 @@
       "ghost_element.active": "#2f3246",
       "ghost_element.selected": "#2f3246",
       "version_control.added": "#179c78",
-      "version_control.modified": "#c6904e",
+      "version_control.modified": "#cfaf59",
       "version_control.deleted": "#d6606a",
       "editor.indent_guide": "#2f3246",
       "editor.document_highlight.read_background": "#2f3246",
       "editor.document_highlight.write_background": "#2f3246",
-      "created": "#22d0a2",
+      "created": "#179c78",
       "deleted": "#e06c76",
       "error": "#e06c76",
-      "modified": "#e0af68",
+      "modified": "#cfaf59",
       "terminal.foreground": "#b3bac6",
       "terminal.bright_foreground": "#e2e5e9",
       "syntax": {
         "property": {
           "color": "#bac0de",
           "font_style": null,
-          "font_weight": null,
+          "font_weight": null
         },
         "variable": {
           "color": "#bac0de",
           "font_style": null,
-          "font_weight": null,
+          "font_weight": null
         },
         "string": {
           "color": "#4ac9a1",
           "font_style": null,
-          "font_weight": null,
+          "font_weight": null
         },
         "string.doc": {
           "color": "#4ac9a1",
           "font_style": null,
-          "font_weight": null,
+          "font_weight": null
         },
         "text.literal": {
           "color": "#22d0a2",
           "font_style": null,
-          "font_weight": null,
+          "font_weight": null
         },
         "constant": {
           "color": "#db9351",
           "font_style": null,
-          "font_weight": null,
+          "font_weight": null
         },
         "constant.builtin": {
           "color": "#db9351",
           "font_style": null,
-          "font_weight": null,
-        },
-      },
-    },
+          "font_weight": null
+        }
+      }
+    }
   },
   "icon_theme": {
     "mode": "dark",
     "light": "Zed (Default)",
-    "dark": "Zed (Default)",
+    "dark": "Zed (Default)"
   },
   "ui_font_size": 17.0,
   "buffer_font_size": 15.0,
   "buffer_font_family": ".ZedMono",
   "buffer_font_fallbacks": [".ZedMono", "JetBrainsMono Nerd Font"],
+  "title_bar": {
+    "show_branch_status_icon": true,
+    "show_branch_name": true,
+    "show_sign_in": false
+  },
 
   // ── Editor
   "vim_mode": true,
   "relative_line_numbers": "enabled",
   "show_whitespaces": "trailing",
+  "soft_wrap": "editor_width",
   "multi_cursor_modifier": "alt",
   "scroll_beyond_last_line": "vertical_scroll_margin",
   "diff_view_style": "split",
-  "code_lens": "on",
+  "code_lens": "off",
   "inlay_hints": {
-    "enabled": false,
+    "enabled": false
   },
   "gutter": {
-    "min_line_number_digits": 3,
+    "min_line_number_digits": 3
   },
   "scrollbar": {
-    "git_diff": false,
+    "git_diff": false
   },
   "git": {
     "path_style": "file_path_first",
+    "git_gutter": "tracked_files",
     "inline_blame": {
+      "enabled": false
+    }
+  },
+  "diagnostics": {
+    "inline": {
       "enabled": false,
-    },
+      "padding": 8,
+      "max_severity": "warning"
+    }
   },
   "which_key": {
-    "enabled": true,
+    "enabled": true
   },
 
   // ── Agent / AI
@@ -132,30 +147,27 @@
     "favorite_models": [],
     "model_parameters": [],
     "inline_assistant_model": {
-      "provider": "opencode",
-      "model": "free/minimax-m2.5-free",
+      "provider": "google",
+      "model": "gemini-3.5-flash"
     },
     "default_model": {
       "enable_thinking": true,
       "provider": "google",
-      "model": "gemini-2.5-flash",
-    },
+      "model": "gemini-3.1-flash-lite"
+    }
   },
   "agent_buffer_font_size": 14.0,
   "agent_ui_font_size": 17.0,
   "agent_servers": {
-    "claude-acp": {
-      "type": "registry",
-    },
-    "gemini": {
-      "type": "registry",
-    },
     "opencode": {
-      "type": "registry",
-    },
+      "favorite_config_option_values": {
+        "model": ["opencode/minimax-m2.5-free"]
+      },
+      "type": "registry"
+    }
   },
   "edit_predictions": {
-    "mode": "eager",
+    "mode": "subtle",
     "provider": "codestral",
     "disabled_globs": [
       "**/.env*",
@@ -166,28 +178,28 @@
       "**/.dev.vars",
       "**/secrets.yml",
       "/**/zed/settings.json",
-      "/**/zed/keymap.json",
-    ],
+      "/**/zed/keymap.json"
+    ]
   },
 
   // ── Panels
   "project_panel": {
     "entry_spacing": "standard",
     "default_width": 360,
-    "dock": "left",
+    "dock": "left"
   },
   "git_panel": {
     "tree_view": true,
     "default_width": 360,
-    "dock": "left",
+    "dock": "left"
   },
   "outline_panel": {
     "button": false,
-    "dock": "right",
+    "dock": "right"
   },
   "collaboration_panel": {
     "button": false,
-    "dock": "right",
+    "dock": "right"
   },
 
   // ── Terminal
@@ -196,32 +208,14 @@
     "copy_on_select": true,
     "default_height": 360,
     "env": {
-      "EDITOR": "zed --wait",
+      "EDITOR": "zed --wait"
     },
     "detect_venv": {
       "on": {
         "directories": [".venv", "venv"],
-        "activate_script": "default",
-      },
-    },
-  },
-
-  // ── Languages
-  "languages": {
-    // Not ready yet
-    // "TypeScript": {
-    //   "language_servers": ["tsgo", "!vtsls"],
-    // },
-    "Python": {
-      "language_servers": [
-        "ty",
-        "ruff",
-        "!basedpyright",
-        "!pyrefly",
-        "!pyright",
-        "!pylsp",
-      ],
-    },
+        "activate_script": "default"
+      }
+    }
   },
 
   // ── File Indexing
@@ -235,17 +229,108 @@
     "**/.classpath",
     "**/.settings",
     // above is default from Zed
-    // "**/out",
-    // "**/dist",
+    "**/out",
+    "**/dist",
     "**/.husky",
     "**/.turbo",
     "**/.vscode-test",
-    "**/.vscode",
     "**/.next",
-    "**/.storybook",
+    // "**/.storybook",
     "**/.tap",
     "**/.nyc_output",
     "**/report",
-    "**/node_modules",
+    "**/node_modules"
   ],
+
+  "auto_install_extensions": {
+    "html": true,
+    "svelte": true,
+    "toml": true,
+    "emmet": true,
+    "tokyo-night": true
+  },
+
+  // ── Languages
+  "formatter": [
+    {
+      "language_server": {
+        "name": "oxfmt"
+      }
+    }
+  ],
+  "format_on_save": "on",
+
+  "languages": {
+    "TypeScript": {
+      "language_servers": ["tsgo", "!vtsls", "!eslint", "!typescript-language-server", "..."]
+    },
+    "JavaScript": {
+      "language_servers": ["!vtsls", "!eslint", "!typescript-language-server", "..."]
+    },
+    "Svelte": {
+      "language_servers": ["tsgo", "!vtsls", "!eslint", "!typescript-language-server", "..."]
+    },
+    "Python": {
+      "language_servers": ["ty", "ruff", "!basedpyright", "!pyrefly", "!pyright", "!pylsp"]
+    }
+  },
+
+  "lsp": {
+    "tailwindcss-language-server": {
+      "settings": {
+        "classFunctions": ["cn", "tv"],
+        "experimental": {
+          "classRegex": ["[cls|className]\\s\\:\\=\\s\"([^\"]*)", ["\\[((.|\\n)*)\\]", "'([^']*)'"]]
+        }
+      }
+    },
+    "vscode-css-language-server": {
+      "settings": {
+        "css": {
+          "lint": {
+            "unknownAtRules": "ignore"
+          }
+        }
+      }
+    },
+    "oxlint": {
+      "initialization_options": {
+        "settings": {
+          "configPath": null,
+          "run": "onType",
+          "disableNestedConfig": false,
+          "fixKind": "safe_fix",
+          "unusedDisableDirectives": "deny"
+        }
+      }
+    },
+    "oxfmt": {
+      "initialization_options": {
+        "settings": {
+          "fmt.configPath": null,
+          "run": "onSave"
+        }
+      }
+    },
+    "tsgo": {
+      "settings": {
+        "typescript": {
+          "preferences": {
+            "autoImportFileExcludePatterns": [
+              "node_modules",
+              ".next",
+              "dist",
+              "coverage",
+              "**/*.stories.**"
+            ],
+            "preferTypeOnlyAutoImports": true
+          }
+        }
+      }
+    }
+  },
+
+  "file_types": {
+    "HTML": ["*.svg"]
+  }
 }
