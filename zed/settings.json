@@ -38,15 +38,15 @@
       "ghost_element.active": "#2f3246",
       "ghost_element.selected": "#2f3246",
       "version_control.added": "#179c78",
-      "version_control.modified": "#c6904e",
+      "version_control.modified": "#cfaf59",
       "version_control.deleted": "#d6606a",
       "editor.indent_guide": "#2f3246",
       "editor.document_highlight.read_background": "#2f3246",
       "editor.document_highlight.write_background": "#2f3246",
-      "created": "#22d0a2",
+      "created": "#179c78",
       "deleted": "#e06c76",
       "error": "#e06c76",
-      "modified": "#e0af68",
+      "modified": "#cfaf59",
       "terminal.foreground": "#b3bac6",
       "terminal.bright_foreground": "#e2e5e9",
       "syntax": {
@@ -97,11 +97,17 @@
   "buffer_font_size": 15.0,
   "buffer_font_family": ".ZedMono",
   "buffer_font_fallbacks": [".ZedMono", "JetBrainsMono Nerd Font"],
+  "title_bar": {
+    "show_branch_status_icon": true,
+    "show_branch_name": true,
+    "show_sign_in": false,
+  },
 
   // ── Editor
   "vim_mode": true,
   "relative_line_numbers": "enabled",
   "show_whitespaces": "trailing",
+  "soft_wrap": "editor_width",
   "multi_cursor_modifier": "alt",
   "scroll_beyond_last_line": "vertical_scroll_margin",
   "diff_view_style": "split",
@@ -151,11 +157,14 @@
       "type": "registry",
     },
     "opencode": {
+      "favorite_config_option_values": {
+        "model": ["opencode/minimax-m2.5-free"],
+      },
       "type": "registry",
     },
   },
   "edit_predictions": {
-    "mode": "eager",
+    "mode": "subtle",
     "provider": "codestral",
     "disabled_globs": [
       "**/.env*",
@@ -212,6 +221,9 @@
     // "TypeScript": {
     //   "language_servers": ["tsgo", "!vtsls"],
     // },
+    "Markdown": {
+      "format_on_save": "on",
+    },
     "Python": {
       "language_servers": [
         "ty",
@@ -222,6 +234,27 @@
         "!pylsp",
       ],
     },
+  },
+
+  "lsp": {
+    "vscode-css-language-server": {
+      "settings": {
+        "css": {
+          "lint": {
+            "unknownAtRules": "ignore",
+          },
+        },
+      },
+    },
+  },
+
+  "auto_install_extensions": {
+    "html": true,
+    "svelte": true,
+  },
+
+  "file_types": {
+    "HTML": ["*.svg"],
   },
 
   // ── File Indexing
@@ -235,8 +268,8 @@
     "**/.classpath",
     "**/.settings",
     // above is default from Zed
-    // "**/out",
-    // "**/dist",
+    "**/out",
+    "**/dist",
     "**/.husky",
     "**/.turbo",
     "**/.vscode-test",

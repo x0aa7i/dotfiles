@@ -24,6 +24,7 @@
       "O": "project_panel::RevealInFileManager",
       "H": "project_panel::CollapseAllEntries",
       "y": "workspace::CopyPath",
+      "q": "workspace::ToggleLeftDock",
       "shift-y": "workspace::CopyRelativePath",
       "space e": "project_panel::Toggle",
     },
@@ -33,11 +34,14 @@
   {
     "context": "Editor && (vim_mode == normal || vim_mode == visual) && !VimWaiting && !menu",
     "bindings": {
-      "shift-l": ["workspace::SendKeystrokes", "$"],
-      "shift-h": ["workspace::SendKeystrokes", "^"],
+      "shift-l": ["workspace::SendKeystrokes", "g $"],
+      "shift-h": ["workspace::SendKeystrokes", "g ^"],
 
       "ctrl-shift-c": "editor::Copy",
       "ctrl-shift-v": "editor::Paste",
+
+      "s": "vim::PushSneak",
+      "shift-s": "vim::PushSneakBackward",
 
       "ctrl-u": ["workspace::SendKeystrokes", "ctrl-u z z"],
       "ctrl-d": ["workspace::SendKeystrokes", "ctrl-d z z"],
@@ -47,6 +51,10 @@
       // Move lines up and down
       "alt-j": "editor::MoveLineDown",
       "alt-k": "editor::MoveLineUp",
+
+      // Map j/k to gj/gk
+      "j": ["vim::Down", { "display_lines": true }],
+      "k": ["vim::Up", { "display_lines": true }],
 
       // Search
       "space s w": "buffer_search::Deploy", // Search word under cursor in current pane
@@ -65,7 +73,6 @@
     "bindings": {
       "shift-y": ["workspace::SendKeystrokes", "y $"],
       "enter": ["workspace::SendKeystrokes", "c i w"],
-      "shift-k": "editor::Hover",
 
       // Navigate panes
       "shift-q": "pane::CloseActiveItem",
@@ -76,13 +83,13 @@
       "space b b": "pane::AlternateFile", // Jump to the previous location
       "space f p": "projects::OpenRecent",
 
+      // Open recent project
+      "space s p": ["projects::OpenRecent", { "create_new_window": false }],
+
       // Split panel
       "ctrl-w": null,
       "space w h": "pane::SplitDown",
       "space w v": "pane::SplitRight",
-
-      // Project search
-      "space /": "pane::DeploySearch",
 
       // Show panels
       "space e": "project_panel::Toggle",
@@ -92,6 +99,7 @@
       "space a a": "agent::Toggle",
 
       // LSP
+      "shift-k": "editor::Hover",
       "g d": "editor::GoToDefinition",
       "g D": "editor::GoToDefinitionSplit",
       "g i": "editor::GoToImplementation",
@@ -150,6 +158,13 @@
         "task::Spawn",
         { "task_name": "start lazygit file log", "reveal_target": "center" },
       ],
+      "space -": [
+        "task::Spawn",
+        {
+          "task_name": "yazi",
+          "reveal_target": "center",
+        },
+      ],
     },
   },
 
@@ -158,6 +173,8 @@
     "context": "Editor && vim_mode == visual && !VimWaiting && !menu",
     "bindings": {
       // visual, visual line & visual block modes
+      ">": ["workspace::SendKeystrokes", "> g v"],
+      "<": ["workspace::SendKeystrokes", "< g v"],
     },
   },
 
@@ -166,6 +183,7 @@
     "context": "Editor && vim_mode == insert && !menu",
     "bindings": {
       "ctrl-shift-v": "editor::Paste",
+      "ctrl-s": ["workspace::SendKeystrokes", "escape ctrl-s"],
     },
   },
   {
@@ -212,16 +230,16 @@
     "bindings": {
       "alt-tab": null,
       "alt-l": "editor::AcceptEditPrediction",
-      "alt-j": "editor::AcceptNextLineEditPrediction",
-      "alt-p": "editor::AcceptEditPrediction",
       "alt-]": "editor::AcceptNextWordEditPrediction",
+      "alt-j": "editor::AcceptNextLineEditPrediction",
+      // "alt-p": "editor::AcceptEditPrediction",
     },
   },
   {
     "context": "Terminal",
     "bindings": {
-      // "alt-l": "pane::ActivateNextItem",
-      // "alt-h": "pane::ActivatePreviousItem",
+      "alt-l": "pane::ActivateNextItem",
+      "alt-h": "pane::ActivatePreviousItem",
     },
   },
 
@@ -235,11 +253,24 @@
     },
   },
 
+  {
+    "context": "SharedScreen || KeyContextView || MarkdownPreview",
+    "bindings": {
+      "shift-q": "pane::CloseActiveItem",
+    },
+  },
+
   // ── Git Panel
   {
     "context": "GitPanel && ChangesList",
     "bindings": {
       "space": "git::ToggleStaged",
+    },
+  },
+  {
+    "context": "GitPanel && !CommitEditor",
+    "bindings": {
+      "q": "workspace::ToggleLeftDock",
     },
   },
 
