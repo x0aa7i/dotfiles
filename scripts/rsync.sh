@@ -147,6 +147,17 @@ perform_rsync() {
     return 1
   fi
 
+  # Set core.filemode = false on target repositories to prevent them from showing
+  # as dirty with +x file mode changes due to destination filesystem limitations.
+  if [[ -d "$dest" ]]; then
+    log_info "Setting core.filemode to false for synced repositories in $dest..."
+    find "$dest" -type d \( -name .git -print0 -prune \) -o \( -name node_modules -o -name .venv -o -name dist -o -name build -o -name target -o -name .cache \) -prune 2>/dev/null | while IFS= read -r -d '' git_dir; do
+      if [[ -f "${git_dir}/config" ]]; then
+        git config -f "${git_dir}/config" core.filemode false || true
+      fi
+    done
+  fi
+
   log_info "Completed sync: $source → $dest"
   return 0
 }
