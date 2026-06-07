@@ -17,8 +17,8 @@ set -gx fish_prompt_pwd_dir_length 0 # show the full path instead of the first l
 
 # pnpm
 set -gx PNPM_HOME "/home/abdo/.local/share/pnpm"
-if not string match -q -- $PNPM_HOME $PATH
-    set -gx PATH "$PNPM_HOME" $PATH
+if not string match -q -- "$PNPM_HOME/bin" $PATH
+  set -gx PATH "$PNPM_HOME/bin" $PATH
 end
 # pnpm end
 
@@ -112,3 +112,7 @@ test -d $PYENV_ROOT/bin; and fish_add_path $PYENV_ROOT/bin
 
 # opencode
 fish_add_path /home/abdo/.opencode/bin
+
+
+# Added by Antigravity CLI installer
+set -gx PATH "/home/abdo/.local/bin" $PATH
