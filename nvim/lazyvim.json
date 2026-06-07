@@ -14,6 +14,8 @@
     "lazyvim.plugins.extras.lang.sql",
     "lazyvim.plugins.extras.lang.svelte",
     "lazyvim.plugins.extras.lang.typescript",
+    "lazyvim.plugins.extras.lang.typescript.oxc",
+    "lazyvim.plugins.extras.lang.typescript.tsgo",
     "lazyvim.plugins.extras.ui.treesitter-context",
     "lazyvim.plugins.extras.util.dot",
     "lazyvim.plugins.extras.vscode"

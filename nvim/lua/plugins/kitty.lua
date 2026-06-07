@@ -1,6 +1,7 @@
 return {
   "MunsMan/kitty-navigator.nvim",
   build = "cp ./*.py ~/.config/kitty",
+  enabled = vim.fn.executable("kitty") == 1,
   event = "VeryLazy",
     -- stylua: ignore
     keys = {
