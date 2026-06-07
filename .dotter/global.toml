@@ -42,6 +42,11 @@ default_target_type = "symbolic"
 [mpv.files]
 "mpv" = { target = "~/.config/mpv", type = "symbolic", recurse = false }
 
+[ai.files]
+".agents" = { target = "~/.agents", type = "symbolic", recurse = false }
+".agents/skills" = { target = "~/.claude/skills", type = "symbolic", recurse = false }
+".agents/skills" = { target = "~/.gemini/skills", type = "symbolic", recurse = false }
+
 [opencode.files]
 "opencode/opencode.json" = "~/.config/opencode/opencode.json"
 "opencode/skills" = { target = "~/.config/opencode/skills", type = "symbolic", recurse = false }
