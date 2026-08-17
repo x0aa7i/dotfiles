@@ -107,8 +107,8 @@ return {
         },
       },
       formatters_by_ft = {
-        ["markdown"] = { "prettierd" },
-        ["mdx"] = { "prettierd" },
+        ["markdown"] = { "oxfmt", "prettierd" },
+        ["mdx"] = { "oxfmt", "prettierd" },
       },
     },
   },
