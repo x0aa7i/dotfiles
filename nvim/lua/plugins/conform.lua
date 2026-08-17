@@ -18,10 +18,23 @@ return {
             PRETTIERD_DEFAULT_CONFIG = vim.fn.stdpath("config") .. "/rules/.prettierrc.json",
           },
         },
+        oxfmt = {
+          cwd = require("conform.util").root_file({
+            ".oxfmtrc",
+            ".oxfmtrc.json",
+            ".oxfmtrc.jsonc",
+            "oxfmt.json",
+            "oxfmt.jsonc",
+          }),
+          require_cwd = true,
+        },
       },
       formatters_by_ft = {
-        ["html"] = { "prettierd" },
-        ["yaml"] = { "prettierd" },
+        ["html"] = { "oxfmt", "prettierd", stop_after_first = true },
+        ["css"] = { "oxfmt", "prettierd", stop_after_first = true },
+        ["json"] = { "oxfmt", "prettierd", stop_after_first = true },
+        ["yaml"] = { "oxfmt", "prettierd", stop_after_first = true },
+        ["typst"] = { "typstyle" },
       },
     },
   },
@@ -29,7 +42,7 @@ return {
     "mason-org/mason.nvim",
     opts = {
       ensure_installed = {
-        -- "dprint",
+        "oxfmt",
         "prettierd",
         "stylua",
       },
