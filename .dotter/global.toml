@@ -24,6 +24,9 @@ default_target_type = "symbolic"
 [tmux.files]
 "tmux" = { target = "~/.config/tmux", type = "symbolic", recurse = false }
 
+[herdr.files]
+"herdr/config.toml" = "~/.config/herdr/config.toml"
+
 [nvim.files]
 "nvim" = { target = "~/.config/nvim", type = "symbolic", recurse = false }
 

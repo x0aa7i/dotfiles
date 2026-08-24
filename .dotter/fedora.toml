@@ -4,6 +4,7 @@ packages = [
   "fish",
   "ghostty",
   "git",
+  "herdr",
   "kitty",
   "lazygit",
   "mpv",

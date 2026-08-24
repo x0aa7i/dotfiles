@@ -1,0 +1,90 @@
+# Herdr Configuration
+# https://herdr.dev/docs/configuration/
+
+# Skip onboarding setup
+onboarding = false
+
+[theme]
+# Built-in themes: catppuccin, terminal, tokyo-night, dracula, nord,
+#                  gruvbox, one-dark, solarized, kanagawa, rose-pine, vesper
+name = "tokyo-night"
+auto_switch = false
+
+[terminal]
+# Executable used for new interactive panes (empty uses $SHELL)
+default_shell = "fish"
+shell_mode = "auto"
+new_cwd = "follow"
+
+[worktrees]
+# Root directory for Git worktree checkouts created from the sidebar
+directory = "~/.herdr/worktrees"
+
+[remote]
+# Manage SSH keepalive and connection reuse for `herdr --remote`
+manage_ssh_config = true
+
+[keys]
+# Prefix key (default: ctrl+b)
+prefix = "ctrl+b"
+
+# Navigation & actions
+new_tab = "prefix+c"
+next_tab = ["prefix+n", "alt+l"]
+previous_tab = ["prefix+p", "alt+h"]
+split_horizontal = "prefix+-"
+split_vertical = "prefix+|"
+focus_pane_left = "prefix+h"
+focus_pane_down = "prefix+j"
+focus_pane_up = "prefix+k"
+focus_pane_right = "prefix+l"
+
+# Custom commands & popups
+[[keys.command]]
+key = "prefix+alt+g"
+type = "popup"
+command = "lazygit"
+description = "open lazygit popup"
+width = "85%"
+height = "85%"
+
+[[keys.command]]
+key = "prefix+t"
+type = "popup"
+command = "exec \"${SHELL:-fish}\""
+description = "open scratch terminal"
+width = "80%"
+height = "80%"
+
+[ui]
+# Window title written to outer terminal
+window_title = "{hostname}: {workspace}"
+
+# Desktop tab bar position ("top" or "bottom")
+tab_bar_position = "top"
+
+# Visual appearance
+pane_borders = true
+pane_scrollbars = true
+pane_gaps = true
+status_indicators = "dots"
+
+[ui.toast]
+# Delivery: "herdr" (in-app), "terminal", "system", or "off"
+delivery = "herdr"
+delay_seconds = 1
+
+[ui.toast.herdr]
+position = "bottom-right"
+
+[ui.toast.clipboard]
+enabled = true
+position = "bottom-center"
+
+[ui.sound]
+# Play audio notifications when background agents require attention
+enabled = false
+
+[session]
+# Resume supported AI agent sessions after server restart
+resume_agents_on_restore = true
