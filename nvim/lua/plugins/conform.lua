@@ -34,6 +34,7 @@ return {
         ["css"] = { "oxfmt", "prettierd", stop_after_first = true },
         ["json"] = { "oxfmt", "prettierd", stop_after_first = true },
         ["yaml"] = { "oxfmt", "prettierd", stop_after_first = true },
+        ["toml"] = { "taplo", "dprint", stop_after_first = true },
         ["typst"] = { "typstyle" },
       },
     },

@@ -2,7 +2,9 @@ return {
   {
     "neovim/nvim-lspconfig",
     opts = function(_, opts)
-      LazyVim.extend(opts.servers.vtsls, "settings.vtsls.tsserver.globalPlugins", {
+      opts.servers = opts.servers or {}
+      opts.servers.tsc = opts.servers.tsc or {}
+      LazyVim.extend(opts.servers.tsc, "settings.typescript.tsserver.globalPlugins", {
         {
           name = "@astrojs/ts-plugin",
           location = LazyVim.get_pkg_path("astro-language-server", "/node_modules/@astrojs/ts-plugin"),

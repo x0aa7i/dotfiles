@@ -1,5 +1,19 @@
 return {
   {
+    "neovim/nvim-lspconfig",
+    opts = function(_, opts)
+      opts.servers = opts.servers or {}
+      opts.servers.tsc = opts.servers.tsc or {}
+      LazyVim.extend(opts.servers.tsc, "settings.typescript.tsserver.globalPlugins", {
+        {
+          name = "typescript-svelte-plugin",
+          location = LazyVim.get_pkg_path("svelte-language-server", "/node_modules/typescript-svelte-plugin"),
+          enableForWorkspaceTypeScriptVersions = true,
+        },
+      })
+    end,
+  },
+  {
     "nvim-svelte/nvim-svelte-snippets",
     dependencies = "L3MON4D3/LuaSnip",
     Event = "InsertEnter",

@@ -1,67 +1,43 @@
 return {
   {
     "neovim/nvim-lspconfig",
-    opts = {
-      servers = {
-        vtsls = {
-          enabled = false,
-          settings = {
-            vtsls = {
-              experimental = {
-                completion = {
-                  enableServerSideFuzzyMatch = true,
-                  entriesLimit = 30,
-                },
-              },
+    opts = function(_, opts)
+      opts.servers = opts.servers or {}
+      opts.servers.tsc = opts.servers.tsc or {}
+      opts.servers.tsc.cmd = { "tsc", "--lsp", "--stdio" }
+      opts.servers.tsc.root_markers = { "tsconfig.json", "package.json", "jsconfig.json", ".git" }
+
+      LazyVim.extend(opts.servers.tsc, "filetypes", {
+        "javascript",
+        "javascriptreact",
+        "javascript.jsx",
+        "typescript",
+        "typescriptreact",
+        "typescript.tsx",
+      })
+
+      LazyVim.extend(opts.servers.tsc, "settings", {
+        ["js/ts"] = {
+          inlayHints = {
+            enumMemberValues = { enabled = true },
+            functionLikeReturnTypes = { enabled = false },
+            parameterNames = {
+              enabled = "literals",
+              suppressWhenArgumentMatchesName = true,
             },
-            typescript = {
-              preferences = {
-                includePackageJsonAutoImports = "off",
-              },
-              tsserver = {
-                maxTsServerMemory = 8192,
-              },
-            },
+            parameterTypes = { enabled = true },
+            propertyDeclarationTypes = { enabled = true },
+            variableTypes = { enabled = false },
           },
         },
-        tsgo = {
-          enabled = true,
-          cmd = { "tsgo", "--lsp", "--stdio" },
-          filetypes = {
-            "javascript",
-            "javascriptreact",
-            "typescript",
-            "typescriptreact",
-          },
-          settings = {
-            typescript = {
-              inlayHints = {
-                enumMemberValues = { enabled = true },
-                functionLikeReturnTypes = { enabled = false },
-                parameterNames = {
-                  enabled = "literals",
-                  suppressWhenArgumentMatchesName = true,
-                },
-                parameterTypes = { enabled = true },
-                propertyDeclarationTypes = { enabled = true },
-                variableTypes = { enabled = false },
-              },
-            },
-          },
-        },
-      },
-    },
-  },
-  {
-    "pmizio/typescript-tools.nvim",
-    dependencies = { "nvim-lua/plenary.nvim", "neovim/nvim-lspconfig" },
-    opts = {},
+      })
+    end,
   },
   {
     "mason-org/mason.nvim",
     opts = {
       ensure_installed = {
-        "vtsls",
+        "tsc",
       },
     },
   },
@@ -82,6 +58,24 @@ return {
       linters_by_ft = {
         javascript = { "eslint_d" },
         typescript = { "eslint_d" },
+      },
+    },
+  },
+
+  -- Filetype icons
+  {
+    "nvim-mini/mini.icons",
+    opts = {
+      file = {
+        [".eslintrc.js"] = { glyph = "󰱺", hl = "MiniIconsYellow" },
+        [".node-version"] = { glyph = "", hl = "MiniIconsGreen" },
+        [".prettierrc"] = { glyph = "", hl = "MiniIconsPurple" },
+        [".yarnrc.yml"] = { glyph = "", hl = "MiniIconsBlue" },
+        ["eslint.config.js"] = { glyph = "󰱺", hl = "MiniIconsYellow" },
+        ["package.json"] = { glyph = "", hl = "MiniIconsGreen" },
+        ["tsconfig.json"] = { glyph = "", hl = "MiniIconsAzure" },
+        ["tsconfig.build.json"] = { glyph = "", hl = "MiniIconsAzure" },
+        ["yarn.lock"] = { glyph = "", hl = "MiniIconsBlue" },
       },
     },
   },
