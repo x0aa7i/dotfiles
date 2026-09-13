@@ -5,9 +5,9 @@ return {
     "obsidian-nvim/obsidian.nvim",
     version = "*", -- recommended, use latest release instead of latest commit
     lazy = true,
-    enabled = false,
     ft = "markdown",
     dependencies = {
+      "nvim-lua/plenary.nvim",
       {
         "folke/which-key.nvim",
         optional = true,
@@ -18,76 +18,74 @@ return {
         },
       },
     },
-    -- Replace the above line with this if you only want to load obsidian.nvim for markdown files in your vault:
     event = {
-      -- If you want to use the home shortcut '~' here you need to call 'vim.fn.expand'.
-      -- E.g. "BufReadPre " .. vim.fn.expand "~" .. "/my-vault/**.md"
       ("BufReadPre %s/**.md"):format(vault_path),
       ("BufNewFile %s/**.md"):format(vault_path),
     },
-    cmd = { "ObsidianToday", "ObsidianYesterday", "ObsidianTomorrow", "ObsidianNew", "ObsidianSearch" },
+    cmd = { "Obsidian" },
     keys = {
-      { "<leader>od", "<cmd>Obsidian dailies<CR>", desc = "Daily notes" },
-      { "<leader>on", "<cmd>Obsidian new<cr>", desc = "New note" },
-      { "<leader>oN", "<cmd>Obsidian new_from_template<CR>", desc = "New Templated Note" },
-      { "<leader>oj", "<cmd>Obsidian today<CR>", desc = "Today note" },
-      { "<leader>ot", "<cmd>Obsidian template<CR>", desc = "Template" },
-      { "<leader>ob", "<cmd>Obsidian backlinks<cr>", desc = "Backlinks" },
-      { "<leader>ol", "<cmd>Obsidian link<CR>", desc = "New Link", mode = "v" },
-      { "<leader>ol", "<cmd>Obsidian links<CR>", desc = "List Links" },
-      { "<leader>oL", "<cmd>Obsidian link_new<CR>", desc = "New Link & File", mode = "v" },
-      { "<leader>of", "<cmd>Obsidian follow_link<cr>", desc = "Follow link under cursor" },
-      { "<leader>os", "<cmd>Obsidian search<cr>", desc = "Search" },
-      { "<leader>or", "<cmd>Obsidian rename<cr>", desc = "Rename" },
-      { "<leader>of", "<cmd>Obsidian quick_switch<cr>", desc = "Find" },
-      { "<leader>og", "<cmd>Obsidian tags<cr>", desc = "Tags" },
-      { "<leader>ow", "<cmd>Obsidian workspace personal<cr>", desc = "Personal workspace" },
-      { "<leader>oo", "<cmd>Obsidian open<cr>", desc = "Open in Obsidian app" },
-      { "<leader>oh", "<cmd>Obsidian check<CR>", desc = "Check Health" },
-      { "<leader>oH", "<cmd>Obsidian debug<CR>", desc = "Debug Info" },
-      -- { "<leader>op", "<cmd>Obsidian pasteImg<CR>", desc = "Paste Image" },
-      -- { "<leader>og", "<cmd>Obsidian search<CR>", desc = "Grep" },
-
-      -- { "<leader>ot", "<cmd>Obsidian tags<CR>", desc = "Search Tags" },
-      { "<leader>ow", "<cmd>Obsidian workspace<CR>", desc = "Change Workspace" },
       { "<leader>o<space>", "<cmd>Obsidian quick_switch<CR>", desc = "Find Note" },
+      { "<leader>of", "<cmd>Obsidian quick_switch<CR>", desc = "Find Note" },
+      { "<leader>on", "<cmd>Obsidian new<CR>", desc = "New Note" },
+      { "<leader>oN", "<cmd>Obsidian new_from_template<CR>", desc = "New Templated Note" },
+      { "<leader>ou", "<cmd>Obsidian unique_note<CR>", desc = "New Unique Note" },
+      { "<leader>oj", "<cmd>Obsidian today<CR>", desc = "Today Note" },
+      { "<leader>oy", "<cmd>Obsidian yesterday<CR>", desc = "Yesterday Note" },
+      { "<leader>ot", "<cmd>Obsidian tomorrow<CR>", desc = "Tomorrow Note" },
+      { "<leader>od", "<cmd>Obsidian dailies<CR>", desc = "Daily Notes Picker" },
+      { "<leader>os", "<cmd>Obsidian search<CR>", desc = "Search Vault (Grep)" },
+      { "<leader>oi", "<cmd>Obsidian template<CR>", desc = "Insert Template" },
+      { "<leader>oT", "<cmd>Obsidian toc<CR>", desc = "Table of Contents" },
+      { "<leader>ob", "<cmd>Obsidian backlinks<CR>", desc = "Backlinks" },
+      { "<leader>oB", "<cmd>Obsidian bookmarks<CR>", desc = "Bookmarks" },
+      { "<leader>og", "<cmd>Obsidian tags<CR>", desc = "Tags" },
+      { "<leader>ol", "<cmd>Obsidian links<CR>", desc = "List Links" },
+      { "<leader>ol", "<cmd>Obsidian link<CR>", desc = "Link Selection", mode = "v" },
+      { "<leader>oL", "<cmd>Obsidian link_new<CR>", desc = "New Link & Note", mode = "v" },
+      { "<leader>oe", "<cmd>Obsidian extract_note<CR>", desc = "Extract Note", mode = "v" },
+      { "<leader>op", "<cmd>Obsidian paste_img<CR>", desc = "Paste Image" },
+      { "<leader>or", "<cmd>Obsidian rename<CR>", desc = "Rename Note" },
+      { "<leader>oc", "<cmd>Obsidian toggle_checkbox<CR>", desc = "Toggle Checkbox" },
+      { "<leader>ow", "<cmd>Obsidian workspace<CR>", desc = "Switch Workspace" },
+      { "<leader>oo", "<cmd>Obsidian open<CR>", desc = "Open in Obsidian App" },
+      { "<leader>oh", "<cmd>Obsidian help<CR>", desc = "Obsidian Help" },
+      { "<leader>oH", "<cmd>Obsidian check<CR>", desc = "Check Health" },
     },
     ---@module 'obsidian'
     ---@type obsidian.config
     opts = {
+      legacy_commands = false,
       workspaces = {
         {
           name = "personal",
           path = vault_path,
         },
       },
-      completion = { -- handled by markdown-oxide instead
-        nvim_cmp = false,
-        blink = false,
-        min_chars = 2, -- Trigger completion at 2 chars.
+      new_notes_location = "current_dir",
+      note_id_func = function(title, dir)
+        return require("obsidian.builtin").title_id(title, dir)
+      end,
+      completion = {
+        min_chars = 2,
+        match_case = true,
+        create_new = true,
       },
-
-      ui = {
-        enable = false,
+      link = {
+        style = "wiki",
+        format = "shortest",
       },
-
-      -- see below for full list of options 👇
       daily_notes = {
-        -- Optional, if you keep daily notes in a separate directory.
-        folder = "Journal/Daily",
-        -- Optional, if you want to change the date format for the ID of daily notes.
-        date_format = "%Y/%Y-%m-%d",
-        -- Optional, if you want to change the date format of the default alias of daily notes.
+        folder = "10-journal/daily",
+        date_format = "YYYY/MM/YYYY-MM-DD-dddd",
         alias_format = "%B %-d, %Y",
-        -- Optional, if you want to automatically insert a template from your template directory like 'daily.md'
-        template = "Assets/Templates/nvim/daily.md",
+        template = "60-system/templates/nvim/daily.md",
+        default_tags = { "daily-notes" },
+        workdays_only = true,
       },
-
       templates = {
-        folder = "Assets/Templates",
-        date_format = "%Y-%m-%d",
-        time_format = "%H:%M",
-        -- A map for custom variables, the key should be the variable and the value a function
+        folder = "60-system/templates",
+        date_format = "YYYY-MM-DD",
+        time_format = "HH:mm",
         substitutions = {
           ["now"] = function()
             return os.date("%Y-%m-%d %H:%M")
@@ -95,93 +93,108 @@ return {
           ["long-date"] = function()
             return os.date("%A, %B %d %Y")
           end,
+          ["cursor"] = function()
+            return "{{cursor}}"
+          end,
         },
       },
-
-      highlight = {
-        enable = false,
-        additional_vim_regex_highlighting = { "markdown" },
+      attachments = {
+        folder = "60-system/attachments",
+        img_name_func = function()
+          return string.format("Pasted image %s", os.date("%Y%m%d%H%M%S"))
+        end,
+        confirm_img_paste = true,
       },
-
-      -- `true` indicates that you don't want obsidian.nvim to manage frontmatter.
-      -- disable_frontmatter = function()
-      --   local filepath = vim.fn.expand("%:p")
-      --   local directories = { "Assets/Templates" }
-      --
-      --   for _, directory in ipairs(directories) do
-      --     if filepath:find(directory, 1, true) ~= nil then
-      --       return true
-      --     end
-      --   end
-      --   return false
-      -- end,
-      disable_frontmatter = true,
-
-      -- Either 'wiki' or 'markdown'.
-      preferred_link_style = "wiki",
-
-      -- Optional, alternatively you can customize the frontmatter data.
-      ---@return table
-      note_frontmatter_func = function(note)
-        local out = {
-          aliases = note.aliases,
-          tags = note.tags,
-          created = os.date("%Y-%m-%d %H:%M"),
-        }
-
-        -- `note.metadata` contains any manually added fields in the frontmatter.
-        -- So here we just make sure those fields are kept in the frontmatter.
-        if note.metadata ~= nil and not vim.tbl_isempty(note.metadata) then
-          for k, v in pairs(note.metadata) do
-            out[k] = v
-          end
-        end
-
-        out.modified = os.date("%Y-%m-%d %H:%M")
-
-        return out
-      end,
-
       picker = {
-        -- Set your preferred picker. Can be one of 'telescope.nvim', 'fzf-lua', 'mini.pick' or 'snacks.pick'.
-        name = "snacks.pick",
-        -- Optional, configure key mappings for the picker. These are the defaults.
-        -- Not all pickers support all mappings.
+        name = "snacks.picker",
         note_mappings = {
-          -- Create a new note from your query.
           new = "<C-x>",
-          -- Insert a link to the selected note.
           insert_link = "<C-l>",
         },
         tag_mappings = {
-          -- Add tag(s) to current note.
           tag_note = "<C-x>",
-          -- Insert a tag at the current location.
           insert_tag = "<C-l>",
         },
       },
+      frontmatter = {
+        enabled = function(fname)
+          -- Disable frontmatter for template files
+          if fname and fname:find("60%-system/templates") then
+            return false
+          end
+          return true
+        end,
+        func = function(note)
+          local out = {
+            aliases = note.aliases,
+            tags = note.tags,
+            created = os.date("%Y-%m-%d %H:%M"),
+          }
 
+          if note.metadata ~= nil and not vim.tbl_isempty(note.metadata) then
+            for k, v in pairs(note.metadata) do
+              out[k] = v
+            end
+          end
+
+          out.modified = os.date("%Y-%m-%d %H:%M")
+          return out
+        end,
+        sort = { "id", "aliases", "tags", "created", "modified" },
+      },
+      search = {
+        sort_by = "modified",
+        sort_reversed = true,
+        max_lines = 1000,
+      },
+      checkbox = {
+        enabled = true,
+        create_new = true,
+        order = { " ", "~", "!", ">", "x" },
+      },
       footer = {
         enabled = true,
-        format = "{{backlinks}} backlinks  {{properties}} properties", -- works like the template system
-        -- hl_group = "@property", -- Use another hl group
+        format = "{{backlinks}} backlinks  {{properties}} properties  {{words}} words",
       },
-
-      statusline = {
-        enabled = false,
-        format = "{{properties}} props {{backlinks}} backlinks",
+      ui = {
+        enable = false, -- Handled by render-markdown.nvim
       },
-
       callbacks = {
-        enter_note = function(_, note)
-          vim.keymap.del("n", "<CR>", { buffer = note.bufnr })
-
+        enter_note = function(note)
           vim.keymap.set(
             "n",
             "gd",
             "<cmd>Obsidian follow_link<CR>",
             { noremap = true, silent = true, buffer = note.bufnr, desc = "Follow link" }
           )
+
+          -- Handle template cursor positioning (e.g. {{cursor}}, <% tp.file.cursor() %>, or #l)
+          vim.schedule(function()
+            if not vim.api.nvim_buf_is_valid(note.bufnr) then
+              return
+            end
+            local lines = vim.api.nvim_buf_get_lines(note.bufnr, 0, -1, false)
+            for i, line in ipairs(lines) do
+              local s, e = line:find("{{cursor}}", 1, true)
+              if not s then
+                s, e = line:find("<%%%s*tp%.file%.cursor%(.-%)%s*%%>")
+              end
+              if not s then
+                s, e = line:find("%s*#l$")
+              end
+
+              if s then
+                local new_line = line:sub(1, s - 1) .. line:sub(e + 1)
+                if new_line:match("^%s*[%-%*]%s*%[[^%]]%]$") then
+                  new_line = new_line .. " "
+                end
+                vim.api.nvim_buf_set_lines(note.bufnr, i - 1, i, false, { new_line })
+                local target_col = math.max(0, #new_line)
+                pcall(vim.api.nvim_win_set_cursor, 0, { i, target_col })
+                break
+              end
+            end
+          end)
         end,
       },
     },
