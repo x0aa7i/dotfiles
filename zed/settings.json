@@ -8,10 +8,11 @@
 // from the command palette or from `Zed` application menu.
 {
   // ── Appearance
+  "cli_default_open_behavior": "new_window",
   "theme": {
     "mode": "system",
-    "light": "Tokyo Night Light",
-    "dark": "Tokyo Night"
+    "light": "One Light",
+    "dark": "Tokyo Night",
   },
   "theme_overrides": {
     "Tokyo Night": {
@@ -54,54 +55,54 @@
         "property": {
           "color": "#bac0de",
           "font_style": null,
-          "font_weight": null
+          "font_weight": null,
         },
         "variable": {
           "color": "#bac0de",
           "font_style": null,
-          "font_weight": null
+          "font_weight": null,
         },
         "string": {
           "color": "#4ac9a1",
           "font_style": null,
-          "font_weight": null
+          "font_weight": null,
         },
         "string.doc": {
           "color": "#4ac9a1",
           "font_style": null,
-          "font_weight": null
+          "font_weight": null,
         },
         "text.literal": {
           "color": "#22d0a2",
           "font_style": null,
-          "font_weight": null
+          "font_weight": null,
         },
         "constant": {
           "color": "#db9351",
           "font_style": null,
-          "font_weight": null
+          "font_weight": null,
         },
         "constant.builtin": {
           "color": "#db9351",
           "font_style": null,
-          "font_weight": null
-        }
-      }
-    }
+          "font_weight": null,
+        },
+      },
+    },
   },
   "icon_theme": {
     "mode": "dark",
     "light": "Zed (Default)",
-    "dark": "Zed (Default)"
+    "dark": "Zed (Default)",
   },
-  "ui_font_size": 17.0,
-  "buffer_font_size": 15.0,
+  "ui_font_size": 18.0,
+  "buffer_font_size": 16.0,
   "buffer_font_family": ".ZedMono",
   "buffer_font_fallbacks": [".ZedMono", "JetBrainsMono Nerd Font"],
   "title_bar": {
     "show_branch_status_icon": true,
     "show_branch_name": true,
-    "show_sign_in": false
+    "show_sign_in": false,
   },
 
   // ── Editor
@@ -114,30 +115,30 @@
   "diff_view_style": "split",
   "code_lens": "off",
   "inlay_hints": {
-    "enabled": false
+    "enabled": false,
   },
   "gutter": {
-    "min_line_number_digits": 3
+    "min_line_number_digits": 3,
   },
   "scrollbar": {
-    "git_diff": false
+    "git_diff": false,
   },
   "git": {
     "path_style": "file_path_first",
     "git_gutter": "tracked_files",
     "inline_blame": {
-      "enabled": false
-    }
+      "enabled": false,
+    },
   },
   "diagnostics": {
     "inline": {
       "enabled": false,
       "padding": 8,
-      "max_severity": "warning"
-    }
+      "max_severity": "warning",
+    },
   },
   "which_key": {
-    "enabled": true
+    "enabled": true,
   },
 
   // ── Agent / AI
@@ -148,23 +149,24 @@
     "model_parameters": [],
     "inline_assistant_model": {
       "provider": "google",
-      "model": "gemini-3.5-flash"
+      "model": "gemini-3.5-flash",
     },
     "default_model": {
-      "enable_thinking": true,
+      // "enable_thinking": true,
       "provider": "google",
-      "model": "gemini-3.1-flash-lite"
-    }
+      "model": "gemini-3.1-flash-lite",
+    },
+    "commit_message_instructions": "Use the Conventional Commits format: <type>(<scope>): <description>.",
   },
   "agent_buffer_font_size": 14.0,
   "agent_ui_font_size": 17.0,
   "agent_servers": {
     "opencode": {
       "favorite_config_option_values": {
-        "model": ["opencode/minimax-m2.5-free"]
+        "model": ["opencode/minimax-m2.5-free"],
       },
-      "type": "registry"
-    }
+      "type": "registry",
+    },
   },
   "edit_predictions": {
     "mode": "subtle",
@@ -178,28 +180,28 @@
       "**/.dev.vars",
       "**/secrets.yml",
       "/**/zed/settings.json",
-      "/**/zed/keymap.json"
-    ]
+      "/**/zed/keymap.json",
+    ],
   },
 
   // ── Panels
   "project_panel": {
     "entry_spacing": "standard",
     "default_width": 360,
-    "dock": "left"
+    "dock": "left",
   },
   "git_panel": {
     "tree_view": true,
     "default_width": 360,
-    "dock": "left"
+    "dock": "left",
   },
   "outline_panel": {
     "button": false,
-    "dock": "right"
+    "dock": "right",
   },
   "collaboration_panel": {
     "button": false,
-    "dock": "right"
+    "dock": "right",
   },
 
   // ── Terminal
@@ -208,14 +210,14 @@
     "copy_on_select": true,
     "default_height": 360,
     "env": {
-      "EDITOR": "zed --wait"
+      "EDITOR": "zed --wait",
     },
     "detect_venv": {
       "on": {
         "directories": [".venv", "venv"],
-        "activate_script": "default"
-      }
-    }
+        "activate_script": "default",
+      },
+    },
   },
 
   // ── File Indexing
@@ -239,7 +241,7 @@
     "**/.tap",
     "**/.nyc_output",
     "**/report",
-    "**/node_modules"
+    "**/node_modules",
   ],
 
   "auto_install_extensions": {
@@ -247,32 +249,56 @@
     "svelte": true,
     "toml": true,
     "emmet": true,
-    "tokyo-night": true
+    "tokyo-night": true,
   },
 
   // ── Languages
-  "formatter": [
-    {
-      "language_server": {
-        "name": "oxfmt"
-      }
-    }
-  ],
+  // "formatter": [
+  //   {
+  //     "language_server": {
+  //       "name": "oxfmt"
+  //     }
+  //   }
+  // ],
   "format_on_save": "on",
 
   "languages": {
     "TypeScript": {
-      "language_servers": ["tsgo", "!vtsls", "!eslint", "!typescript-language-server", "..."]
+      "language_servers": [
+        "tsgo",
+        "!vtsls",
+        "!eslint",
+        "!typescript-language-server",
+        "...",
+      ],
     },
     "JavaScript": {
-      "language_servers": ["!vtsls", "!eslint", "!typescript-language-server", "..."]
+      "language_servers": [
+        "!vtsls",
+        "!eslint",
+        "!typescript-language-server",
+        "...",
+      ],
     },
     "Svelte": {
-      "language_servers": ["tsgo", "!vtsls", "!eslint", "!typescript-language-server", "..."]
+      "language_servers": [
+        "tsgo",
+        "!vtsls",
+        "!eslint",
+        "!typescript-language-server",
+        "...",
+      ],
     },
     "Python": {
-      "language_servers": ["ty", "ruff", "!basedpyright", "!pyrefly", "!pyright", "!pylsp"]
-    }
+      "language_servers": [
+        "ty",
+        "ruff",
+        "!basedpyright",
+        "!pyrefly",
+        "!pyright",
+        "!pylsp",
+      ],
+    },
   },
 
   "lsp": {
@@ -280,18 +306,21 @@
       "settings": {
         "classFunctions": ["cn", "tv"],
         "experimental": {
-          "classRegex": ["[cls|className]\\s\\:\\=\\s\"([^\"]*)", ["\\[((.|\\n)*)\\]", "'([^']*)'"]]
-        }
-      }
+          "classRegex": [
+            "[cls|className]\\s\\:\\=\\s\"([^\"]*)",
+            ["\\[((.|\\n)*)\\]", "'([^']*)'"],
+          ],
+        },
+      },
     },
     "vscode-css-language-server": {
       "settings": {
         "css": {
           "lint": {
-            "unknownAtRules": "ignore"
-          }
-        }
-      }
+            "unknownAtRules": "ignore",
+          },
+        },
+      },
     },
     "oxlint": {
       "initialization_options": {
@@ -300,19 +329,19 @@
           "run": "onType",
           "disableNestedConfig": false,
           "fixKind": "safe_fix",
-          "unusedDisableDirectives": "deny"
-        }
-      }
+          "unusedDisableDirectives": "deny",
+        },
+      },
     },
     "oxfmt": {
       "initialization_options": {
         "settings": {
           "fmt.configPath": null,
-          "run": "onSave"
-        }
-      }
+          "run": "onSave",
+        },
+      },
     },
-    "tsgo": {
+    "vtsls": {
       "settings": {
         "typescript": {
           "preferences": {
@@ -321,16 +350,16 @@
               ".next",
               "dist",
               "coverage",
-              "**/*.stories.**"
+              "**/*.stories.**",
             ],
-            "preferTypeOnlyAutoImports": true
-          }
-        }
-      }
-    }
+            "preferTypeOnlyAutoImports": true,
+          },
+        },
+      },
+    },
   },
 
   "file_types": {
-    "HTML": ["*.svg"]
-  }
+    "HTML": ["*.svg"],
+  },
 }

@@ -64,7 +64,13 @@
   {
     "label": "yazi",
     "command": "yazi",
-    "args": ["$ZED_FILE"],
-    "hide": "on_success",
+    "hide": "always",
+    "cwd": "$ZED_DIRNAME",
+    "env": { "EDITOR": "zed" },
+  },
+  {
+    "label": "Terminal in Current Directory",
+    "command": "$SHELL",
+    "cwd": "$ZED_DIRNAME",
   },
 ]
