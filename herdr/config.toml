@@ -32,6 +32,10 @@ prefix = "ctrl+b"
 new_tab = "prefix+c"
 next_tab = ["prefix+n", "alt+l"]
 previous_tab = ["prefix+p", "alt+h"]
+
+next_workspace = "ctrl+alt+j"
+previous_workspace = "ctrl+alt+k"
+
 split_horizontal = "prefix+-"
 split_vertical = "prefix+|"
 focus_pane_left = "prefix+h"
@@ -56,6 +60,12 @@ description = "open scratch terminal"
 width = "80%"
 height = "80%"
 
+[[keys.command]]
+key = "prefix+r"
+type = "plugin_action"
+command = "herdr-agent-quota.refresh"
+description = "refresh all agent quotas"
+
 [ui]
 # Window title written to outer terminal
 window_title = "{hostname}: {workspace}"
@@ -63,11 +73,23 @@ window_title = "{hostname}: {workspace}"
 # Desktop tab bar position ("top" or "bottom")
 tab_bar_position = "top"
 
+tab_bar_right = [
+  { type = "zoom" },
+  { type = "hostname" },
+  { type = "datetime", format = "%H:%M" },
+]
+
+tab_bar_right_separator = " · "
+
 # Visual appearance
 pane_borders = true
-pane_scrollbars = true
+pane_scrollbars = false
 pane_gaps = true
 status_indicators = "dots"
+
+agent_panel_sort = "spaces" # "priority"
+prompt_new_tab_name = false
+show_agent_labels_on_pane_borders = true
 
 [ui.toast]
 # Delivery: "herdr" (in-app), "terminal", "system", or "off"
@@ -83,8 +105,41 @@ position = "bottom-center"
 
 [ui.sound]
 # Play audio notifications when background agents require attention
-enabled = false
+enabled = true
+
+[ui.sidebar]
+
+[ui.sidebar.agents]
+row_gap = 1 # herdr-agent-quota
+rows = [
+  [
+    "state_icon",
+    "tab",
+    { token = "$quota_provider", fg = "#9aa7b8", bold = true, dim = false },
+    "workspace",
+  ],
+  [
+    { token = "$quota_error", fg = "#ca6470", bold = true, dim = false },
+  ],
+  [
+    { token = "$quota_context", fg = "#9aa7b8", bold = false, dim = false },
+    { token = "$quota_week_inline_normal", fg = "#84b084", bold = true, dim = false },
+    { token = "$quota_week_inline_warning", fg = "#cdaa65", bold = true, dim = false },
+    { token = "$quota_week_inline_danger", fg = "#ca6470", bold = true, dim = false },
+  ],
+  [
+    { token = "$quota_5h_normal", fg = "#84b084", bold = false, dim = false },
+    { token = "$quota_5h_warning", fg = "#cdaa65", bold = false, dim = false },
+    { token = "$quota_5h_danger", fg = "#ca6470", bold = false, dim = false },
+    { token = "$quota_week_normal", fg = "#84b084", bold = false, dim = true },
+    { token = "$quota_week_warning", fg = "#cdaa65", bold = false, dim = true },
+    { token = "$quota_week_danger", fg = "#ca6470", bold = false, dim = true },
+  ],
+]
 
 [session]
 # Resume supported AI agent sessions after server restart
 resume_agents_on_restore = true
+
+[experimental]
+kitty_graphics = true

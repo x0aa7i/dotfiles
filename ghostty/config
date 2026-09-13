@@ -2,6 +2,7 @@
 theme = "/home/abdo/.config/ghostty/theme"
 # font-family = "JetBrainsMono Nerd Font"
 font-family = "Lilex"
+font-size = 13
 # font-style = medium
 # background-opacity = 0.8
 
@@ -32,6 +33,7 @@ shell-integration-features = cursor,sudo,no-title
 
 # initial-command = tmux new-session -A -s main
 # initial-command = "fish -c 'tmux new-session -A -s main; exec fish'"
+initial-command = "fish -c 'herdr; exec fish'"
 
 # keybindings
 keybind = clear
@@ -47,8 +49,8 @@ keybind = ctrl+shift+tab=previous_tab
 keybind = ctrl+tab=next_tab
 keybind = ctrl+shift+w=close_surface
 
-keybind = alt+l=next_tab
-keybind = alt+h=previous_tab
+# keybind = alt+l=next_tab
+# keybind = alt+h=previous_tab
 
 keybind = ctrl+shift+enter=new_split:auto
 keybind = ctrl+shift+-=new_split:down
