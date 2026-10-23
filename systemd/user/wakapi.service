@@ -5,8 +5,8 @@ StartLimitBurst=3
 
 [Service]
 Type=simple
-WorkingDirectory=/home/abdo/.local/share/wakapi
-ExecStart=/home/abdo/.local/share/wakapi/wakapi --config /home/abdo/.local/share/wakapi/wakapi.yml
+WorkingDirectory=%h/.local/share/wakapi
+ExecStart=%h/.local/share/wakapi/wakapi --config %h/.local/share/wakapi/wakapi.yml
 
 Environment=WAKAPI_PORT=3050
 Environment=WAKAPI_PUBLIC_URL=http://localhost:3050

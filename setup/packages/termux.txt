@@ -1,0 +1,34 @@
+# Termux packages, installed by install.sh with `pkg install`
+# One package per line, `#` starts a comment
+
+# Core
+git
+curl
+unzip
+xz-utils
+which
+
+# Shell
+fish
+starship
+zoxide
+fzf
+eza
+ripgrep
+fd
+bat
+git-delta
+gh
+
+# Editor & toolchains (rust is needed to build dotter on Termux)
+neovim
+nodejs-lts
+python
+clang
+make
+rust
+
+# TUIs
+lazygit
+yazi
+tmux

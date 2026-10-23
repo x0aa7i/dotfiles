@@ -1,0 +1,41 @@
+# Fedora RPM packages, installed by setup/setup.sh with `dnf install`
+# One package per line, `#` starts a comment. Some come from Terra/RPM Fusion.
+
+# Shell & core utilities
+fish
+fzf
+fd-find
+zoxide
+eza
+bat
+git
+git-delta
+gh
+tmux
+ripgrep
+lazygit
+tokei
+trash-cli
+rsync
+curl
+unzip
+jq
+
+# Editor & toolchains
+neovim
+yazi
+nodejs
+gcc
+make
+
+# Development
+docker-ce
+docker-ce-cli
+containerd.io
+docker-buildx-plugin
+docker-compose-plugin
+
+# Applications / system utilities
+espanso-wayland
+syncthing
+nginx
