@@ -16,7 +16,7 @@ set -gx fish_prompt_pwd_dir_length 0 # show the full path instead of the first l
 # nvm use v20.11.1 --silent
 
 # pnpm
-set -gx PNPM_HOME "/home/abdo/.local/share/pnpm"
+set -gx PNPM_HOME "$HOME/.local/share/pnpm"
 if not string match -q -- "$PNPM_HOME/bin" $PATH
   set -gx PATH "$PNPM_HOME/bin" $PATH
 end
@@ -45,7 +45,7 @@ alias oc="opencode"
 #overrides
 alias mkdir="mkdir -p"
 alias cp="cp -r"
-alias rm="safe-rm"
+command -q safe-rm; and alias rm="safe-rm"
 
 alias yanki="pnpm dlx yanki sync"
 
@@ -103,7 +103,7 @@ set --export BUN_INSTALL "$HOME/.bun"
 set --export PATH $BUN_INSTALL/bin $PATH
 
 # dprint
-set -x DPRINT_INSTALL "/home/abdo/.dprint"
+set -x DPRINT_INSTALL "$HOME/.dprint"
 fish_add_path $DPRINT_INSTALL/bin
 
 # pyenv
@@ -111,8 +111,8 @@ set -Ux PYENV_ROOT $HOME/.pyenv
 test -d $PYENV_ROOT/bin; and fish_add_path $PYENV_ROOT/bin
 
 # opencode
-fish_add_path /home/abdo/.opencode/bin
+fish_add_path $HOME/.opencode/bin
 
 
 # Added by Antigravity CLI installer
-set -gx PATH "/home/abdo/.local/bin" $PATH
+set -gx PATH "$HOME/.local/bin" $PATH

@@ -1,0 +1,9 @@
+packages = [
+  "fish",
+  "git",
+  "lazygit",
+  "nvim",
+  "starship",
+  "termux",
+  "yazi",
+]
