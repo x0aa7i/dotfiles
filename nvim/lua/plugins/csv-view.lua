@@ -19,4 +19,23 @@ return {
     },
   },
   cmd = { "CsvViewEnable", "CsvViewDisable", "CsvViewToggle" },
+  ft = { "csv", "tsv" },
+  config = function()
+    local autocmd = vim.api.nvim_create_autocmd
+
+    autocmd("FileType", {
+      pattern = "csv",
+      callback = function()
+        vim.cmd("CsvViewEnable display_mode=border header_lnum=1")
+      end,
+    })
+  end,
+  keys = {
+    {
+      "<leader>uv",
+      "<cmd>CsvViewToggle display_mode=border header_lnum=1<cr>",
+      desc = "CSVView: Toggle",
+      silent = true,
+    },
+  },
 }

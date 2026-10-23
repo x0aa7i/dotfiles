@@ -62,7 +62,7 @@ return {
             return require("codecompanion.adapters").extend("gemini", {
               schema = {
                 model = {
-                  default = "gemma-4-26b-a4b-it",
+                  default = "gemini-3.1-flash-lite",
                   choices = {
                     "gemma-4-31b-it",
                     "gemma-4-26b-a4b-it",

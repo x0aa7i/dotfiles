@@ -1,6 +1,7 @@
 return {
   {
     "vuki656/package-info.nvim",
+    enabled = false,
     dependencies = { "folke/which-key.nvim", "MunifTanjim/nui.nvim" },
     event = { "BufRead package.json" },
     ft = "json",

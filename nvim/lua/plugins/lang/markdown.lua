@@ -28,7 +28,7 @@ return {
     "mason-org/mason.nvim",
     opts = {
       ensure_installed = {
-        "markdown-oxide", -- PKM markdown lsp
+        -- "markdown-oxide", -- PKM markdown lsp
         "markdownlint-cli2", -- markdown linter
         "markdown-toc", -- markdown table of contents
         -- "marksman", -- markdown lsp
@@ -44,7 +44,7 @@ return {
     opts = {
       servers = {
         markdown_oxide = {
-          enabled = true,
+          enabled = false,
           capabilities = { workspace = { didChangeWatchedFiles = { dynamicRegistration = true } } },
         },
         harper_ls = {
