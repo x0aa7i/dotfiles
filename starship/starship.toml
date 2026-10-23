@@ -7,7 +7,8 @@ add_newline = true
 # Timeout for commands executed by starship (in milliseconds).
 command_timeout = 3600
 
-format = """$directory\
+format = """$hostname\
+$directory\
 $git_branch\
 $git_commit\
 $git_state\
@@ -24,6 +25,13 @@ $character"""
 
 [fill]
 symbol = " "
+
+# Only shown over SSH
+[hostname]
+ssh_only = true
+ssh_symbol = "󰣀"
+format = "[$ssh_symbol]($style) "
+style = "bold yellow"
 
 [os.symbols]
 Windows = ""
