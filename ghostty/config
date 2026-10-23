@@ -64,3 +64,6 @@ keybind = ctrl+shift+v=paste_from_clipboard
 
 keybind = alt+r=reload_config
 
+cursor-opacity = 0
+cursor-text = cell-foreground
+custom-shader = ./shaders/cursor-glide.glsl
