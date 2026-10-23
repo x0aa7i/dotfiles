@@ -20,6 +20,9 @@ systemd user units in `systemd/user/`. One-time Fedora provisioning (repos, RPMs
 backup restore) lives in `setup/setup.sh`, which calls `install.sh` at the end. Package lists are in
 `setup/packages/{fedora,flatpak,termux}.txt` (one per line, `#` comments).
 
+SSH between the PC and the phone (Tailscale, shared `ssh/config.d/tailnet.conf`, `pair-phone`) and its manual steps
+are documented in `ssh/README.md`. Never commit keys, `authorized_keys` or `known_hosts`.
+
 To re-apply the dotfiles afterwards, use `dotter`:
 
 ```bash

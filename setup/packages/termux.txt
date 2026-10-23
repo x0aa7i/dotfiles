@@ -28,6 +28,10 @@ clang
 make
 rust
 
+# SSH server, started on every Termux launch via termux-services (port 8022)
+openssh
+termux-services
+
 # TUIs
 lazygit
 yazi

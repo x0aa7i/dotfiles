@@ -5,12 +5,12 @@
 # Run this script AFTER formatting and installing Fedora (with sudo).
 # It automates the system-level part of the setup:
 # - DNF speed optimizations
-# - Custom repositories (RPM Fusion, Docker, Terra)
+# - Custom repositories (RPM Fusion, Docker, Terra, Tailscale)
 # - Package installations (setup/packages/fedora.txt, setup/packages/flatpak.txt)
 # - NVIDIA drivers (when an NVIDIA GPU is detected)
 # - Zed editor (installed for the target user)
 # - Restoring backed-up data (SSH, GPG, home configs, Wakapi, Flatpak profiles)
-# - System services (Docker, user lingering)
+# - System services (Docker, Tailscale, key-only sshd, user lingering)
 #
 # Everything dotfiles-related (dotter, deploy, starship, fish as login shell,
 # systemd user services) is delegated to ../install.sh, run as the target user.
@@ -91,6 +91,12 @@ add_repos() {
   # curl -L https://download.docker.com/linux/fedora/docker-ce.repo -o /etc/yum.repos.d/docker-ce.repo
   if [[ ! -f /etc/yum.repos.d/docker-ce.repo ]]; then
     dnf config-manager addrepo --from-repofile https://download.docker.com/linux/fedora/docker-ce.repo
+  fi
+
+  # Tailscale
+  log_info "   - Adding Tailscale repository..."
+  if [[ ! -f /etc/yum.repos.d/tailscale.repo ]]; then
+    dnf config-manager addrepo --from-repofile https://pkgs.tailscale.com/stable/fedora/tailscale.repo
   fi
 
   # Terra Repository (Fyra Labs)
@@ -217,6 +223,13 @@ configure_services() {
 
   systemctl daemon-reload
   systemctl enable --now docker
+  systemctl enable --now tailscaled
+
+  # SSH server: keys only, since it is reachable from the LAN as well as Tailscale.
+  # The 10- prefix wins over Fedora's 50-redhat.conf (first value set is used)
+  log_info "Enabling sshd (key authentication only)..."
+  printf 'PasswordAuthentication no\nKbdInteractiveAuthentication no\n' >/etc/ssh/sshd_config.d/10-keys-only.conf
+  systemctl enable --now sshd
 
   # Enable linger so user services start at boot without active graphical sessions
   log_info "Enabling user lingering for $username..."
@@ -274,6 +287,7 @@ main() {
 
   echo -e "\n============================================================="
   log_info "System configuration completed!"
+  log_warn "Log in to Tailscale with 'sudo tailscale up', then pair the phone (ssh/README.md)."
   log_warn "Please REBOOT your computer to apply all changes (including shell change & Nvidia drivers)."
   echo -e "============================================================="
 }

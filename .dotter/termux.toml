@@ -3,6 +3,7 @@ packages = [
   "git",
   "lazygit",
   "nvim",
+  "ssh",
   "starship",
   "termux",
   "yazi",

@@ -19,12 +19,12 @@ overlap. On Termux, just run `install.sh`.
 
 2. **`setup.sh`**: Run this script **after** a fresh install of Fedora. It will:
    - Apply performance tweaks to DNF
-   - Enable RPM repositories (RPM Fusion, Docker, Terra)
+   - Enable RPM repositories (RPM Fusion, Docker, Terra, Tailscale)
    - Install RPMs from `packages/fedora.txt` and Flatpaks from `packages/flatpak.txt`
    - Install NVIDIA drivers when an NVIDIA GPU is detected
    - Install Zed for your user
    - Restore the backup: SSH/GPG keys, home configs, Wakapi data, Flatpak profiles and `~/.dotfiles` (if missing)
-   - Enable Docker and user lingering
+   - Enable Docker, Tailscale, `sshd` (key login only) and user lingering
    - Run `../install.sh --profile fedora` as your user, which deploys the dotfiles, installs starship, sets fish as
      the login shell and enables the user services (Wakapi, Syncthing, Espanso)
 
@@ -66,8 +66,10 @@ overlap. On Termux, just run `install.sh`.
    ```
 4. Follow the prompts. The script will ask you if you want to restore from your backup folder (specify
    `/mnt/backup/fedora_migration_backup`). `chsh` may ask for your password when switching to fish.
-5. Merge any custom mounts from `configs/fstab.bak` in the backup into `/etc/fstab`.
-6. Once completed, reboot your system to apply all changes:
+5. Log in to Tailscale with `sudo tailscale up`, then pair the phone with `pair-phone`
+   (see [`../ssh/README.md`](../ssh/README.md)).
+6. Merge any custom mounts from `configs/fstab.bak` in the backup into `/etc/fstab`.
+7. Once completed, reboot your system to apply all changes:
    ```bash
    sudo reboot
    ```

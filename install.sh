@@ -5,7 +5,8 @@
 # Detects the environment (Termux, Fedora, generic Linux, macOS), downloads
 # dotter into the repo root, selects the matching .dotter/<profile>.toml and
 # deploys the dotfiles. Then sets up what the dotfiles need at user level:
-# starship, fish as the login shell and the shipped systemd user services.
+# starship, fish as the login shell, the shipped systemd user services, an SSH
+# key plus the shared ~/.ssh/config.d include, and sshd autostart on Termux.
 #
 # Runs as the normal user (no sudo). System provisioning for a fresh Fedora
 # install lives in setup/setup.sh, which calls this script at the end.
@@ -228,6 +229,67 @@ enable_user_services() {
   done
 }
 
+# ~/.ssh must exist with strict permissions before dotter links into it
+prepare_ssh_dirs() {
+  mkdir -p "$HOME/.ssh/config.d" "$HOME/.ssh/sockets"
+  chmod 700 "$HOME/.ssh" "$HOME/.ssh/sockets"
+}
+
+# Keeps ~/.ssh/config local (machine-specific, may be edited by tools like herdr)
+# and makes it include the shared configs deployed to ~/.ssh/config.d/
+setup_ssh_config() {
+  local config="$HOME/.ssh/config"
+  local include="Include config.d/*.conf"
+
+  if [ -f "$config" ] && grep -qxF "$include" "$config"; then
+    return
+  fi
+
+  log_info "Adding '$include' to ~/.ssh/config..."
+  local tmp
+  tmp="$(mktemp)"
+  {
+    echo "$include"
+    [ -f "$config" ] && echo && cat "$config"
+  } >"$tmp"
+  mv "$tmp" "$config"
+  chmod 600 "$config"
+}
+
+setup_ssh_key() {
+  local key="$HOME/.ssh/id_ed25519"
+  if [ -f "$key" ]; then
+    return
+  fi
+
+  log_info "Generating SSH key $key..."
+  if [ -t 0 ]; then
+    ssh-keygen -t ed25519 -C "$(id -un)@$(uname -n)" -f "$key"
+  else
+    ssh-keygen -q -t ed25519 -N "" -C "$(id -un)@$(uname -n)" -f "$key"
+  fi
+  log_warn "New SSH key: authorize it on your other machines (see ssh/README.md)."
+}
+
+# Starts sshd now and on every Termux launch (termux-services)
+enable_termux_sshd() {
+  if ! command -v sshd >/dev/null; then
+    log_warn "openssh is not installed, skipping sshd."
+    return
+  fi
+
+  # Removes the service's "down" file; `sv up` itself fails until runsvdir runs
+  # after the next Termux restart, which is fine
+  if command -v sv-enable >/dev/null; then
+    sv-enable sshd >/dev/null 2>&1 || true
+  fi
+
+  if ! pgrep -x sshd >/dev/null; then
+    log_info "Starting sshd on port 8022..."
+    sshd
+  fi
+}
+
 # Writes .dotter/local.toml from the selected profile
 setup_local_config() {
   local profile="$1"
@@ -300,13 +362,20 @@ main() {
 
   if [ "$deploy" = "1" ]; then
     [ "$ENV" = "termux" ] && backup_termux_defaults
+    prepare_ssh_dirs
     log_info "Deploying dotfiles..."
     (cd "$DOTFILES_DIR" && "$DOTTER_BIN" deploy)
+    setup_ssh_config
+  fi
+
+  if command -v ssh-keygen >/dev/null; then
+    setup_ssh_key
   fi
 
   if [ "$ENV" = "termux" ]; then
     install_termux_font
     command -v termux-reload-settings >/dev/null && termux-reload-settings
+    enable_termux_sshd
   else
     install_starship
     if [ "$ENV" != "macos" ] && [ "$deploy" = "1" ]; then

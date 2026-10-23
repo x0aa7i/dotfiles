@@ -8,6 +8,9 @@ default_target_type = "symbolic"
 [fish.files]
 "fish" = { target = "~/.config/fish", type = "symbolic", recurse = false }
 
+[ssh.files]
+"ssh/config.d/tailnet.conf" = "~/.ssh/config.d/tailnet.conf"
+
 [starship.files]
 "starship/starship.toml" = "~/.config/starship.toml"
 

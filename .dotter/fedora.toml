@@ -12,6 +12,7 @@ packages = [
   "nvim",
   "opencode",
   "scripts",
+  "ssh",
   "starship",
   "systemd",
   "tmux",
