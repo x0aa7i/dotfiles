@@ -70,6 +70,10 @@ description = "refresh all agent quotas"
 # Window title written to outer terminal
 window_title = "{hostname}: {workspace}"
 
+# Switch to the single-column mobile layout at or below this width (default: 64).
+# Phone (Termux over SSH) stays under it even with a small font; PC windows are wider.
+mobile_width_threshold = 80
+
 # Desktop tab bar position ("top" or "bottom")
 tab_bar_position = "top"
 
