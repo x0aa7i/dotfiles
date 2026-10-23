@@ -2,6 +2,7 @@ packages = [
   "ai",
   "espanso",
   "fish",
+  "foot",
   "ghostty",
   "git",
   "herdr",
