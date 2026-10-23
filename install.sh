@@ -278,10 +278,10 @@ enable_termux_sshd() {
     return
   fi
 
-  # Removes the service's "down" file; `sv up` itself fails until runsvdir runs
-  # after the next Termux restart, which is fine
+  # Removes the service's "down" file. SVDIR is only exported after Termux
+  # restarts with termux-services, and `sv up` fails until then, which is fine
   if command -v sv-enable >/dev/null; then
-    sv-enable sshd >/dev/null 2>&1 || true
+    SVDIR="${SVDIR:-$PREFIX/var/service}" sv-enable sshd >/dev/null 2>&1 || true
   fi
 
   if ! pgrep -x sshd >/dev/null; then

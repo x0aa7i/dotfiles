@@ -10,8 +10,10 @@ function pair-phone -d "Exchange SSH keys with the phone (Termux sshd) over Tail
         return 1
     end
 
-    # A reinstalled phone has a new host key, forget the old one
+    # A reinstalled phone has a new host key, forget the old one. Close any shared
+    # (ControlMaster) connection too, or the host key would never be checked again
     ssh-keygen -R "[$phone]:8022" >/dev/null 2>&1
+    ssh -O exit $phone >/dev/null 2>&1
 
     echo "1/3 PC -> phone (asks for the Termux password set with `passwd`)"
     ssh-copy-id -o StrictHostKeyChecking=accept-new $phone; or return 1
@@ -30,7 +32,7 @@ function pair-phone -d "Exchange SSH keys with the phone (Termux sshd) over Tail
 
     echo "3/3 testing phone -> PC login"
     # Also forgets a stale PC host key on the phone (e.g. after reinstalling the PC)
-    ssh $phone "ssh-keygen -R $pc >/dev/null 2>&1; ssh -o BatchMode=yes -o StrictHostKeyChecking=accept-new $pc true"
+    ssh $phone "ssh -O exit $pc >/dev/null 2>&1; ssh-keygen -R $pc >/dev/null 2>&1; ssh -o BatchMode=yes -o StrictHostKeyChecking=accept-new $pc true"
     and echo "Paired: 'ssh $phone' here, 'ssh $pc' on the phone."
     or echo "Phone -> PC login failed, is sshd running here? (sudo systemctl enable --now sshd)" >&2
 end

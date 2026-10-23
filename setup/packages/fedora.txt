@@ -38,6 +38,7 @@ docker-compose-plugin
 # Networking (tailscale comes from its own repo, added by setup.sh)
 tailscale
 openssh-server
+fuse-sshfs
 
 # Applications / system utilities
 espanso-wayland

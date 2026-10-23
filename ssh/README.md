@@ -20,6 +20,7 @@ default MagicDNS names:
 - `setup/setup.sh` (PC): installs Tailscale and `openssh-server`, enables `tailscaled`, enables `sshd` with password
   login disabled (`/etc/ssh/sshd_config.d/10-keys-only.conf`).
 - `pair-phone` (fish function, run on the PC): exchanges the keys in both directions and tests the login.
+- `mount-phone` / `umount-phone` (fish functions, run on the PC): mount the phone's storage with sshfs.
 
 Never in git: private keys, `authorized_keys`, `known_hosts`. On the PC they come back from the backup
 (`setup/backup.sh` saves `~/.ssh`), or are created by the steps below.
@@ -72,6 +73,20 @@ It runs three steps:
 3. Logs in from the phone to the PC to test, accepting the PC's host key on the phone.
 
 It is safe to re-run: existing keys are skipped and nothing is duplicated.
+
+## Phone storage on the PC
+
+```fish
+mount-phone   # mounts the phone's internal storage (/storage/emulated/0) at ~/Phone
+umount-phone  # unmounts it (also works if the phone went offline)
+```
+
+Both take optional arguments: `mount-phone [host] [mountpoint]`, `umount-phone [mountpoint]`. They need `sshfs`
+(`fuse-sshfs`, in `setup/packages/fedora.txt`) and a paired phone. Termux needs the storage permission, which
+`install.sh` asks for (`termux-setup-storage`).
+
+The mount reconnects by itself when the phone sleeps or switches networks. If it hangs, run `umount-phone`, then
+`mount-phone` again.
 
 ## New device names
 
