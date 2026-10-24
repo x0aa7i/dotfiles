@@ -82,3 +82,7 @@ default_target_type = "symbolic"
 
 [zed.files]
 "zed" = "~/.config/zed"
+
+[agent-statusline.files]
+"agent-statusline/claude.sh" = "~/.claude/statusline.sh"
+"agent-statusline/antigravity.sh" = "~/.gemini/antigravity-cli/statusline.sh"

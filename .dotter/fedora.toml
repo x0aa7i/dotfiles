@@ -1,4 +1,5 @@
 packages = [
+  "agent-statusline",
   "ai",
   "espanso",
   "fish",
