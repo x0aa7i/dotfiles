@@ -60,12 +60,6 @@ description = "open scratch terminal"
 width = "80%"
 height = "80%"
 
-[[keys.command]]
-key = "prefix+r"
-type = "plugin_action"
-command = "herdr-agent-quota.refresh"
-description = "refresh all agent quotas"
-
 [ui]
 # Window title written to outer terminal
 window_title = "{hostname}: {workspace}"
@@ -114,31 +108,10 @@ enabled = true
 [ui.sidebar]
 
 [ui.sidebar.agents]
-row_gap = 1 # herdr-agent-quota
+row_gap = 0
 rows = [
-  [
-    "state_icon",
-    "tab",
-    { token = "$quota_provider", fg = "#9aa7b8", bold = true, dim = false },
-    "workspace",
-  ],
-  [
-    { token = "$quota_error", fg = "#ca6470", bold = true, dim = false },
-  ],
-  [
-    { token = "$quota_context", fg = "#9aa7b8", bold = false, dim = false },
-    { token = "$quota_week_inline_normal", fg = "#84b084", bold = true, dim = false },
-    { token = "$quota_week_inline_warning", fg = "#cdaa65", bold = true, dim = false },
-    { token = "$quota_week_inline_danger", fg = "#ca6470", bold = true, dim = false },
-  ],
-  [
-    { token = "$quota_5h_normal", fg = "#84b084", bold = false, dim = false },
-    { token = "$quota_5h_warning", fg = "#cdaa65", bold = false, dim = false },
-    { token = "$quota_5h_danger", fg = "#ca6470", bold = false, dim = false },
-    { token = "$quota_week_normal", fg = "#84b084", bold = false, dim = true },
-    { token = "$quota_week_warning", fg = "#cdaa65", bold = false, dim = true },
-    { token = "$quota_week_danger", fg = "#ca6470", bold = false, dim = true },
-  ],
+  ["state_icon", { token = "agent", fg = "#c0caf5", bold = true, dim = false }],
+  [{ token = "terminal_title_stripped", fg = "#737aa2", bold = false, dim = false }],
 ]
 
 [session]
