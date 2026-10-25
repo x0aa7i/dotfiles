@@ -9,6 +9,7 @@
 # - Package installations (setup/packages/fedora.txt, setup/packages/flatpak.txt)
 # - NVIDIA drivers (when an NVIDIA GPU is detected)
 # - Zed editor (installed for the target user)
+# - An Ubuntu distrobox with Playwright's system dependencies
 # - Restoring backed-up data (SSH, GPG, home configs, Wakapi, Flatpak profiles)
 # - System services (Docker, Tailscale, key-only sshd, user lingering)
 #
@@ -21,6 +22,8 @@ set -euo pipefail
 SETUP_DIR="$(cd "$(dirname "$0")" && pwd)"
 DOTFILES_DIR="$(dirname "$SETUP_DIR")"
 PACKAGES_DIR="$SETUP_DIR/packages"
+DISTROBOX_NAME="ubuntu"
+DISTROBOX_IMAGE="docker.io/library/ubuntu:24.04"
 
 # --- Color Codes for Output ---
 RED='\033[0;31m'
@@ -144,6 +147,31 @@ install_manual_tools() {
   # Zed installs into the user's ~/.local, so it must not run as root
   log_info "   - Installing Zed Editor..."
   sudo -u "$username" -H sh -c 'curl -f https://zed.dev/install.sh | sh'
+}
+
+# --- 5b. Ubuntu distrobox (Non-root user context) ---
+# Playwright only supports Ubuntu/Debian, so its browsers run from this box:
+#   distrobox enter ubuntu -- npx playwright test
+# Ubuntu-only apps can be installed in it and exported with distrobox-export --app
+setup_distrobox() {
+  local username="$1"
+
+  if run_as_user "$username" podman container exists "$DISTROBOX_NAME"; then
+    log_info "Distrobox '$DISTROBOX_NAME' already exists."
+    return
+  fi
+
+  log_info "Creating distrobox '$DISTROBOX_NAME' ($DISTROBOX_IMAGE)..."
+  if ! run_as_user "$username" distrobox create --yes --name "$DISTROBOX_NAME" --image "$DISTROBOX_IMAGE"; then
+    log_warn "   - distrobox create failed, skipping the box."
+    return
+  fi
+
+  # The browsers themselves are per project version: npx playwright install
+  log_info "   - Installing Node.js and Playwright dependencies in the box..."
+  run_as_user "$username" distrobox enter "$DISTROBOX_NAME" -- sh -c \
+    'sudo apt-get update && sudo apt-get install -y nodejs npm && sudo npx -y playwright install-deps' ||
+    log_warn "   - Box setup failed, retry with: distrobox enter $DISTROBOX_NAME"
 }
 
 # --- 6. Restore backed up data (Non-root user context) ---
@@ -283,6 +311,8 @@ main() {
   fi
 
   configure_services "$real_user"
+  # Rootless podman needs the user's runtime dir, which lingering provides
+  setup_distrobox "$real_user"
   deploy_dotfiles "$real_user"
 
   echo -e "\n============================================================="

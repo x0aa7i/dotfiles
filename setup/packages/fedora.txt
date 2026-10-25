@@ -34,6 +34,9 @@ docker-ce-cli
 containerd.io
 docker-buildx-plugin
 docker-compose-plugin
+# Ubuntu box for Playwright and Ubuntu-only apps, created by setup.sh
+podman
+distrobox
 
 # Networking (tailscale comes from its own repo, added by setup.sh)
 tailscale

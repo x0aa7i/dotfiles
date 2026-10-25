@@ -23,6 +23,9 @@ overlap. On Termux, just run `install.sh`.
    - Install RPMs from `packages/fedora.txt` and Flatpaks from `packages/flatpak.txt`
    - Install NVIDIA drivers when an NVIDIA GPU is detected
    - Install Zed for your user
+   - Create an Ubuntu 24.04 distrobox (`ubuntu`) with Node.js and Playwright's system dependencies, since Playwright
+     only supports Ubuntu/Debian. Run tests with `distrobox enter ubuntu -- npx playwright test`; Ubuntu-only apps can
+     be installed in the box and added to the app menu with `distrobox-export --app <name>`
    - Restore the backup: SSH/GPG keys, home configs, Wakapi data, Flatpak profiles and `~/.dotfiles` (if missing)
    - Enable Docker, Tailscale, `sshd` (key login only) and user lingering
    - Run `../install.sh --profile fedora` as your user, which deploys the dotfiles, installs starship, sets fish as
