@@ -15,10 +15,13 @@ function pair-phone -d "Exchange SSH keys with the phone (Termux sshd) over Tail
     ssh-keygen -R "[$phone]:8022" >/dev/null 2>&1
     ssh -O exit $phone >/dev/null 2>&1
 
-    echo "1/3 PC -> phone (asks for the Termux password set with `passwd`)"
-    ssh-copy-id -o StrictHostKeyChecking=accept-new $phone; or return 1
+    echo "1/4 PC -> phone (asks for the Termux password set with `passwd`)"
+    if not ssh-copy-id -o StrictHostKeyChecking=accept-new $phone
+        echo "If the phone refused the password, run 'sshd-password on' in Termux and retry." >&2
+        return 1
+    end
 
-    echo "2/3 phone -> PC"
+    echo "2/4 phone -> PC"
     set -l pubkey (ssh $phone 'cat ~/.ssh/id_ed25519.pub' 2>/dev/null)
     if test -z "$pubkey"
         echo "No ~/.ssh/id_ed25519.pub on the phone, run install.sh there first." >&2
@@ -30,9 +33,17 @@ function pair-phone -d "Exchange SSH keys with the phone (Termux sshd) over Tail
         echo $pubkey >>~/.ssh/authorized_keys
     end
 
-    echo "3/3 testing phone -> PC login"
+    echo "3/4 testing phone -> PC login"
     # Also forgets a stale PC host key on the phone (e.g. after reinstalling the PC)
-    ssh $phone "ssh -O exit $pc >/dev/null 2>&1; ssh-keygen -R $pc >/dev/null 2>&1; ssh -o BatchMode=yes -o StrictHostKeyChecking=accept-new $pc true"
-    and echo "Paired: 'ssh $phone' here, 'ssh $pc' on the phone."
-    or echo "Phone -> PC login failed, is sshd running here? (sudo systemctl enable --now sshd)" >&2
+    if not ssh $phone "ssh -O exit $pc >/dev/null 2>&1; ssh-keygen -R $pc >/dev/null 2>&1; ssh -o BatchMode=yes -o StrictHostKeyChecking=accept-new $pc true"
+        echo "Phone -> PC login failed, is sshd running here? (sudo systemctl enable --now sshd)" >&2
+        return 1
+    end
+
+    # Termux's sshd listens on every network the phone joins, keys only from now on
+    echo "4/4 turning off password login on the phone"
+    ssh $phone "sshd-password off"
+    or echo "Could not turn it off, run 'sshd-password off' in Termux." >&2
+
+    echo "Paired: 'ssh $phone' here, 'ssh $pc' on the phone."
 end

@@ -16,10 +16,13 @@ default MagicDNS names:
   - creates `~/.ssh`, `~/.ssh/config.d` and `~/.ssh/sockets` with the right permissions
   - adds `Include config.d/*.conf` to the top of `~/.ssh/config`, which stays a local, untracked file
   - generates `~/.ssh/id_ed25519` if there is none (asks for an optional passphrase)
-  - on Termux: installs `openssh` + `termux-services`, starts `sshd` and enables it on every Termux launch
+  - on Termux: installs `openssh` + `termux-services`, starts `sshd` and enables it on every Termux launch. On an
+    already paired phone (`~/.ssh/authorized_keys` exists) it turns off `sshd` password login
 - `setup/setup.sh` (PC): installs Tailscale and `openssh-server`, enables `tailscaled`, enables `sshd` with password
   login disabled (`/etc/ssh/sshd_config.d/10-keys-only.conf`).
-- `pair-phone` (fish function, run on the PC): exchanges the keys in both directions and tests the login.
+- `pair-phone` (fish function, run on the PC): exchanges the keys in both directions, tests the login and turns off
+  password login on the phone.
+- `sshd-password [on|off]` (fish function, run in Termux): turns password login for Termux's `sshd` on or off.
 - `mount-phone` / `umount-phone` (fish functions, run on the PC): mount the phone's storage with sshfs.
 
 Never in git: private keys, `authorized_keys`, `known_hosts`. On the PC they come back from the backup
@@ -38,7 +41,7 @@ Never in git: private keys, `authorized_keys`, `known_hosts`. On the PC they com
    ~/dotfiles/install.sh
    ```
    Grant the storage permission when asked. Restart Termux once so `termux-services` takes over `sshd`.
-4. Set a password for Termux's `sshd`, needed once for pairing:
+4. Set a password for Termux's `sshd`, needed once for pairing (`pair-phone` turns password login off afterwards):
    ```sh
    passwd
    ```
@@ -65,14 +68,17 @@ pair-phone              # defaults: phone s21, PC fedora
 pair-phone pixel fedora # if the Tailscale names differ
 ```
 
-It runs three steps:
+It runs four steps:
 
 1. Forgets the phone's old host key, then `ssh-copy-id` to the phone (asks for the Termux password).
 2. Copies the phone's public key into the PC's `~/.ssh/authorized_keys`. This is why pairing runs from the PC: the
    PC refuses password logins, so the phone can't `ssh-copy-id` to it.
 3. Logs in from the phone to the PC to test, accepting the PC's host key on the phone.
+4. Turns off password login on the phone (`sshd-password off`). Termux's `sshd` listens on every network the phone
+   joins, not just Tailscale, so after pairing it accepts keys only.
 
-It is safe to re-run: existing keys are skipped and nothing is duplicated.
+It is safe to re-run: existing keys are skipped and nothing is duplicated. Pairing a new PC key (e.g. a reinstalled PC
+without the backup) needs the password again: run `sshd-password on` in Termux first.
 
 ## Phone storage on the PC
 
@@ -146,14 +152,15 @@ The names follow the device (Tailscale uses the OS hostname). With a new phone o
 
 ## Troubleshooting
 
-| Symptom                                            | Fix                                                                                                                                        |
-| -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| `REMOTE HOST IDENTIFICATION HAS CHANGED` on the PC | `ssh-keygen -R "[s21]:8022"`, or re-run `pair-phone`                                                                                       |
-| Same on the phone                                  | `ssh-keygen -R fedora` in Termux, or re-run `pair-phone`                                                                                   |
-| `ssh s21` times out                                | Termux or Tailscale was killed: open Termux (starts `sshd`), check battery optimization                                                    |
-| `ssh fedora` refused                               | `sudo systemctl enable --now sshd` on the PC                                                                                               |
-| Is password login off on the PC?                   | `sudo sshd -T \| grep -E '^(passwordauth\|kbdinteractive)'` should print `no` twice                                                        |
-| Stale shared connection                            | `ssh -O exit s21` (or `fedora`) closes the reused connection                                                                               |
-| Remote desktop rejects the login                   | Wrong Desktop Sharing credentials (log: `MIC verification failed`). Reset them in Settings, watch the phone keyboard's auto-capitalization |
-| Remote desktop disconnects right away              | Screen locked (log: `Session creation inhibited`): enable Allow Locked Remote Desktop                                                      |
-| Remote desktop log                                 | `journalctl --user -u gnome-remote-desktop -e`                                                                                             |
+| Symptom                                              | Fix                                                                                                                                        |
+| ---------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `REMOTE HOST IDENTIFICATION HAS CHANGED` on the PC   | `ssh-keygen -R "[s21]:8022"`, or re-run `pair-phone`                                                                                       |
+| Same on the phone                                    | `ssh-keygen -R fedora` in Termux, or re-run `pair-phone`                                                                                   |
+| `ssh s21` times out                                  | Termux or Tailscale was killed: open Termux (starts `sshd`), check battery optimization                                                    |
+| `ssh fedora` refused                                 | `sudo systemctl enable --now sshd` on the PC                                                                                               |
+| Is password login off on the PC?                     | `sudo sshd -T \| grep -E '^(passwordauth\|kbdinteractive)'` should print `no` twice                                                        |
+| Stale shared connection                              | `ssh -O exit s21` (or `fedora`) closes the reused connection                                                                               |
+| `pair-phone` step 1: `Permission denied (publickey)` | Password login is off on the phone: `sshd-password on` in Termux, re-run `pair-phone`                                                      |
+| Remote desktop rejects the login                     | Wrong Desktop Sharing credentials (log: `MIC verification failed`). Reset them in Settings, watch the phone keyboard's auto-capitalization |
+| Remote desktop disconnects right away                | Screen locked (log: `Session creation inhibited`): enable Allow Locked Remote Desktop                                                      |
+| Remote desktop log                                   | `journalctl --user -u gnome-remote-desktop -e`                                                                                             |

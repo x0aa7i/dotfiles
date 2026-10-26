@@ -284,6 +284,18 @@ enable_termux_sshd() {
     SVDIR="${SVDIR:-$PREFIX/var/service}" sv-enable sshd >/dev/null 2>&1 || true
   fi
 
+  # Password login is only needed until pair-phone has run (authorized_keys exists).
+  # sshd-password is a fish function deployed by dotter
+  if [ -s "$HOME/.ssh/authorized_keys" ]; then
+    if command -v fish >/dev/null && [ -f "$HOME/.config/fish/functions/sshd-password.fish" ]; then
+      fish -c 'sshd-password off' >/dev/null || log_warn "Failed to turn off sshd password login."
+    else
+      log_warn "Already paired: run 'sshd-password off' to turn off sshd password login."
+    fi
+  else
+    log_warn "sshd accepts passwords until pairing: set one with 'passwd', then run pair-phone on the PC."
+  fi
+
   if ! pgrep -x sshd >/dev/null; then
     log_info "Starting sshd on port 8022..."
     sshd
