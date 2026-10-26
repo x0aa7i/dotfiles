@@ -7,3 +7,4 @@ opencode/
 .dotter/cargo
 fish/fish_variables
 fish/conf.d/fish_frozen_*.fish
+fish/conf.d/vite-plus.fish
