@@ -33,7 +33,7 @@ To re-apply the dotfiles afterwards, use `dotter`:
 ./dotter deploy --include nvim
 ```
 
-_Note: `dotter` is downloaded using `utils/get_dotter`._
+_Note: `dotter` is downloaded (or built on Termux) by `install.sh`._
 
 ### Linting and Formatting
 

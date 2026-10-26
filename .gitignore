@@ -2,7 +2,9 @@
 .dotter/cache.toml
 .dotter/cache
 dotter
-opencode/
+opencode/skills/
+opencode/agents/
+opencode/commands/
 .agents/skills
 .dotter/cargo
 fish/fish_variables
