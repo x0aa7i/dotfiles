@@ -88,6 +88,54 @@ Both take optional arguments: `mount-phone [host] [mountpoint]`, `umount-phone [
 The mount reconnects by itself when the phone sleeps or switches networks. If it hangs, run `umount-phone`, then
 `mount-phone` again.
 
+## Remote desktop (PC screen on the phone)
+
+GNOME Remote Desktop (`gnome-remote-desktop`, installed with Fedora Workstation) serves the PC's screen over RDP,
+reached through Tailscale like SSH. Nothing here is automated; it is set up once in GNOME Settings.
+
+On the PC, in **Settings → System → Remote Desktop → Desktop Sharing**:
+
+1. Turn on **Desktop Sharing** and **Remote Control** (without it the phone can only watch).
+2. Set a username and password under **Login Details**. These are RDP-only credentials, not the Fedora login.
+
+Manage it from Settings only: `grdctl rdp ...` keeps its own separate config, and `grdctl status` shows RDP as disabled
+even while the Settings server is running.
+
+On the phone, install **Windows App** (Microsoft's RDP client) and add a PC:
+
+| Field        | Value                                                      |
+| ------------ | ---------------------------------------------------------- |
+| PC name      | `fedora:3390` (or `fedora.<tailnet>.ts.net:3390`)          |
+| User account | the Desktop Sharing credentials, plain username, no domain |
+
+Accept the certificate warning on the first connection. If `fedora` does not resolve on the phone, use the PC's
+Tailscale IP (`tailscale ip -4`).
+
+Port 3390, not 3389: GNOME's **Remote Login** (`gnome-remote-desktop.service`, a system service with its own login
+screen) took 3389 when it was enabled once, so Desktop Sharing moved to 3390. Remote Login is not used: it can only
+start a new session, and it refuses to attach to the one already running on the screen. Keep it off:
+
+```sh
+sudo grdctl --system rdp disable
+sudo systemctl disable --now gnome-remote-desktop.service
+```
+
+### Locked screen
+
+GNOME refuses Desktop Sharing while the screen is locked (log: `Session creation inhibited`). The
+**Allow Locked Remote Desktop** extension
+lifts that: the phone connects to the lock screen and unlocks it with the Fedora password. Install it with Extension
+Manager.
+
+Desktop Sharing only exists inside a logged-in session: after a reboot, log in at the PC once before connecting. The PC
+must also be awake; to stop it suspending on AC power:
+
+```sh
+gsettings set org.gnome.settings-daemon.plugins.power sleep-inactive-ac-type 'nothing'
+```
+
+`tailscale0` is in firewalld's `trusted` zone, so the port is reachable over Tailscale.
+
 ## New device names
 
 The names follow the device (Tailscale uses the OS hostname). With a new phone or a renamed PC:
@@ -98,11 +146,14 @@ The names follow the device (Tailscale uses the OS hostname). With a new phone o
 
 ## Troubleshooting
 
-| Symptom                                            | Fix                                                                                     |
-| -------------------------------------------------- | --------------------------------------------------------------------------------------- |
-| `REMOTE HOST IDENTIFICATION HAS CHANGED` on the PC | `ssh-keygen -R "[s21]:8022"`, or re-run `pair-phone`                                    |
-| Same on the phone                                  | `ssh-keygen -R fedora` in Termux, or re-run `pair-phone`                                |
-| `ssh s21` times out                                | Termux or Tailscale was killed: open Termux (starts `sshd`), check battery optimization |
-| `ssh fedora` refused                               | `sudo systemctl enable --now sshd` on the PC                                            |
-| Is password login off on the PC?                   | `sudo sshd -T \| grep -E '^(passwordauth\|kbdinteractive)'` should print `no` twice     |
-| Stale shared connection                            | `ssh -O exit s21` (or `fedora`) closes the reused connection                            |
+| Symptom                                            | Fix                                                                                                                                        |
+| -------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
+| `REMOTE HOST IDENTIFICATION HAS CHANGED` on the PC | `ssh-keygen -R "[s21]:8022"`, or re-run `pair-phone`                                                                                       |
+| Same on the phone                                  | `ssh-keygen -R fedora` in Termux, or re-run `pair-phone`                                                                                   |
+| `ssh s21` times out                                | Termux or Tailscale was killed: open Termux (starts `sshd`), check battery optimization                                                    |
+| `ssh fedora` refused                               | `sudo systemctl enable --now sshd` on the PC                                                                                               |
+| Is password login off on the PC?                   | `sudo sshd -T \| grep -E '^(passwordauth\|kbdinteractive)'` should print `no` twice                                                        |
+| Stale shared connection                            | `ssh -O exit s21` (or `fedora`) closes the reused connection                                                                               |
+| Remote desktop rejects the login                   | Wrong Desktop Sharing credentials (log: `MIC verification failed`). Reset them in Settings, watch the phone keyboard's auto-capitalization |
+| Remote desktop disconnects right away              | Screen locked (log: `Session creation inhibited`): enable Allow Locked Remote Desktop                                                      |
+| Remote desktop log                                 | `journalctl --user -u gnome-remote-desktop -e`                                                                                             |
