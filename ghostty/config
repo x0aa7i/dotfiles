@@ -28,7 +28,8 @@ clipboard-trim-trailing-spaces = true
 clipboard-paste-protection = false
 
 # Other
-copy-on-select = clipboard
+# 1.4: "clipboard" no longer also sets primary; "both" keeps the 1.3 behavior
+copy-on-select = both
 shell-integration-features = cursor,sudo,no-title
 
 # initial-command = tmux new-session -A -s main
