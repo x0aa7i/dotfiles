@@ -1,5 +1,5 @@
 #!/bin/bash
-# Antigravity CLI status line: state, mode, model, dir, branch, context tokens, usage remaining, session info, subagents, artifacts.
+# Antigravity CLI status line: mode, model, dir, branch, context tokens, usage remaining, subagents, artifacts.
 # Reads the session JSON on stdin; needs jq.
 set -e
 
@@ -9,14 +9,12 @@ input=$(cat)
 # shellcheck source=lib.sh
 source "$(dirname "$(readlink -f "$0")")/lib.sh"
 
-IFS=$'\x1f' read -r state mode model effort dir conv_title subagents_count artifacts queued ctx_pct ctx_size ctx_used cost < <(
+IFS=$'\x1f' read -r mode model effort dir subagents_count artifacts queued ctx_pct ctx_size ctx_used cost < <(
   printf '%s' "$input" | jq -r '[
-    (.agent_state // "idle"),
     (.mode // ""),
     (.model.display_name // .model.id // ""),
     (.model.effort // ""),
     (.workspace.current_dir // .cwd // ""),
-    (.conversation_title // .conversation_name // ""),
     ([.subagents[]? | select(.status == "running")] | length | tostring),
     ((.artifacts // "") | tostring),
     ((.queued_messages // "") | tostring),
@@ -27,16 +25,6 @@ IFS=$'\x1f' read -r state mode model effort dir conv_title subagents_count artif
   ] | join("\u001f")' 2>/dev/null
 )
 
-# State and mode first: they change most often
-case "$state" in
-  idle)      add_part "${green}● idle${rst}" ;;
-  working)   add_part "${yellow}● working${rst}" ;;
-  thinking)  add_part "${magenta}● thinking${rst}" ;;
-  tool_use)  add_part "${cyan}● tool_use${rst}" ;;
-  reviewing) add_part "${blue}● reviewing${rst}" ;;
-  error)     add_part "${red}● error${rst}" ;;
-  *)         add_part "$(seg_dim "$state")" ;;
-esac
 [ -n "$mode" ] && add_part "${bold}${yellow}[$mode]${rst}"
 
 add_part "$(seg_model "$model" "$effort")"
@@ -110,13 +98,6 @@ done < <(
 )
 
 add_part "$(seg_cost "$cost")"
-
-# Session title (omitted when empty, no fallback ID)
-if [ -n "$conv_title" ]; then
-  title="$conv_title"
-  [ ${#title} -gt 35 ] && title="${title:0:33}…"
-  add_part "${dim}session:${rst} ${title}"
-fi
 
 [ -n "$subagents_count" ] && [ "$subagents_count" -gt 0 ] && add_part "${cyan}🤖 $subagents_count${rst}"
 [ -n "$artifacts" ] && [ "$artifacts" -gt 0 ] && add_part "${dim}📄 $artifacts${rst}"
