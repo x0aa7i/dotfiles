@@ -57,9 +57,8 @@ default_target_type = "symbolic"
 
 [ai.files]
 ".agents" = { target = "~/.agents", type = "symbolic", recurse = false }
-# dotter allows one target per source; ~/.claude/skills is managed separately
-# ".agents/skills" = { target = "~/.claude/skills", type = "symbolic", recurse = false }
 ".agents/skills" = { target = "~/.gemini/skills", type = "symbolic", recurse = false }
+"./.agents/skills" = { target = "~/.claude/skills", type = "symbolic", recurse = false }
 
 [opencode.files]
 "opencode/opencode.json" = "~/.config/opencode/opencode.json"
