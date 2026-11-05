@@ -6,7 +6,8 @@
 # dotter into the repo root, selects the matching .dotter/<profile>.toml and
 # deploys the dotfiles. Then sets up what the dotfiles need at user level:
 # starship, fish as the login shell, the shipped systemd user services, an SSH
-# key plus the shared ~/.ssh/config.d include, and sshd autostart on Termux.
+# key plus the shared ~/.ssh/config.d include, the agent status lines
+# (agent-statusline/install.sh), and sshd autostart on Termux.
 #
 # Runs as the normal user (no sudo). System provisioning for a fresh Fedora
 # install lives in setup/setup.sh, which calls this script at the end.
@@ -390,6 +391,7 @@ main() {
     log_info "Deploying dotfiles..."
     (cd "$DOTFILES_DIR" && "$DOTTER_BIN" deploy)
     setup_ssh_config
+    bash "$DOTFILES_DIR/agent-statusline/install.sh" || log_warn "agent-statusline/install.sh failed."
   fi
 
   if command -v ssh-keygen >/dev/null; then
