@@ -2,9 +2,9 @@
 notARepository: "skip" # one of: 'prompt' | 'create' | 'skip'
 promptToReturnFromSubprocess: false
 git:
-  paging:
-    colorArg: always
-    pager: delta --dark --paging=never
+  diffRenderers:
+    - colorArg: always
+      command: delta --dark --paging=never
 os:
   editPreset: "nvim" # see 'Configuring File Editing' section
   edit: nvim {{filename}}
