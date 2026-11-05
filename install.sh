@@ -384,6 +384,9 @@ main() {
   if [ "$deploy" = "1" ]; then
     [ "$ENV" = "termux" ] && backup_termux_defaults
     prepare_ssh_dirs
+    # Symlinked dirs that a fresh clone lacks (gitignored or empty), dotter fails on missing sources
+    mkdir -p "$DOTFILES_DIR/.agents/skills" \
+      "$DOTFILES_DIR/opencode/"{agents,commands,skills}
     log_info "Deploying dotfiles..."
     (cd "$DOTFILES_DIR" && "$DOTTER_BIN" deploy)
     setup_ssh_config
