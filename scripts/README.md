@@ -8,27 +8,30 @@ A performant bash script for syncing files to multiple backup destinations using
 
 ### Features
 
-- Syncs multiple source directories to multiple destinations
-- Parallel-ready structure with array-based configuration
+- Syncs every source to every backup drive, with optional drives (external disks) used only when mounted
 - Comprehensive error handling with detailed logging
 - Lock file to prevent concurrent runs
 - Automatic cleanup of old log files (7 day retention)
 - Progress tracking and statistics
 - Support for exclude patterns via `rsync_exclude.txt` and each repo's `.gitignore`
 - `.env` files are always copied, even when `.gitignore` excludes them
-- Pairs marked `full` ignore `.gitignore` files (the Obsidian vault, copied from `/mnt/backup` to `/mnt/media`)
+- Sources marked `full` ignore `.gitignore` files (the Obsidian vault, which keeps its settings out of git)
 - Drives that aren't mounted are skipped (and reported as failures) instead of filling the empty mount point
 
 ### Configuration
 
-Edit the `SYNC_PAIRS` array in the script to add/remove sync operations:
+Edit the arrays at the top of the script. Every source is synced to `<drive>/<name>` on every drive:
 
 ```bash
-declare -a SYNC_PAIRS=(
-  "$HOME/dev/ /mnt/backup/dev/"
-  "$HOME/.dotfiles/ /mnt/backup/dotfiles/"
+readonly REQUIRED_DRIVES=(/mnt/backup /mnt/media)            # a failure when not mounted
+readonly OPTIONAL_DRIVES=("/run/media/$(id -un)/Storage")   # used only when mounted
+readonly SYNC_SOURCES=(
+  "${HOME}/dev/ dev"
+  "/mnt/backup/documents/obsidian/ obsidian full"            # full: ignore .gitignore
 )
 ```
+
+A source is never copied onto the drive it already lives on.
 
 ### Scheduling with Cron
 

@@ -3,7 +3,7 @@
 # Fedora Pre-Format Backup Script
 # =============================================================================
 # Run this script BEFORE formatting. It writes the same backup to every drive in
-# MOUNTS (both must be mounted):
+# REQUIRED_DRIVES (must be mounted) and OPTIONAL_DRIVES (when mounted):
 # - ~/dev and ~/.dotfiles, .env files included (scripts/rsync.sh)
 # - home.tar.gz: SSH keys, gh config, Syncthing identity, fonts, fish history,
 #   zoxide database and standalone home configs (.npmrc, .modal.toml, ...)
@@ -11,6 +11,7 @@
 # - Package and tool inventories, to reinstall what setup.sh doesn't cover
 #
 # setup.sh restores it from <drive>/fedora_migration_backup and <drive>/dev.
+# Keep the drive lists in sync with scripts/rsync.sh.
 # =============================================================================
 
 set -euo pipefail
@@ -18,7 +19,8 @@ set -euo pipefail
 SETUP_DIR="$(cd "$(dirname "$0")" && pwd)"
 DOTFILES_DIR="$(dirname "$SETUP_DIR")"
 BACKUP_NAME="fedora_migration_backup"
-MOUNTS=(/mnt/backup /mnt/media)
+REQUIRED_DRIVES=(/mnt/backup /mnt/media)
+OPTIONAL_DRIVES=("/run/media/$(id -un)/Storage")
 
 # Paths relative to $HOME, archived into home.tar.gz when they exist
 HOME_PATHS=(
@@ -62,20 +64,34 @@ inventory() {
   "$@" >"$INVENTORY/$file" 2>/dev/null || log_warn "   - '$*' failed"
 }
 
+# Fills DRIVES with the required drives plus the optional ones that are mounted
 check_mounts() {
-  local mount
-  for mount in "${MOUNTS[@]}"; do
-    if ! mountpoint -q "$mount"; then
-      log_err "$mount is not mounted. Mount every drive in MOUNTS, then run again."
+  local drive
+  DRIVES=()
+  for drive in "${REQUIRED_DRIVES[@]}"; do
+    if ! mountpoint -q "$drive"; then
+      log_err "$drive is not mounted. Mount every drive in REQUIRED_DRIVES, then run again."
       exit 1
+    fi
+    DRIVES+=("$drive")
+  done
+  for drive in "${OPTIONAL_DRIVES[@]}"; do
+    if mountpoint -q "$drive"; then
+      DRIVES+=("$drive")
+    else
+      log_warn "Optional drive $drive is not mounted, skipping it."
     fi
   done
 }
 
 # ~/dev and ~/.dotfiles go straight to <drive>/dev and <drive>/dotfiles
 sync_dev() {
-  log_info "1. Syncing ~/dev and ~/.dotfiles (scripts/rsync.sh)..."
-  "$DOTFILES_DIR/scripts/rsync.sh"
+  log_info "1. Syncing ~/dev, ~/.dotfiles and the Obsidian vault (scripts/rsync.sh)..."
+  # A failing drive shouldn't stop the rest of the backup
+  "$DOTFILES_DIR/scripts/rsync.sh" || {
+    log_warn "   - rsync.sh reported failures, see ~/log/rsync_$(date '+%Y%m%d').log"
+    FAILED=1
+  }
 }
 
 backup_home_files() {
@@ -130,17 +146,20 @@ backup_inventory() {
 # Writes the staged backup to every drive, replacing an older one
 copy_to_drives() {
   log_info "5. Copying the backup to the drives..."
-  local mount dest
-  for mount in "${MOUNTS[@]}"; do
-    dest="$mount/$BACKUP_NAME"
-    rm -rf "$dest"
-    mkdir -p "$dest"
-    cp -r "$STAGE/." "$dest/"
-    log_info "   - $dest"
+  local drive dest
+  for drive in "${DRIVES[@]}"; do
+    dest="$drive/$BACKUP_NAME"
+    if rm -rf "$dest" && mkdir -p "$dest" && cp -r "$STAGE/." "$dest/"; then
+      log_info "   - $dest"
+    else
+      log_err "   - Failed to write $dest"
+      FAILED=1
+    fi
   done
 }
 
 main() {
+  FAILED=0
   check_mounts
 
   STAGE="$(mktemp -d)"
@@ -153,16 +172,21 @@ main() {
   copy_to_drives
 
   echo -e "\n============================================================="
-  log_info "Backup complete!"
+  if [[ $FAILED -eq 0 ]]; then
+    log_info "Backup complete!"
+  else
+    log_err "Backup finished with errors, check the messages above."
+  fi
   echo -e "============================================================="
-  local mount
-  for mount in "${MOUNTS[@]}"; do
-    echo -e "  ${BLUE}$mount/$BACKUP_NAME${NC}, ${BLUE}$mount/dev${NC}, ${BLUE}$mount/dotfiles${NC}"
+  local drive
+  for drive in "${DRIVES[@]}"; do
+    echo -e "  ${BLUE}$drive${NC}"
   done
   echo -e "\n${YELLOW}Before formatting:${NC}"
   echo -e "  - Push or commit anything you want in git (repos without a remote only live in <drive>/dev)"
   echo -e "  - Keep /mnt/backup's partition (sdb4) out of the installer's partitioning: reformat / only"
   echo -e "============================================================="
+  return "$FAILED"
 }
 
 main "$@"

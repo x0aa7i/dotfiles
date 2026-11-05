@@ -30,16 +30,18 @@ readonly LOGFILE
 readonly RSYNC_EXCLUDE="${HOME}/.config/scripts/rsync_exclude.txt"
 readonly LOG_RETENTION_DAYS=7
 
-# Source and destination pairs
-# Format: "source destination [full]"
+# Backup drives. Required ones count as a failure when they aren't mounted,
+# optional ones (external disks) are only used when they are
+readonly REQUIRED_DRIVES=(/mnt/backup /mnt/media)
+readonly OPTIONAL_DRIVES=("/run/media/$(id -un)/Storage")
+
+# Synced to <drive>/<name> on every drive. Format: "source name [full]"
 # "full" copies everything, ignoring .gitignore files
-declare -a SYNC_PAIRS=(
-  "${HOME}/dev/ /mnt/backup/dev/"
-  "${HOME}/dev/ /mnt/media/dev/"
-  "${HOME}/.dotfiles/ /mnt/backup/dotfiles/"
-  "${HOME}/.dotfiles/ /mnt/media/dotfiles/"
-  # The vault lives on /mnt/backup only; its .gitignore skips settings, PDFs and EPUBs
-  "/mnt/backup/documents/obsidian/ /mnt/media/obsidian/ full"
+readonly SYNC_SOURCES=(
+  "${HOME}/dev/ dev"
+  "${HOME}/.dotfiles/ dotfiles"
+  # Lives on /mnt/backup; its .gitignore skips settings, PDFs and EPUBs
+  "/mnt/backup/documents/obsidian/ obsidian full"
 )
 
 # -----------------------------------------------------------------------------
@@ -186,50 +188,41 @@ main() {
   log_info "=========================================="
 
   local failed_syncs=0
-  local total_syncs=${#SYNC_PAIRS[@]}
   local completed_syncs=0
+  local drive entry source name mode dest
 
-  # Process each sync pair
-  for pair in "${SYNC_PAIRS[@]}"; do
-    IFS=' ' read -r source dest mode <<<"$pair"
-
-    # Skip drives that aren't mounted, or the sync would fill the empty mount point
-    # on the root filesystem (destinations are /mnt/<drive>/...)
-    local mount_root
-    mount_root="$(cut -d/ -f1-3 <<<"$dest")"
-    if ! mountpoint -q "$mount_root"; then
-      log_error "Drive not mounted, skipping: $mount_root"
-      failed_syncs=$((failed_syncs + 1))
-      completed_syncs=$((completed_syncs + 1))
+  for drive in "${REQUIRED_DRIVES[@]}" "${OPTIONAL_DRIVES[@]}"; do
+    # An unmounted drive would fill its empty mount point on the root filesystem
+    if ! mountpoint -q "$drive"; then
+      if [[ " ${REQUIRED_DRIVES[*]} " == *" $drive "* ]]; then
+        log_error "Drive not mounted, skipping: $drive"
+        failed_syncs=$((failed_syncs + 1))
+      else
+        log_info "Optional drive not mounted, skipping: $drive"
+      fi
       continue
     fi
 
-    # Skip if source doesn't exist
-    if [[ ! -e "$source" ]]; then
-      log_warn "Source does not exist, skipping: $source"
-      continue
-    fi
+    for entry in "${SYNC_SOURCES[@]}"; do
+      IFS=' ' read -r source name mode <<<"$entry"
+      dest="${drive}/${name}/"
 
-    # Create destination directory if it doesn't exist
-    if [[ ! -d "$dest" ]]; then
-      local parent_dir
-      parent_dir=$(dirname "$dest")
-      if [[ ! -d "$parent_dir" ]]; then
-        log_warn "Parent directory does not exist, skipping: $dest"
+      if [[ ! -e "$source" ]]; then
+        log_warn "Source does not exist, skipping: $source"
+        continue
+      fi
+      # No point copying a folder onto the drive it already lives on
+      if [[ "$source" == "$drive/"* ]]; then
         continue
       fi
 
       mkdir -p "$dest"
-      log_info "Created destination directory: $dest"
-    fi
-
-    # Perform the sync
-    if ! perform_rsync "$source" "$dest" "$mode"; then
-      failed_syncs=$((failed_syncs + 1))
-    fi
-
-    completed_syncs=$((completed_syncs + 1))
-    log_info "Progress: ${completed_syncs}/${total_syncs} syncs completed"
+      if perform_rsync "$source" "$dest" "$mode"; then
+        completed_syncs=$((completed_syncs + 1))
+      else
+        failed_syncs=$((failed_syncs + 1))
+      fi
+    done
   done
 
   # Clean up old log files
@@ -238,7 +231,7 @@ main() {
 
   log_info "=========================================="
   log_info "Backup operation complete"
-  log_info "Total: ${total_syncs}, Successful: $((completed_syncs - failed_syncs)), Failed: ${failed_syncs}"
+  log_info "Successful: ${completed_syncs}, Failed: ${failed_syncs}"
   log_info "=========================================="
 
   if [[ $failed_syncs -gt 0 ]]; then

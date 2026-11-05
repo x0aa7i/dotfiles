@@ -9,9 +9,11 @@ overlap. On Termux, just run `install.sh`.
 ## Scripts Included
 
 1. **`backup.sh`**: Run this script **before** formatting your system. It needs both `/mnt/backup` and `/mnt/media`
-   mounted and writes the same backup to each:
+   mounted, and also uses the external `Storage` disk (`/run/media/$USER/Storage`) when it's plugged in. It writes the
+   same backup to each:
    - `~/dev` and `~/.dotfiles` to `<drive>/dev` and `<drive>/dotfiles`, `.env` files included (`scripts/rsync.sh`)
-   - The Obsidian vault from `/mnt/backup/documents/obsidian` to `/mnt/media/obsidian`, settings and plugins included
+   - The Obsidian vault from `/mnt/backup/documents/obsidian` to `<drive>/obsidian` on the other drives, settings and
+     plugins included
    - `<drive>/fedora_migration_backup/home.tar.gz`: SSH keys, `gh` config, Syncthing identity (same device ID),
      fonts, fish history, zoxide database and `.npmrc`, `.aicommit2`, `.aicommits`, `.modal.toml`, `.opencommit`
    - `crontab.txt`, `dconf.ini` (GNOME settings) and `fstab.bak`
@@ -61,7 +63,8 @@ overlap. On Termux, just run `install.sh`.
 
 ### Step 3: Post-Install Setup
 
-1. Mount the backup drives (`/mnt/media` is the default restore source).
+1. Mount the backup drives (`/mnt/media` is the default restore source; the external disk works too, at
+   `/run/media/$USER/Storage/fedora_migration_backup`).
 2. Clone the dotfiles: `git clone https://github.com/x0aa7i/dotfiles ~/.dotfiles` (setup switches it to SSH).
 3. Run the setup script with `sudo` (since it installs packages and configures system services):
    ```bash
