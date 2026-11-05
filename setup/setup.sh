@@ -7,11 +7,9 @@
 # - DNF speed optimizations
 # - Custom repositories (RPM Fusion, Docker, Terra, Tailscale)
 # - Package installations (setup/packages/fedora.txt, setup/packages/flatpak.txt)
-# - NVIDIA drivers (when an NVIDIA GPU is detected)
-# - Zed editor (installed for the target user)
-# - An Ubuntu distrobox with Playwright's system dependencies
-# - Restoring backed-up data (SSH, GPG, home configs, Wakapi, Flatpak profiles)
-# - System services (Docker, Tailscale, key-only sshd, user lingering)
+# - Flathub as the only Flatpak remote (replaces Fedora's own)
+# - Restoring backed-up data (SSH keys, home configs, crontab) and ~/dev
+# - System services (Docker, Tailscale, cron, key-only sshd, user lingering)
 #
 # Everything dotfiles-related (dotter, deploy, starship, fish as login shell,
 # systemd user services) is delegated to ../install.sh, run as the target user.
@@ -22,8 +20,6 @@ set -euo pipefail
 SETUP_DIR="$(cd "$(dirname "$0")" && pwd)"
 DOTFILES_DIR="$(dirname "$SETUP_DIR")"
 PACKAGES_DIR="$SETUP_DIR/packages"
-DISTROBOX_NAME="ubuntu"
-DISTROBOX_IMAGE="docker.io/library/ubuntu:24.04"
 
 # --- Color Codes for Output ---
 RED='\033[0;31m'
@@ -118,69 +114,47 @@ install_rpm_packages() {
 
   # Missing packages are reported but don't abort the whole transaction
   dnf install -y --skip-unavailable "${packages[@]}"
-
-  # NVIDIA Drivers installation (optional block - run if Nvidia GPU is present)
-  if lspci | grep -i nvidia &>/dev/null; then
-    log_info "NVIDIA GPU detected. Installing drivers..."
-    dnf install -y akmod-nvidia xorg-x11-drv-nvidia-cuda
-    log_warn "NVIDIA driver installation initiated. NOTE: The kernel modules will compile in the background."
-    log_warn "Please wait 5-10 minutes before rebooting, or monitor progress using: 'journalctl -fl -u akmods'"
-  fi
 }
 
 # --- 4. Install Flatpaks ---
-install_flatpaks() {
-  log_info "Installing Flatpak applications from packages/flatpak.txt..."
+# Fedora ships its own "fedora" remote (apps rebuilt from Fedora RPMs) and GNOME
+# Software prefers it. Use the official, unfiltered Flathub only, moving any app
+# installed from Fedora's remotes over to Flathub
+setup_flathub() {
+  log_info "Making Flathub the only Flatpak remote..."
   flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+  flatpak remote-modify --enable --no-filter flathub
 
+  local remote app
+  for remote in fedora fedora-testing; do
+    grep -qx "$remote" < <(flatpak remotes --columns=name) || continue
+    while read -r app; do
+      log_info "   - Reinstalling $app from Flathub..."
+      flatpak install -y --noninteractive --reinstall flathub "$app" ||
+        log_warn "   - $app is not on Flathub, it stays without updates"
+    done < <(flatpak list --app --columns=application,origin | awk -v r="$remote" '$2 == r { print $1 }')
+    log_info "   - Removing the '$remote' remote..."
+    flatpak remote-delete --force "$remote"
+  done
+  flatpak uninstall -y --noninteractive --unused
+}
+
+install_flatpaks() {
+  setup_flathub
+
+  log_info "Installing Flatpak applications from packages/flatpak.txt..."
   local -a flatpaks
   mapfile -t flatpaks < <(read_packages flatpak)
-  flatpak install -y flathub "${flatpaks[@]}"
-}
-
-# --- 5. Install standalone apps (Non-root user context) ---
-install_manual_tools() {
-  local username="$1"
-
-  log_info "Installing standalone apps for $username..."
-
-  # Zed installs into the user's ~/.local, so it must not run as root
-  log_info "   - Installing Zed Editor..."
-  sudo -u "$username" -H sh -c 'curl -f https://zed.dev/install.sh | sh'
-}
-
-# --- 5b. Ubuntu distrobox (Non-root user context) ---
-# Playwright only supports Ubuntu/Debian, so its browsers run from this box:
-#   distrobox enter ubuntu -- npx playwright test
-# Ubuntu-only apps can be installed in it and exported with distrobox-export --app
-setup_distrobox() {
-  local username="$1"
-
-  if run_as_user "$username" podman container exists "$DISTROBOX_NAME"; then
-    log_info "Distrobox '$DISTROBOX_NAME' already exists."
-    return
-  fi
-
-  log_info "Creating distrobox '$DISTROBOX_NAME' ($DISTROBOX_IMAGE)..."
-  if ! run_as_user "$username" distrobox create --yes --name "$DISTROBOX_NAME" --image "$DISTROBOX_IMAGE"; then
-    log_warn "   - distrobox create failed, skipping the box."
-    return
-  fi
-
-  # The browsers themselves are per project version: npx playwright install
-  log_info "   - Installing Node.js and Playwright dependencies in the box..."
-  run_as_user "$username" distrobox enter "$DISTROBOX_NAME" -- sh -c \
-    'sudo apt-get update && sudo apt-get install -y nodejs npm && sudo npx -y playwright install-deps' ||
-    log_warn "   - Box setup failed, retry with: distrobox enter $DISTROBOX_NAME"
+  flatpak install -y --noninteractive flathub "${flatpaks[@]}"
 }
 
 # --- 6. Restore backed up data (Non-root user context) ---
 # Matches the layout written by backup.sh
 restore_backup() {
   local username="$1"
+  local backup_path="$2"
   local user_home
   user_home="$(getent passwd "$username" | cut -d: -f6)"
-  local backup_path="$2"
 
   if [[ ! -d "$backup_path" ]]; then
     log_err "Backup path '$backup_path' does not exist. Skipping restoration."
@@ -189,59 +163,71 @@ restore_backup() {
 
   log_info "Restoring data from backup at $backup_path..."
 
-  # 1. Restore SSH keys (backup.sh stores them as ssh/.ssh)
-  local ssh_src="$backup_path/ssh/.ssh"
-  [[ -d "$ssh_src" ]] || ssh_src="$backup_path/ssh"
-  if [[ -n "$(ls -A "$ssh_src" 2>/dev/null)" ]]; then
-    log_info "   - Restoring SSH keys..."
-    sudo -u "$username" mkdir -p "$user_home/.ssh"
-    sudo -u "$username" cp -rp "$ssh_src/." "$user_home/.ssh/"
-    chmod 700 "$user_home/.ssh"
-    find "$user_home/.ssh" -type f -exec chmod 600 {} +
-    find "$user_home/.ssh" -type f -name '*.pub' -exec chmod 644 {} +
+  # 1. SSH keys, gh, Syncthing identity, fonts, shell history, home configs.
+  # Restored before install.sh, so it neither generates a new SSH key nor gives
+  # Syncthing a new device ID
+  if [[ -f "$backup_path/home.tar.gz" ]]; then
+    log_info "   - Restoring home files (SSH keys, Syncthing, fonts, configs)..."
+    sudo -u "$username" tar -xzpf "$backup_path/home.tar.gz" -C "$user_home"
+    [[ -d "$user_home/.ssh" ]] && chmod 700 "$user_home/.ssh"
+    sudo -u "$username" fc-cache -f >/dev/null 2>&1 || true
   fi
 
-  # 2. Restore GPG keys
-  if [[ -f "$backup_path/gnupg/gnupg.tar.gz" ]]; then
-    log_info "   - Restoring GPG keys..."
-    sudo -u "$username" tar -xzf "$backup_path/gnupg/gnupg.tar.gz" -C "$user_home/"
-    chmod 700 "$user_home/.gnupg"
+  # 2. A fresh https clone of the dotfiles can't push, switch it to SSH
+  local origin
+  origin="$(sudo -u "$username" git -C "$user_home/.dotfiles" remote get-url origin 2>/dev/null || true)"
+  if [[ "$origin" == https://github.com/* && -f "$user_home/.ssh/id_ed25519" ]]; then
+    log_info "   - Switching the dotfiles remote to SSH..."
+    sudo -u "$username" git -C "$user_home/.dotfiles" remote set-url origin "git@github.com:${origin#https://github.com/}"
   fi
 
-  # 3. Restore standalone home config files (.npmrc, .aicommits, ...)
-  if [[ -d "$backup_path/configs" ]]; then
-    log_info "   - Restoring standalone config files..."
-    sudo -u "$username" rsync -a --exclude 'fstab.bak' "$backup_path/configs/" "$user_home/"
-  fi
-  if [[ -f "$backup_path/configs/fstab.bak" ]]; then
-    log_warn "   - Old fstab kept at $backup_path/configs/fstab.bak, merge mounts into /etc/fstab manually."
+  # 3. Crontab (runs scripts/rsync.sh), unless the user already has one
+  if [[ -s "$backup_path/crontab.txt" ]] && ! crontab -u "$username" -l >/dev/null 2>&1; then
+    log_info "   - Restoring crontab..."
+    crontab -u "$username" "$backup_path/crontab.txt"
   fi
 
-  # 4. Restore Wakapi data (before install.sh starts wakapi.service)
-  if [[ -n "$(ls -A "$backup_path/wakapi" 2>/dev/null)" ]]; then
-    log_info "   - Restoring Wakapi data..."
-    sudo -u "$username" mkdir -p "$user_home/.local/share/wakapi"
-    sudo -u "$username" cp -rp "$backup_path/wakapi/." "$user_home/.local/share/wakapi/"
+  if [[ -f "$backup_path/dconf.ini" ]]; then
+    log_warn "   - GNOME settings saved at $backup_path/dconf.ini, load what you need with: dconf load / < dconf.ini"
+  fi
+  if [[ -f "$backup_path/fstab.bak" ]]; then
+    log_warn "   - Old fstab kept at $backup_path/fstab.bak, merge mounts into /etc/fstab manually."
+  fi
+}
+
+# --- 6b. Restore ~/dev from the drive copy made by scripts/rsync.sh ---
+# NTFS/exFAT copies have every file at 777 and core.filemode off, so the modes
+# are reset to 644/755 and the executable bits come back from each git index
+restore_dev() {
+  local username="$1"
+  local src="$2"
+  local user_home
+  user_home="$(getent passwd "$username" | cut -d: -f6)"
+  local dest="$user_home/dev"
+
+  if [[ ! -d "$src" ]]; then
+    log_warn "No ~/dev copy at $src, skipping."
+    return
+  fi
+  if [[ -n "$(ls -A "$dest" 2>/dev/null)" ]]; then
+    log_warn "$dest is not empty, not restoring it."
+    return
   fi
 
-  # 5. Restore Flatpak app profiles
-  local app_dir
-  for app_dir in "$backup_path"/flatpak_data/*/; do
-    [[ -d "$app_dir" ]] || continue
-    log_info "   - Restoring Flatpak data for: $(basename "$app_dir")..."
-    sudo -u "$username" mkdir -p "$user_home/.var/app"
-    sudo -u "$username" cp -rp "${app_dir%/}" "$user_home/.var/app/"
-  done
+  log_info "Restoring $dest from $src..."
+  sudo -u "$username" rsync -rtp --chmod=D755,F644 "$src/" "$dest/"
 
-  # 6. Restore Dotfiles repo (only when it isn't already on disk)
-  if [[ -d "$backup_path/dotfiles_backup/.dotfiles" ]]; then
-    if [[ -d "$user_home/.dotfiles" ]]; then
-      log_warn "   - $user_home/.dotfiles already exists, not restoring it from the backup."
-    else
-      log_info "   - Restoring .dotfiles folder..."
-      sudo -u "$username" cp -rp "$backup_path/dotfiles_backup/.dotfiles" "$user_home/.dotfiles"
-    fi
-  fi
+  local git_dir repo entry
+  while IFS= read -r -d '' git_dir; do
+    repo="$(dirname "$git_dir")"
+    sudo -u "$username" git -C "$repo" config core.filemode true
+    while IFS= read -r -d '' entry; do
+      if [[ "$entry" == 100755* ]]; then
+        chmod +x "$repo/${entry#*$'\t'}" 2>/dev/null || true
+      fi
+    done < <(sudo -u "$username" git -C "$repo" ls-files -s -z)
+    find "$git_dir/hooks" -type f ! -name '*.sample' -exec chmod +x {} + 2>/dev/null || true
+  done < <(find "$dest" -name node_modules -prune -o -name .git -type d -print0 -prune)
 }
 
 # --- 7. Configure System Services ---
@@ -252,6 +238,7 @@ configure_services() {
   systemctl daemon-reload
   systemctl enable --now docker
   systemctl enable --now tailscaled
+  systemctl enable --now crond
 
   # SSH server: keys only, since it is reachable from the LAN as well as Tailscale.
   # The 10- prefix wins over Fedora's 50-redhat.conf (first value set is used)
@@ -297,28 +284,28 @@ main() {
   add_repos
   install_rpm_packages
   install_flatpaks
-  install_manual_tools "$real_user"
 
   # Ask user for backup location to restore
   echo -e "\n============================================================="
   read -p "Would you like to restore data from a backup directory? [y/N]: " answer
   if [[ "$answer" =~ ^[Yy]$ ]]; then
-    read -p "Enter backup source path [/mnt/backup/fedora_migration_backup]: " backup_src
-    backup_src="${backup_src:-/mnt/backup/fedora_migration_backup}"
+    read -p "Enter backup source path [/mnt/media/fedora_migration_backup]: " backup_src
+    backup_src="${backup_src:-/mnt/media/fedora_migration_backup}"
     restore_backup "$real_user" "$backup_src" || true
+    # rsync.sh keeps ~/dev next to the backup folder, at <drive>/dev
+    restore_dev "$real_user" "$(dirname "$backup_src")/dev"
   else
     log_info "Skipping data restore step."
   fi
 
   configure_services "$real_user"
-  # Rootless podman needs the user's runtime dir, which lingering provides
-  setup_distrobox "$real_user"
   deploy_dotfiles "$real_user"
 
   echo -e "\n============================================================="
   log_info "System configuration completed!"
   log_warn "Log in to Tailscale with 'sudo tailscale up', then pair the phone (ssh/README.md)."
-  log_warn "Please REBOOT your computer to apply all changes (including shell change & Nvidia drivers)."
+  log_warn "Log in to the GitHub CLI with 'gh auth login' (its token was in the old keyring)."
+  log_warn "Please REBOOT your computer to apply all changes (including the shell change)."
   echo -e "============================================================="
 }
 

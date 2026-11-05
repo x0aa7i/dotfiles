@@ -5,7 +5,7 @@ set -euo pipefail
 # RSYNC Backup Script
 # =============================================================================
 # A performant and maintainable rsync-based backup solution.
-# Syncs the same folders as the original rclone.sh script.
+# Syncs ~/dev and ~/.dotfiles to every backup drive.
 #
 # Features:
 # - Parallel syncing for better performance
@@ -37,8 +37,6 @@ declare -a SYNC_PAIRS=(
   "${HOME}/dev/ /mnt/media/dev/"
   "${HOME}/.dotfiles/ /mnt/backup/dotfiles/"
   "${HOME}/.dotfiles/ /mnt/media/dotfiles/"
-  "/opt/wakapi/wakapi_db.db /mnt/backup/data/wakapi_db.db"
-  "/opt/wakapi/wakapi_db.db /mnt/media/data/wakapi_db.db"
 )
 
 # -----------------------------------------------------------------------------
@@ -132,6 +130,10 @@ perform_rsync() {
     rsync_opts="${rsync_opts} --exclude-from=${RSYNC_EXCLUDE}"
   fi
 
+  # Keep .env files although .gitignore excludes them (first matching rule wins).
+  # Directories named .env* (Python virtualenvs) stay excluded
+  rsync_opts="${rsync_opts} --exclude='.env*/' --include='.env*'"
+
   # Exclude files and directories in .gitignore
   rsync_opts="${rsync_opts} --filter='dir-merge,- .gitignore'"
 
@@ -184,6 +186,17 @@ main() {
   # Process each sync pair
   for pair in "${SYNC_PAIRS[@]}"; do
     IFS=' ' read -r source dest <<<"$pair"
+
+    # Skip drives that aren't mounted, or the sync would fill the empty mount point
+    # on the root filesystem (destinations are /mnt/<drive>/...)
+    local mount_root
+    mount_root="$(cut -d/ -f1-3 <<<"$dest")"
+    if ! mountpoint -q "$mount_root"; then
+      log_error "Drive not mounted, skipping: $mount_root"
+      failed_syncs=$((failed_syncs + 1))
+      completed_syncs=$((completed_syncs + 1))
+      continue
+    fi
 
     # Skip if source doesn't exist
     if [[ ! -e "$source" ]]; then

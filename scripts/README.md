@@ -14,7 +14,9 @@ A performant bash script for syncing files to multiple backup destinations using
 - Lock file to prevent concurrent runs
 - Automatic cleanup of old log files (7 day retention)
 - Progress tracking and statistics
-- Support for exclude patterns via `rclone_exclude.txt`
+- Support for exclude patterns via `rsync_exclude.txt` and each repo's `.gitignore`
+- `.env` files are always copied, even when `.gitignore` excludes them
+- Drives that aren't mounted are skipped (and reported as failures) instead of filling the empty mount point
 
 ### Configuration
 
@@ -58,17 +60,3 @@ Logs are stored in `~/log/rsync_YYYYMMDD.log`. Check these for sync status and a
 The script uses `~/.config/scripts/rsync_exclude.txt` for exclude patterns.
 
 To exclude a directory from being synced, create a `.rsyncignore` file in that directory (similar to `.gitignore`).
-
-## rclone.sh (Legacy)
-
-The original rclone-based backup script. Kept for reference.
-
-**Note:** If migrating from `rclone.sh` to `rsync.sh`, update your crontab entry:
-
-```bash
-# Old
-0 */6 * * * /home/abdo/.config/scripts/rclone.sh
-
-# New
-0 */6 * * * /home/abdo/.config/scripts/rsync.sh
-```

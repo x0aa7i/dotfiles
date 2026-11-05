@@ -2,19 +2,48 @@
 # =============================================================================
 # Fedora Pre-Format Backup Script
 # =============================================================================
-# Run this script BEFORE formatting your drive. It gathers and backs up:
-# - System configuration (fstab, etc.)
-# - SSH and GPG keys
-# - Application databases (Wakapi, etc.)
-# - Home config files (Wakatime, Modal, etc.)
-# - User installed packages (RPM & Flatpak lists)
-# - Flatpak application data (Zen Browser, Obsidian, Anki, etc.)
-# - Dotfiles repository state
+# Run this script BEFORE formatting. It writes the same backup to every drive in
+# MOUNTS (both must be mounted):
+# - ~/dev and ~/.dotfiles, .env files included (scripts/rsync.sh)
+# - home.tar.gz: SSH keys, gh config, Syncthing identity, fonts, fish history,
+#   zoxide database and standalone home configs (.npmrc, .modal.toml, ...)
+# - crontab, GNOME settings (dconf dump) and /etc/fstab
+# - Package and tool inventories, to reinstall what setup.sh doesn't cover
+#
+# setup.sh restores it from <drive>/fedora_migration_backup and <drive>/dev.
 # =============================================================================
 
 set -euo pipefail
 
-# --- Color Codes for Output ---
+SETUP_DIR="$(cd "$(dirname "$0")" && pwd)"
+DOTFILES_DIR="$(dirname "$SETUP_DIR")"
+BACKUP_NAME="fedora_migration_backup"
+MOUNTS=(/mnt/backup /mnt/media)
+
+# Paths relative to $HOME, archived into home.tar.gz when they exist
+HOME_PATHS=(
+  .ssh
+  .config/gh
+  .local/state/syncthing
+  .local/share/fonts
+  .fonts
+  .local/share/fish/fish_history
+  .local/share/zoxide
+  .npmrc
+  .aicommit2
+  .aicommits
+  .modal.toml
+  .opencommit
+)
+
+# Recreated automatically or deployed by dotter
+HOME_EXCLUDES=(
+  .ssh/sockets
+  .ssh/config.d
+  '.local/state/syncthing/index-*'
+  .local/state/syncthing/syncthing.lock
+)
+
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
@@ -25,135 +54,115 @@ log_info() { echo -e "${GREEN}[INFO]${NC} $1"; }
 log_warn() { echo -e "${YELLOW}[WARN]${NC} $1"; }
 log_err() { echo -e "${RED}[ERROR]${NC} $1"; }
 
-# --- Check Backup Destination ---
-DEFAULT_DEST="/mnt/backup/fedora_migration_backup"
-read -p "Enter backup destination directory [$DEFAULT_DEST]: " DEST
-DEST="${DEST:-$DEFAULT_DEST}"
+# Runs a command into $INVENTORY/<file> when the command is installed
+inventory() {
+  local file="$1"
+  shift
+  command -v "$1" >/dev/null || return 0
+  "$@" >"$INVENTORY/$file" 2>/dev/null || log_warn "   - '$*' failed"
+}
 
-if [[ ! -d "$(dirname "$DEST")" ]]; then
-  log_err "Parent directory of '$DEST' does not exist."
-  log_warn "Please ensure your backup drive is mounted."
-  exit 1
-fi
+check_mounts() {
+  local mount
+  for mount in "${MOUNTS[@]}"; do
+    if ! mountpoint -q "$mount"; then
+      log_err "$mount is not mounted. Mount every drive in MOUNTS, then run again."
+      exit 1
+    fi
+  done
+}
 
-log_info "Creating backup directory structure at: $DEST"
-mkdir -p "$DEST/configs"
-mkdir -p "$DEST/ssh"
-mkdir -p "$DEST/gnupg"
-mkdir -p "$DEST/wakapi"
-mkdir -p "$DEST/flatpak_data"
-mkdir -p "$DEST/dotfiles_backup"
+# ~/dev and ~/.dotfiles go straight to <drive>/dev and <drive>/dotfiles
+sync_dev() {
+  log_info "1. Syncing ~/dev and ~/.dotfiles (scripts/rsync.sh)..."
+  "$DOTFILES_DIR/scripts/rsync.sh"
+}
 
-# --- 1. Export Installed Package Lists ---
-log_info "1. Exporting installed package lists..."
-if command -v flatpak &>/dev/null; then
-  flatpak list --app --columns=application >"$DEST/flatpaks.txt"
-  log_info "   - Flatpak list saved to flatpaks.txt"
-else
-  log_warn "   - flatpak command not found. Skipping flatpak list."
-fi
+backup_home_files() {
+  log_info "2. Archiving home files..."
+  local -a paths=() excludes=()
+  local path
+  for path in "${HOME_PATHS[@]}"; do
+    if [[ -e "$HOME/$path" ]]; then
+      paths+=("$path")
+    else
+      log_warn "   - ~/$path not found"
+    fi
+  done
+  for path in "${HOME_EXCLUDES[@]}"; do
+    excludes+=(--exclude="$path")
+  done
 
-if command -v dnf &>/dev/null; then
-  # Filter out common base packages to get user-installed/modified list
-  dnf repoquery --userinstalled --queryformat "%{name}" >"$DEST/user_installed_packages.txt"
-  log_info "   - User-installed DNF package list saved to user_installed_packages.txt"
-else
-  log_warn "   - dnf command not found. Skipping package list."
-fi
+  # tar keeps the strict SSH permissions that NTFS/exFAT drives can't store
+  tar -czf "$STAGE/home.tar.gz" -C "$HOME" "${excludes[@]}" "${paths[@]}"
 
-# --- 2. Copy System Configurations ---
-log_info "2. Backing up system configuration files..."
-if [[ -f "/etc/fstab" ]]; then
-  cp "/etc/fstab" "$DEST/configs/fstab.bak"
-  log_info "   - /etc/fstab backed up (critical for mount point UUIDs!)"
-else
-  log_warn "   - /etc/fstab not found!"
-fi
-
-# --- 3. Copy SSH and GPG Keys ---
-log_info "3. Backing up security keys..."
-if [[ -d "$HOME/.ssh" ]]; then
-  cp -rp "$HOME/.ssh" "$DEST/ssh/"
-  log_info "   - SSH keys backed up"
-else
-  log_warn "   - ~/.ssh directory not found"
-fi
-
-if [[ -d "$HOME/.gnupg" ]]; then
-  # Use tar to preserve GPG permission requirements
-  tar -czf "$DEST/gnupg/gnupg.tar.gz" -C "$HOME" .gnupg
-  log_info "   - GPG keys archived to gnupg.tar.gz"
-else
-  log_warn "   - ~/.gnupg directory not found"
-fi
-
-# --- 4. Copy Wakapi Data ---
-log_info "4. Backing up Wakapi data..."
-WAKAPI_SHARE="$HOME/.local/share/wakapi"
-if [[ -d "$WAKAPI_SHARE" ]]; then
-  cp -rp "$WAKAPI_SHARE"/* "$DEST/wakapi/"
-  log_info "   - Wakapi database and configurations backed up"
-else
-  log_warn "   - Wakapi share directory not found at $WAKAPI_SHARE"
-fi
-
-# --- 5. Copy Home Config Files ---
-log_info "5. Backing up standalone home configurations..."
-declare -a HOME_FILES=(
-  ".npmrc"
-  ".aicommit2"
-  ".aicommits"
-)
-
-for file in "${HOME_FILES[@]}"; do
-  if [[ -f "$HOME/$file" ]]; then
-    cp "$HOME/$file" "$DEST/configs/$file"
-    log_info "   - $file backed up"
+  # Process substitution: with pipefail, grep -q exiting early would fail the pipe
+  if ! grep -qx '.ssh/id_ed25519' < <(tar -tzf "$STAGE/home.tar.gz"); then
+    log_err "~/.ssh/id_ed25519 is missing from home.tar.gz, aborting."
+    exit 1
   fi
-done
+  log_info "   - home.tar.gz written ($(du -h "$STAGE/home.tar.gz" | cut -f1))"
+}
 
-# --- 6. Back up .dotfiles Folder (Safety Net) ---
-log_info "6. Backing up dotfiles repository..."
-if [[ -d "$HOME/.dotfiles" ]]; then
-  # Copy dotfiles directory, preserving git history
-  cp -rp "$HOME/.dotfiles" "$DEST/dotfiles_backup/"
-  log_info "   - ~/.dotfiles backed up (includes uncommitted changes!)"
-else
-  log_warn "   - ~/.dotfiles folder not found"
-fi
-
-# --- 7. Copy Flatpak Application Data ---
-log_info "7. Backing up key Flatpak application profiles..."
-# We backup Zen Browser and Obsidian profiles as they contain cookies/settings/plugins.
-# Note: Obsidian vault is stored elsewhere (mount), but its configuration is in Flatpak data.
-declare -a FLATPAK_APPS=(
-  "app.zen_browser.zen"
-  "md.obsidian.Obsidian"
-  "net.ankiweb.Anki"
-  "com.github.johnfactotum.Foliate"
-  "org.telegram.desktop"
-)
-
-for app in "${FLATPAK_APPS[@]}"; do
-  if [[ -d "$HOME/.var/app/$app" ]]; then
-    log_info "   - Backing up Flatpak data for: $app..."
-    mkdir -p "$DEST/flatpak_data/$app"
-    # Syncing config & data
-    cp -rp "$HOME/.var/app/$app" "$DEST/flatpak_data/"
-  else
-    log_warn "   - Flatpak data directory not found for: $app"
+backup_system_state() {
+  log_info "3. Saving crontab, GNOME settings and fstab..."
+  crontab -l >"$STAGE/crontab.txt" 2>/dev/null || log_warn "   - No crontab"
+  if command -v dconf >/dev/null; then
+    dconf dump / >"$STAGE/dconf.ini"
   fi
-done
+  cp /etc/fstab "$STAGE/fstab.bak"
+}
 
-# --- Summary & Final Instructions ---
-echo -e "\n============================================================="
-log_info "Backup complete!"
-echo -e "============================================================="
-echo -e "Your backup is located at: ${BLUE}$DEST${NC}"
-echo -e "\n${YELLOW}Please verify that the following files exist in the backup folder before formatting:${NC}"
-echo -e "1. ${BLUE}$DEST/ssh/${NC} (Check your private/public key pairs)"
-echo -e "2. ${BLUE}$DEST/gnupg/gnupg.tar.gz${NC} (Check GPG keys)"
-echo -e "3. ${BLUE}$DEST/wakapi/wakapi_db.db${NC} (Check your Wakapi SQLite database)"
-echo -e "4. ${BLUE}$DEST/flatpak_data/app.zen_browser.zen${NC} (Check Zen Browser profile)"
-echo -e "5. ${BLUE}$DEST/configs/fstab.bak${NC} (Keep UUIDs of your SSD/HDDs safe)"
-echo -e "============================================================="
+backup_inventory() {
+  log_info "4. Writing package and tool inventories..."
+  INVENTORY="$STAGE/inventory"
+  mkdir -p "$INVENTORY"
+  inventory dnf.txt dnf repoquery --userinstalled --queryformat '%{name}\n'
+  inventory flatpak.txt flatpak list --app --columns=application
+  inventory local-bin.txt ls -l "$HOME/.local/bin"
+  inventory cargo.txt cargo install --list
+  inventory uv.txt uv tool list
+  inventory npm.txt npm ls -g --depth=0
+  inventory bun.txt bun pm ls -g
+  inventory gnome-extensions.txt gnome-extensions list --enabled
+}
+
+# Writes the staged backup to every drive, replacing an older one
+copy_to_drives() {
+  log_info "5. Copying the backup to the drives..."
+  local mount dest
+  for mount in "${MOUNTS[@]}"; do
+    dest="$mount/$BACKUP_NAME"
+    rm -rf "$dest"
+    mkdir -p "$dest"
+    cp -r "$STAGE/." "$dest/"
+    log_info "   - $dest"
+  done
+}
+
+main() {
+  check_mounts
+
+  STAGE="$(mktemp -d)"
+  trap 'rm -rf "$STAGE"' EXIT
+
+  sync_dev
+  backup_home_files
+  backup_system_state
+  backup_inventory
+  copy_to_drives
+
+  echo -e "\n============================================================="
+  log_info "Backup complete!"
+  echo -e "============================================================="
+  local mount
+  for mount in "${MOUNTS[@]}"; do
+    echo -e "  ${BLUE}$mount/$BACKUP_NAME${NC}, ${BLUE}$mount/dev${NC}, ${BLUE}$mount/dotfiles${NC}"
+  done
+  echo -e "\n${YELLOW}Before formatting:${NC}"
+  echo -e "  - Push or commit anything you want in git (repos without a remote only live in <drive>/dev)"
+  echo -e "  - Keep /mnt/backup's partition (sdb4) out of the installer's partitioning: reformat / only"
+  echo -e "============================================================="
+}
+
+main "$@"

@@ -8,28 +8,27 @@ overlap. On Termux, just run `install.sh`.
 
 ## Scripts Included
 
-1. **`backup.sh`**: Run this script **before** formatting your system. It collects:
-   - User security credentials (`~/.ssh`, `~/.gnupg`)
-   - Manual system mounts (`/etc/fstab` backup)
-   - Configuration databases (`~/.local/share/wakapi`)
-   - Standalone home configs (`.npmrc`, `.aicommit2`, `.aicommits`)
-   - Flatpak list and user-installed RPM package lists
-   - Profiles of key Flatpak apps (Zen Browser, Obsidian, Anki, Foliate, Telegram)
-   - The dotfiles repository (`~/.dotfiles` directory)
+1. **`backup.sh`**: Run this script **before** formatting your system. It needs both `/mnt/backup` and `/mnt/media`
+   mounted and writes the same backup to each:
+   - `~/dev` and `~/.dotfiles` to `<drive>/dev` and `<drive>/dotfiles`, `.env` files included (`scripts/rsync.sh`)
+   - `<drive>/fedora_migration_backup/home.tar.gz`: SSH keys, `gh` config, Syncthing identity (same device ID),
+     fonts, fish history, zoxide database and `.npmrc`, `.aicommit2`, `.aicommits`, `.modal.toml`, `.opencommit`
+   - `crontab.txt`, `dconf.ini` (GNOME settings) and `fstab.bak`
+   - `inventory/`: dnf, Flatpak, `~/.local/bin`, cargo, uv, npm, bun and GNOME extension lists, to reinstall what
+     `setup.sh` doesn't cover
 
 2. **`setup.sh`**: Run this script **after** a fresh install of Fedora. It will:
    - Apply performance tweaks to DNF
    - Enable RPM repositories (RPM Fusion, Docker, Terra, Tailscale)
    - Install RPMs from `packages/fedora.txt` and Flatpaks from `packages/flatpak.txt`
-   - Install NVIDIA drivers when an NVIDIA GPU is detected
-   - Install Zed for your user
-   - Create an Ubuntu 24.04 distrobox (`ubuntu`) with Node.js and Playwright's system dependencies, since Playwright
-     only supports Ubuntu/Debian. Run tests with `distrobox enter ubuntu -- npx playwright test`; Ubuntu-only apps can
-     be installed in the box and added to the app menu with `distrobox-export --app <name>`
-   - Restore the backup: SSH/GPG keys, home configs, Wakapi data, Flatpak profiles and `~/.dotfiles` (if missing)
-   - Enable Docker, Tailscale, `sshd` (key login only) and user lingering
+   - Make Flathub the only Flatpak remote: unfiltered, with Fedora's own `fedora` remote removed and any app from it
+     reinstalled from Flathub
+   - Restore the backup: `home.tar.gz` and the crontab, then `~/dev` from `<drive>/dev` (when `~/dev` is empty),
+     with file modes reset and executable bits taken from each repo's git index. An https dotfiles clone is
+     switched to SSH
+   - Enable Docker, Tailscale, cron, `sshd` (key login only) and user lingering
    - Run `../install.sh --profile fedora` as your user, which deploys the dotfiles, installs starship, sets fish as
-     the login shell and enables the user services (Wakapi, Syncthing, Espanso)
+     the login shell and enables the user services (Syncthing, Espanso)
 
 ## Package Lists
 
@@ -45,34 +44,52 @@ overlap. On Termux, just run `install.sh`.
 
 ### Step 1: Pre-Format Backup
 
-1. Insert and mount your backup drive (e.g., `/mnt/backup`).
-2. Run the backup script:
+1. Push or commit what you can. Repos without a remote only survive in `<drive>/dev`.
+2. Make sure `/mnt/backup` and `/mnt/media` are both mounted, then run:
    ```bash
-   chmod +x backup.sh
-   ./backup.sh
+   ~/.dotfiles/setup/backup.sh
    ```
-3. Enter your backup destination folder when prompted (e.g., `/mnt/backup/fedora_migration_backup`).
-4. Wait for the backup to complete, then verify the contents of the backup directory.
+3. Check `<drive>/fedora_migration_backup` on both drives, and that `.env` files exist under `<drive>/dev`.
 
 ### Step 2: Fresh Fedora Installation
 
-1. Install Fedora Workstation from scratch on your drive.
+1. Install Fedora Workstation with custom partitioning: reformat only the Fedora root (`sdb7`) and reuse the EFI
+   (`sdb1`) and `/boot` (`sdb6`) partitions. `/mnt/backup` (`sdb4`) is on the same disk and holds the Obsidian vault,
+   so never let the installer erase the whole disk.
 2. Create your user account with the same username (e.g., `abdo`) to avoid path mismatch issues with configurations.
 
 ### Step 3: Post-Install Setup
 
-1. Mount your backup drive (e.g., at `/mnt/backup`).
-2. Clone the dotfiles to `~/.dotfiles` (or copy them from the backup).
+1. Mount the backup drives (`/mnt/media` is the default restore source).
+2. Clone the dotfiles: `git clone https://github.com/x0aa7i/dotfiles ~/.dotfiles` (setup switches it to SSH).
 3. Run the setup script with `sudo` (since it installs packages and configures system services):
    ```bash
    sudo ~/.dotfiles/setup/setup.sh
    ```
 4. Follow the prompts. The script will ask you if you want to restore from your backup folder (specify
-   `/mnt/backup/fedora_migration_backup`). `chsh` may ask for your password when switching to fish.
+   `/mnt/media/fedora_migration_backup`). `chsh` may ask for your password when switching to fish.
 5. Log in to Tailscale with `sudo tailscale up`, then pair the phone with `pair-phone`
    (see [`../ssh/README.md`](../ssh/README.md)).
-6. Merge any custom mounts from `configs/fstab.bak` in the backup into `/etc/fstab`.
-7. Once completed, reboot your system to apply all changes:
+6. Log in to the GitHub CLI with `gh auth login` (git itself already works over the restored SSH key).
+7. Merge the `/mnt/media` and `/mnt/backup` mounts from `fstab.bak` in the backup into `/etc/fstab`, and load any
+   GNOME settings you want from `dconf.ini` (`dconf load / < dconf.ini`). Reinstall extra tools from `inventory/`.
+8. Once completed, reboot your system to apply all changes:
    ```bash
    sudo reboot
    ```
+
+## Optional, by hand
+
+- **NVIDIA (GTX 850M):** Fedora uses the open `nouveau` driver, which drives the display (through the Intel GPU) but
+  leaves the GTX 850M slow, without NVENC or CUDA. The proprietary driver comes from RPM Fusion. Maxwell cards need its
+  580xx legacy branch, since the default `akmod-nvidia` moved to 595, which dropped them:
+  ```bash
+  sudo dnf install akmod-nvidia-580xx xorg-x11-drv-nvidia-580xx-cuda
+  ```
+  Wait for the module to build (`journalctl -fu akmods`) before rebooting.
+- **Playwright:** Chromium and Firefox run natively, so `npx playwright install chromium firefox` is all a project
+  needs. WebKit only supports Ubuntu/Debian; run it in Playwright's Docker image (same version as the project):
+  ```bash
+  docker run --rm -it --ipc=host -v "$PWD:/work" -w /work mcr.microsoft.com/playwright:v<version>-noble \
+    npx playwright test --project=webkit
+  ```

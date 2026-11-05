@@ -16,7 +16,7 @@ On a fresh machine (Fedora or Termux), run the installer. It detects the environ
 ```
 
 `install.sh` is user-level and safe to re-run: dotter, deploy, starship, fish as login shell and the
-systemd user units in `systemd/user/`. One-time Fedora provisioning (repos, RPMs, Flatpaks, drivers,
+systemd user services (Syncthing, Espanso). One-time Fedora provisioning (repos, RPMs, Flatpaks,
 backup restore) lives in `setup/setup.sh`, which calls `install.sh` at the end. Package lists are in
 `setup/packages/{fedora,flatpak,termux}.txt` (one per line, `#` comments).
 

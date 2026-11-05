@@ -76,9 +76,6 @@ default_target_type = "symbolic"
 "vscode/settings.json" = "~/.config/Code/User/settings.json"
 "vscode/keybindings.json" = "~/.config/Code/User/keybindings.json"
 
-[systemd.files]
-"systemd" = "~/.config/systemd"
-
 [zed.files]
 "zed" = "~/.config/zed"
 
