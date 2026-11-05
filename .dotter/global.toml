@@ -17,6 +17,7 @@ default_target_type = "symbolic"
 # Terminals
 [ghostty.files]
 "ghostty" = { target = "~/.config/ghostty", type = "symbolic", recurse = false }
+"systemd/ghostty-service-override.conf" = "~/.config/systemd/user/app-com.mitchellh.ghostty.service.d/override.conf"
 
 [foot.files]
 "foot" = { target = "~/.config/foot", type = "symbolic", recurse = false }
