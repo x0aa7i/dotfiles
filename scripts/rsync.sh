@@ -31,12 +31,15 @@ readonly RSYNC_EXCLUDE="${HOME}/.config/scripts/rsync_exclude.txt"
 readonly LOG_RETENTION_DAYS=7
 
 # Source and destination pairs
-# Format: "source destination"
+# Format: "source destination [full]"
+# "full" copies everything, ignoring .gitignore files
 declare -a SYNC_PAIRS=(
   "${HOME}/dev/ /mnt/backup/dev/"
   "${HOME}/dev/ /mnt/media/dev/"
   "${HOME}/.dotfiles/ /mnt/backup/dotfiles/"
   "${HOME}/.dotfiles/ /mnt/media/dotfiles/"
+  # The vault lives on /mnt/backup only; its .gitignore skips settings, PDFs and EPUBs
+  "/mnt/backup/documents/obsidian/ /mnt/media/obsidian/ full"
 )
 
 # -----------------------------------------------------------------------------
@@ -111,6 +114,7 @@ acquire_lock() {
 perform_rsync() {
   local source="$1"
   local dest="$2"
+  local mode="${3:-}"
   local rsync_opts=""
 
   # Base options for performance and reliability
@@ -130,12 +134,14 @@ perform_rsync() {
     rsync_opts="${rsync_opts} --exclude-from=${RSYNC_EXCLUDE}"
   fi
 
-  # Keep .env files although .gitignore excludes them (first matching rule wins).
-  # Directories named .env* (Python virtualenvs) stay excluded
-  rsync_opts="${rsync_opts} --exclude='.env*/' --include='.env*'"
+  if [[ "$mode" != "full" ]]; then
+    # Keep .env files although .gitignore excludes them (first matching rule wins).
+    # Directories named .env* (Python virtualenvs) stay excluded
+    rsync_opts="${rsync_opts} --exclude='.env*/' --include='.env*'"
 
-  # Exclude files and directories in .gitignore
-  rsync_opts="${rsync_opts} --filter='dir-merge,- .gitignore'"
+    # Exclude files and directories in .gitignore
+    rsync_opts="${rsync_opts} --filter='dir-merge,- .gitignore'"
+  fi
 
   # Exclude directories containing .rsyncignore (similar to .rcloneignore)
   rsync_opts="${rsync_opts} --filter='dir-merge,e- .syncignore'"
@@ -185,7 +191,7 @@ main() {
 
   # Process each sync pair
   for pair in "${SYNC_PAIRS[@]}"; do
-    IFS=' ' read -r source dest <<<"$pair"
+    IFS=' ' read -r source dest mode <<<"$pair"
 
     # Skip drives that aren't mounted, or the sync would fill the empty mount point
     # on the root filesystem (destinations are /mnt/<drive>/...)
@@ -218,7 +224,7 @@ main() {
     fi
 
     # Perform the sync
-    if ! perform_rsync "$source" "$dest"; then
+    if ! perform_rsync "$source" "$dest" "$mode"; then
       failed_syncs=$((failed_syncs + 1))
     fi
 

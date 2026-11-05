@@ -11,6 +11,7 @@ overlap. On Termux, just run `install.sh`.
 1. **`backup.sh`**: Run this script **before** formatting your system. It needs both `/mnt/backup` and `/mnt/media`
    mounted and writes the same backup to each:
    - `~/dev` and `~/.dotfiles` to `<drive>/dev` and `<drive>/dotfiles`, `.env` files included (`scripts/rsync.sh`)
+   - The Obsidian vault from `/mnt/backup/documents/obsidian` to `/mnt/media/obsidian`, settings and plugins included
    - `<drive>/fedora_migration_backup/home.tar.gz`: SSH keys, `gh` config, Syncthing identity (same device ID),
      fonts, fish history, zoxide database and `.npmrc`, `.aicommit2`, `.aicommits`, `.modal.toml`, `.opencommit`
    - `crontab.txt`, `dconf.ini` (GNOME settings) and `fstab.bak`

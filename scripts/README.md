@@ -16,6 +16,7 @@ A performant bash script for syncing files to multiple backup destinations using
 - Progress tracking and statistics
 - Support for exclude patterns via `rsync_exclude.txt` and each repo's `.gitignore`
 - `.env` files are always copied, even when `.gitignore` excludes them
+- Pairs marked `full` ignore `.gitignore` files (the Obsidian vault, copied from `/mnt/backup` to `/mnt/media`)
 - Drives that aren't mounted are skipped (and reported as failures) instead of filling the empty mount point
 
 ### Configuration
