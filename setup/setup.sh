@@ -8,8 +8,9 @@
 # - Custom repositories (RPM Fusion, Docker, Terra, Tailscale)
 # - Package installations (setup/packages/fedora.txt, setup/packages/flatpak.txt)
 # - Flathub as the only Flatpak remote (replaces Fedora's own)
-# - Restoring backed-up data (SSH keys, home configs, crontab) and ~/dev
+# - Restoring backed-up data (SSH keys, home configs, /mnt drive mounts, crontab) and ~/dev
 # - System services (Docker, Tailscale, cron, key-only sshd, user lingering)
+# - GNOME workspace shortcuts and extensions (setup/packages/gnome-extensions.txt)
 #
 # Everything dotfiles-related (dotter, deploy, starship, fish as login shell,
 # systemd user services) is delegated to ../install.sh, run as the target user.
@@ -100,7 +101,10 @@ add_repos() {
 
   # Terra Repository (Fyra Labs)
   log_info "   - Enabling Terra repository..."
-  dnf install -y --nogpgcheck --repofrompath "terra,https://repos.fyralabs.com/terra\$(rpm -E %fedora)" terra-release
+  # Single quotes: dnf expands $releasever itself
+  if ! rpm -q terra-release >/dev/null 2>&1; then
+    dnf install -y --nogpgcheck --repofrompath 'terra,https://repos.fyralabs.com/terra$releasever' terra-release
+  fi
 
   dnf clean all
   dnf makecache -y
@@ -181,17 +185,48 @@ restore_backup() {
     sudo -u "$username" git -C "$user_home/.dotfiles" remote set-url origin "git@github.com:${origin#https://github.com/}"
   fi
 
-  # 3. Crontab (runs scripts/rsync.sh), unless the user already has one
+  # 3. Drive mounts under /mnt (scripts/rsync.sh needs /mnt/media and /mnt/backup)
+  if [[ -f "$backup_path/fstab.bak" ]]; then
+    restore_mounts "$backup_path/fstab.bak"
+  fi
+
+  # 4. Crontab (runs scripts/rsync.sh), unless the user already has one
   if [[ -s "$backup_path/crontab.txt" ]] && ! crontab -u "$username" -l >/dev/null 2>&1; then
     log_info "   - Restoring crontab..."
     crontab -u "$username" "$backup_path/crontab.txt"
   fi
 
   if [[ -f "$backup_path/dconf.ini" ]]; then
-    log_warn "   - GNOME settings saved at $backup_path/dconf.ini, load what you need with: dconf load / < dconf.ini"
+    log_warn "   - Full GNOME settings saved at $backup_path/dconf.ini, load more with: dconf load / < dconf.ini"
   fi
-  if [[ -f "$backup_path/fstab.bak" ]]; then
-    log_warn "   - Old fstab kept at $backup_path/fstab.bak, merge mounts into /etc/fstab manually."
+}
+
+# Appends the old fstab's /mnt/* entries whose disk is still attached. They are not
+# mounted now, since the backup is usually being read from one of those drives
+restore_mounts() {
+  local old_fstab="$1"
+  local device mountpoint rest dev_path added=0
+
+  while read -r device mountpoint rest; do
+    [[ "$device" == \#* || "$mountpoint" != /mnt/* ]] && continue
+    grep -qE "^[^#]*[[:space:]]$mountpoint[[:space:]]" /etc/fstab && continue
+
+    dev_path="$device"
+    [[ "$device" == UUID=* ]] && dev_path="/dev/disk/by-uuid/${device#UUID=}"
+    if [[ ! -e "$dev_path" ]]; then
+      log_warn "   - $device for $mountpoint is not attached, skipping it."
+      continue
+    fi
+
+    log_info "   - Adding $mountpoint to /etc/fstab..."
+    mkdir -p "$mountpoint"
+    printf '%s %s %s\n' "$device" "$mountpoint" "$rest" >>/etc/fstab
+    added=1
+  done <"$old_fstab"
+
+  if [[ "$added" == 1 ]]; then
+    systemctl daemon-reload
+    log_warn "   - New mounts are active after the reboot."
   fi
 }
 
@@ -251,6 +286,63 @@ configure_services() {
   loginctl enable-linger "$username"
 }
 
+# --- 7b. GNOME: workspace shortcuts and extensions (Non-root user context) ---
+# Super+N switches to workspace N and Super+Shift+N moves the window there, instead
+# of launching the Nth dock app. Extensions are downloaded for the running GNOME
+# version, enabled at the next login, and get their settings back from dconf.ini
+configure_gnome() {
+  local username="$1"
+  local backup_path="$2"
+
+  if ! command -v gnome-shell >/dev/null; then
+    log_warn "GNOME Shell not found, skipping GNOME settings."
+    return
+  fi
+  log_info "Configuring GNOME workspace shortcuts..."
+  local i
+  for i in {1..9}; do
+    run_as_user "$username" gsettings set org.gnome.shell.keybindings "switch-to-application-$i" '[]'
+    run_as_user "$username" gsettings set org.gnome.desktop.wm.keybindings "switch-to-workspace-$i" "['<Super>$i']"
+    run_as_user "$username" gsettings set org.gnome.desktop.wm.keybindings "move-to-workspace-$i" "['<Super><Shift>$i']"
+  done
+
+  log_info "Installing GNOME extensions from packages/gnome-extensions.txt..."
+  local shell_version uuid url zip
+  shell_version="$(gnome-shell --version | grep -oE '[0-9]+' | head -1)"
+  zip="$(mktemp --suffix=.zip)"
+  chmod 644 "$zip"
+  local -a extensions
+  mapfile -t extensions < <(read_packages gnome-extensions)
+
+  for uuid in "${extensions[@]}"; do
+    [[ -d "/usr/share/gnome-shell/extensions/$uuid" ]] && continue
+    url="$(curl -fsS "https://extensions.gnome.org/extension-info/?uuid=$uuid&shell_version=$shell_version" |
+      jq -r '.download_url // empty' 2>/dev/null || true)"
+    if [[ -z "$url" ]]; then
+      log_warn "   - $uuid has no release for GNOME $shell_version, skipping it."
+      continue
+    fi
+    log_info "   - $uuid"
+    if ! curl -fsSL "https://extensions.gnome.org$url" -o "$zip" ||
+      ! run_as_user "$username" gnome-extensions install --force "$zip"; then
+      log_warn "   - Failed to install $uuid."
+    fi
+  done
+  rm -f "$zip"
+
+  # Replaces enabled-extensions, which GNOME reads at the next login
+  local list
+  list="$(printf '%s\n' "${extensions[@]}" | jq -Rnc '[inputs]' | tr '"' "'")"
+  run_as_user "$username" gsettings set org.gnome.shell enabled-extensions "$list"
+  run_as_user "$username" gsettings set org.gnome.shell disable-user-extensions false
+
+  if [[ -f "$backup_path/dconf.ini" ]]; then
+    log_info "   - Restoring extension settings from dconf.ini..."
+    awk '/^\[/ { keep = ($0 ~ /^\[org\/gnome\/shell\/extensions\//) } keep' "$backup_path/dconf.ini" |
+      run_as_user "$username" dconf load /
+  fi
+}
+
 # --- 8. Deploy dotfiles (Non-root user context) ---
 # install.sh owns dotter, deploy, starship, fish as login shell and user services
 deploy_dotfiles() {
@@ -285,12 +377,16 @@ main() {
   install_rpm_packages
   install_flatpaks
 
-  # Ask user for backup location to restore
+  # Ask user for backup location to restore. On a fresh install the drive is
+  # automounted under /run/media/<user>/, not at its old /mnt/media fstab path
+  local backup_src="" default_src
+  default_src="$(compgen -G "/run/media/$real_user/*/fedora_migration_backup" | head -1 || true)"
+  default_src="${default_src:-/mnt/media/fedora_migration_backup}"
   echo -e "\n============================================================="
   read -p "Would you like to restore data from a backup directory? [y/N]: " answer
   if [[ "$answer" =~ ^[Yy]$ ]]; then
-    read -p "Enter backup source path [/mnt/media/fedora_migration_backup]: " backup_src
-    backup_src="${backup_src:-/mnt/media/fedora_migration_backup}"
+    read -p "Enter backup source path [$default_src]: " backup_src
+    backup_src="${backup_src:-$default_src}"
     restore_backup "$real_user" "$backup_src" || true
     # rsync.sh keeps ~/dev next to the backup folder, at <drive>/dev
     restore_dev "$real_user" "$(dirname "$backup_src")/dev"
@@ -299,6 +395,7 @@ main() {
   fi
 
   configure_services "$real_user"
+  configure_gnome "$real_user" "$backup_src"
   deploy_dotfiles "$real_user"
 
   echo -e "\n============================================================="

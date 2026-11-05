@@ -1,0 +1,16 @@
+# GNOME Shell extensions, installed by setup/setup.sh from extensions.gnome.org
+# One UUID per line, `#` starts a comment. Ones shipped by Fedora are only enabled
+
+appindicatorsupport@rgcjonas.gmail.com
+allowlockedremotedesktop@kamens.us
+background-logo@fedorahosted.org
+blur-my-shell@aunetx
+color-picker@tuberry
+executor@raujonas.github.io
+focused-window-dbus@flexagoon.com
+launch-new-instance@gnome-shell-extensions.gcampax.github.com
+no-overview@fthx
+places-menu@gnome-shell-extensions.gcampax.github.com
+tilingshell@ferrarodomenico.com
+Vitals@CoreCoding.com
+weatherornot@somepaulo.github.io
