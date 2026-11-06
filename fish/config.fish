@@ -110,4 +110,3 @@ test -d $PYENV_ROOT/bin; and fish_add_path $PYENV_ROOT/bin
 
 # opencode
 fish_add_path $HOME/.opencode/bin
-
