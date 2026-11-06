@@ -19,7 +19,7 @@ so it can be cloned anywhere (`~/dotfiles` here).
 
 User level, no `sudo`, safe to re-run. It detects the environment, downloads `dotter`, writes `.dotter/local.toml`
 from the matching profile and deploys, then sets up starship, fish as the login shell, an SSH key and the shared
-`~/.ssh/config.d` include, the agent status lines, the systemd user services (Syncthing, Espanso) and the tools in
+`~/.ssh/config.d` include, the agent status lines, the systemd user services (Syncthing) and the tools in
 `TOOLS`. On Termux it also installs `packages/termux.txt`, the Nerd Font and sshd autostart.
 
 ```bash

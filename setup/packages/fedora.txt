@@ -42,6 +42,5 @@ openssh-server
 fuse-sshfs
 
 # Applications / system utilities
-espanso-wayland
 syncthing
 nginx

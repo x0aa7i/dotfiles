@@ -1,7 +1,6 @@
 packages = [
   "agent-statusline",
   "ai",
-  "espanso",
   "fish",
   "foot",
   "ghostty",

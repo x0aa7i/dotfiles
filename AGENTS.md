@@ -17,7 +17,7 @@ On a fresh machine (Fedora or Termux), run the installer. It detects the environ
 ```
 
 `install.sh` is user-level and safe to re-run: dotter, deploy, starship, fish as login shell, the
-systemd user services (Syncthing, Espanso) and the tools in its `TOOLS` array. Everything else lives in
+systemd user services (Syncthing) and the tools in its `TOOLS` array. Everything else lives in
 `setup/` (see `setup/README.md`):
 
 - `setup/lib.sh`: shared helpers (`log_*`, `detect_env`, `read_packages`, `gh_latest_tag`, `run_as_user`).

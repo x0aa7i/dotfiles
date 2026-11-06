@@ -28,7 +28,7 @@ NERD_FONT_URL="https://github.com/ryanoasis/nerd-fonts/releases/latest/download/
 NERD_FONT_FILE="LilexNerdFontMono-Medium.ttf"
 
 # User services enabled when their unit exists (besides the ones in systemd/user/)
-USER_SERVICES=(syncthing.service espanso.service)
+USER_SERVICES=(syncthing.service)
 
 # setup/tools/<name>.sh scripts run after the deploy (install or update a tool)
 TOOLS=(yazi)
@@ -186,10 +186,6 @@ enable_user_services() {
   if ! command -v systemctl >/dev/null || ! systemctl --user show-environment >/dev/null 2>&1; then
     log_warn "No systemd user session, skipping user services."
     return
-  fi
-
-  if command -v espanso >/dev/null && ! systemctl --user cat espanso.service >/dev/null 2>&1; then
-    espanso service register || log_warn "espanso service register failed."
   fi
 
   local -a units=()
