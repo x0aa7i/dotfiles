@@ -13,24 +13,15 @@
 # - GNOME workspace shortcuts and extensions (setup/packages/gnome-extensions.txt)
 #
 # Everything dotfiles-related (dotter, deploy, starship, fish as login shell,
-# systemd user services) is delegated to ../install.sh, run as the target user.
+# systemd user services, yazi) is delegated to ../install.sh, run as the
+# target user.
+#
+# Usage: sudo setup/fedora.sh
 # =============================================================================
 
 set -euo pipefail
 
-SETUP_DIR="$(cd "$(dirname "$0")" && pwd)"
-DOTFILES_DIR="$(dirname "$SETUP_DIR")"
-PACKAGES_DIR="$SETUP_DIR/packages"
-
-# --- Color Codes for Output ---
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[0;33m'
-NC='\033[0m'
-
-log_info() { echo -e "${GREEN}[INFO]${NC} $1"; }
-log_warn() { echo -e "${YELLOW}[WARN]${NC} $1"; }
-log_err() { echo -e "${RED}[ERROR]${NC} $1"; }
+source "$(dirname "$0")/lib.sh"
 
 # Check if run as root for system-wide changes
 check_root() {
@@ -38,23 +29,6 @@ check_root() {
     log_err "This script or section needs to be run with sudo/root privileges."
     exit 1
   fi
-}
-
-# Prints the packages listed in packages/<name>.txt, skipping comments
-read_packages() {
-  sed -e 's/#.*//' -e 's/[[:space:]]*$//' "$PACKAGES_DIR/$1.txt" | grep -v '^$'
-}
-
-# Runs a command as the target user with access to their systemd user session
-run_as_user() {
-  local username="$1"
-  shift
-  local uid
-  uid="$(id -u "$username")"
-  sudo -u "$username" -H env \
-    XDG_RUNTIME_DIR="/run/user/$uid" \
-    DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$uid/bus" \
-    "$@"
 }
 
 # --- 1. DNF Optimizations ---
@@ -179,10 +153,10 @@ restore_backup() {
 
   # 2. A fresh https clone of the dotfiles can't push, switch it to SSH
   local origin
-  origin="$(sudo -u "$username" git -C "$user_home/.dotfiles" remote get-url origin 2>/dev/null || true)"
+  origin="$(sudo -u "$username" git -C "$DOTFILES_DIR" remote get-url origin 2>/dev/null || true)"
   if [[ "$origin" == https://github.com/* && -f "$user_home/.ssh/id_ed25519" ]]; then
     log_info "   - Switching the dotfiles remote to SSH..."
-    sudo -u "$username" git -C "$user_home/.dotfiles" remote set-url origin "git@github.com:${origin#https://github.com/}"
+    sudo -u "$username" git -C "$DOTFILES_DIR" remote set-url origin "git@github.com:${origin#https://github.com/}"
   fi
 
   # 3. Drive mounts under /mnt (scripts/rsync.sh needs /mnt/media and /mnt/backup)
@@ -344,17 +318,11 @@ configure_gnome() {
 }
 
 # --- 8. Deploy dotfiles (Non-root user context) ---
-# install.sh owns dotter, deploy, starship, fish as login shell and user services
+# install.sh owns dotter, deploy, starship, fish as login shell, user services and setup/tools/
 deploy_dotfiles() {
   local username="$1"
-  local user_home
-  user_home="$(getent passwd "$username" | cut -d: -f6)"
-
-  local installer="$user_home/.dotfiles/install.sh"
-  [[ -x "$installer" ]] || installer="$DOTFILES_DIR/install.sh"
-
-  log_info "Running $installer as $username..."
-  run_as_user "$username" "$installer" --profile fedora
+  log_info "Running $DOTFILES_DIR/install.sh as $username..."
+  run_as_user "$username" "$DOTFILES_DIR/install.sh" --profile fedora
 }
 
 # --- Main Flow ---

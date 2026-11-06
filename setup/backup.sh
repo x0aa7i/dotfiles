@@ -4,20 +4,20 @@
 # =============================================================================
 # Run this script BEFORE formatting. It writes the same backup to every drive in
 # REQUIRED_DRIVES (must be mounted) and OPTIONAL_DRIVES (when mounted):
-# - ~/dev and ~/.dotfiles, .env files included (scripts/rsync.sh)
+# - ~/dev and the dotfiles repo, .env files included (scripts/rsync.sh)
 # - home.tar.gz: SSH keys, gh config, Syncthing identity, fonts, fish history,
 #   zoxide database and standalone home configs (.npmrc, .modal.toml, ...)
 # - crontab, GNOME settings (dconf dump) and /etc/fstab
-# - Package and tool inventories, to reinstall what setup.sh doesn't cover
+# - Package and tool inventories, to reinstall what fedora.sh doesn't cover
 #
-# setup.sh restores it from <drive>/fedora_migration_backup and <drive>/dev.
+# setup/fedora.sh restores it from <drive>/fedora_migration_backup and <drive>/dev.
 # Keep the drive lists in sync with scripts/rsync.sh.
 # =============================================================================
 
 set -euo pipefail
 
-SETUP_DIR="$(cd "$(dirname "$0")" && pwd)"
-DOTFILES_DIR="$(dirname "$SETUP_DIR")"
+source "$(dirname "$0")/lib.sh"
+
 BACKUP_NAME="fedora_migration_backup"
 REQUIRED_DRIVES=(/mnt/backup /mnt/media)
 OPTIONAL_DRIVES=("/run/media/$(id -un)/Storage")
@@ -45,16 +45,6 @@ HOME_EXCLUDES=(
   '.local/state/syncthing/index-*'
   .local/state/syncthing/syncthing.lock
 )
-
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[0;33m'
-BLUE='\033[0;34m'
-NC='\033[0m'
-
-log_info() { echo -e "${GREEN}[INFO]${NC} $1"; }
-log_warn() { echo -e "${YELLOW}[WARN]${NC} $1"; }
-log_err() { echo -e "${RED}[ERROR]${NC} $1"; }
 
 # Runs a command into $INVENTORY/<file> when the command is installed
 inventory() {
@@ -84,9 +74,9 @@ check_mounts() {
   done
 }
 
-# ~/dev and ~/.dotfiles go straight to <drive>/dev and <drive>/dotfiles
+# ~/dev and the dotfiles go straight to <drive>/dev and <drive>/dotfiles
 sync_dev() {
-  log_info "1. Syncing ~/dev, ~/.dotfiles and the Obsidian vault (scripts/rsync.sh)..."
+  log_info "1. Syncing ~/dev, the dotfiles and the Obsidian vault (scripts/rsync.sh)..."
   # A failing drive shouldn't stop the rest of the backup
   "$DOTFILES_DIR/scripts/rsync.sh" || {
     log_warn "   - rsync.sh reported failures, see ~/log/rsync_$(date '+%Y%m%d').log"

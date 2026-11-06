@@ -13,12 +13,21 @@ On a fresh machine (Fedora or Termux), run the installer. It detects the environ
 ./install.sh                  # auto-detect (termux -> .dotter/termux.toml, fedora -> .dotter/fedora.toml)
 ./install.sh --profile fedora # force a profile
 ./install.sh --no-packages    # skip `pkg install` on Termux
+./install.sh --no-tools       # skip setup/tools/ (yazi + its plugins)
 ```
 
-`install.sh` is user-level and safe to re-run: dotter, deploy, starship, fish as login shell and the
-systemd user services (Syncthing, Espanso). One-time Fedora provisioning (repos, RPMs, Flatpaks,
-backup restore) lives in `setup/setup.sh`, which calls `install.sh` at the end. Package lists are in
-`setup/packages/{fedora,flatpak,gnome-extensions,termux}.txt` (one per line, `#` comments).
+`install.sh` is user-level and safe to re-run: dotter, deploy, starship, fish as login shell, the
+systemd user services (Syncthing, Espanso) and the tools in its `TOOLS` array. Everything else lives in
+`setup/` (see `setup/README.md`):
+
+- `setup/lib.sh`: shared helpers (`log_*`, `detect_env`, `read_packages`, `gh_latest_tag`, `run_as_user`).
+- `setup/tools/<name>.sh`: install or update one tool in `~/.local/bin` (`yazi.sh` also runs `ya pkg install`).
+- `setup/fedora.sh`: one-time Fedora provisioning (repos, RPMs, Flatpaks, backup restore), run with `sudo`.
+  It calls `install.sh` at the end.
+- `setup/backup.sh`: pre-format backup that `fedora.sh` restores.
+- `setup/packages/{fedora,flatpak,gnome-extensions,termux}.txt`: package lists (one per line, `#` comments).
+
+The scripts locate the repo from their own path, so never hardcode `~/dotfiles` or `~/.dotfiles`.
 
 SSH between the PC and the phone (Tailscale, shared `ssh/config.d/tailnet.conf`, `pair-phone`) and its manual steps
 are documented in `ssh/README.md`. Never commit keys, `authorized_keys` or `known_hosts`.
@@ -87,8 +96,8 @@ Strict adherence to formatting is required. Use the following tools:
 ### Shell Scripts (Bash)
 
 - **Header**: Always include `#!/bin/bash` and `set -e` (exit on error).
-- **Sourcing**: Use `source "$(dirname "$0")/utils.sh"` for shared utilities.
-- **Filenames**: Use `snake_case` (e.g., `update_nvim.sh`).
+- **Sourcing**: Use `source "$(dirname "$0")/lib.sh"` (or `../lib.sh` from `setup/tools/`) for shared helpers.
+- **Filenames**: Use `snake_case` (e.g., `rsync_exclude.txt`); tool installers are named after the tool.
 - **Variables**: Use uppercase for globals (e.g., `DEST_DIR`), lowercase for locals.
 - **Error Handling**: Explicitly check command success if `set -e` is insufficient.
 
@@ -123,7 +132,8 @@ Strict adherence to formatting is required. Use the following tools:
   - `conf.d/`: Initialization scripts.
 - `wezterm/` / `ghostty/` / `kitty/`: Terminal configs.
 - `opencode/`: OpenCode config and plugins.
-- `scripts/`: Maintenance scripts (backups, updates).
+- `setup/`: Install, provisioning and backup scripts, tool installers and package lists.
+- `scripts/`: Day-to-day scripts deployed to `~/.config/scripts` (`rsync.sh`).
 - `yazi/`: Yazi config and plugins.
 - `.dotter/`: Deployment definitions.
 
@@ -132,6 +142,6 @@ Strict adherence to formatting is required. Use the following tools:
 1. **Always read existing configs**: Before modifying a tool's configuration, read the existing files to understand the specific DSL or configuration style used.
 2. **Validate after edit**: After editing a config, run the associated lint/format command.
 3. **Respect Dotter**: If adding new files, update `.dotter/global.toml` or `fedora.toml` to ensure the new files are tracked and symlinked correctly.
-4. **Be cautious with Shell**: When writing shell scripts, favor readability and use the utility functions in `scripts/update/utils.sh`.
+4. **Be cautious with Shell**: When writing shell scripts, favor readability and use the helpers in `setup/lib.sh`.
 5. **Atomic Changes**: Keep changes focused and well-documented in commit messages.
 6. **No Chitchat**: Be direct and professional in communication.

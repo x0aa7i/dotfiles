@@ -1,4 +1,4 @@
-# Fedora RPM packages, installed by setup/setup.sh with `dnf install`
+# Fedora RPM packages, installed by setup/fedora.sh with `dnf install`
 # One package per line, `#` starts a comment. Some come from Terra/RPM Fusion.
 
 # Shell & core utilities
@@ -24,7 +24,7 @@ jq
 
 # Editor & toolchains
 neovim
-yazi
+# yazi: installed and updated in ~/.local/bin by setup/tools/yazi.sh (run by install.sh)
 nodejs
 gcc
 make
@@ -36,7 +36,7 @@ containerd.io
 docker-buildx-plugin
 docker-compose-plugin
 
-# Networking (tailscale comes from its own repo, added by setup.sh)
+# Networking (tailscale comes from its own repo, added by fedora.sh)
 tailscale
 openssh-server
 fuse-sshfs

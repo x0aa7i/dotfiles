@@ -1,4 +1,4 @@
-# Flathub applications, installed by setup/setup.sh with `flatpak install`
+# Flathub applications, installed by setup/fedora.sh with `flatpak install`
 # One app ID per line, `#` starts a comment
 
 app.zen_browser.zen

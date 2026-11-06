@@ -7,36 +7,31 @@
 # deploys the dotfiles. Then sets up what the dotfiles need at user level:
 # starship, fish as the login shell, the shipped systemd user services, an SSH
 # key plus the shared ~/.ssh/config.d include, the agent status lines
-# (agent-statusline/install.sh), and sshd autostart on Termux.
+# (agent-statusline/install.sh), the tools in TOOLS (setup/tools/, e.g. yazi
+# and its plugins) and sshd autostart on Termux.
 #
-# Runs as the normal user (no sudo). System provisioning for a fresh Fedora
-# install lives in setup/setup.sh, which calls this script at the end.
+# Runs as the normal user (no sudo) and is safe to re-run: re-running also
+# updates the tools. System provisioning for a fresh Fedora install lives in
+# setup/fedora.sh, which calls this script at the end.
 #
-# Usage: ./install.sh [--profile NAME] [--no-packages] [--no-deploy] [--force]
+# Usage: ./install.sh [--profile NAME] [--no-packages] [--no-deploy] [--no-tools] [--force]
 # =============================================================================
 
 set -e
 
-DOTFILES_DIR="$(cd "$(dirname "$0")" && pwd)"
+source "$(dirname "$0")/setup/lib.sh"
+
 DOTTER_BIN="$DOTFILES_DIR/dotter"
 DOTTER_URL="https://github.com/SuperCuber/dotter/releases/latest/download"
 NERD_FONT_URL="https://github.com/ryanoasis/nerd-fonts/releases/latest/download/Lilex.tar.xz"
 # Mono variant: Termux uses a fixed cell grid, so icons must be single-width
 NERD_FONT_FILE="LilexNerdFontMono-Medium.ttf"
 
-PACKAGES_DIR="$DOTFILES_DIR/setup/packages"
-
 # User services enabled when their unit exists (besides the ones in systemd/user/)
 USER_SERVICES=(syncthing.service espanso.service)
 
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[0;33m'
-NC='\033[0m'
-
-log_info() { echo -e "${GREEN}[INFO]${NC} $1"; }
-log_warn() { echo -e "${YELLOW}[WARN]${NC} $1"; }
-log_err() { echo -e "${RED}[ERROR]${NC} $1" >&2; }
+# setup/tools/<name>.sh scripts run after the deploy (install or update a tool)
+TOOLS=(yazi)
 
 usage() {
   sed -n '/^# Usage:/s/^# //p' "$0"
@@ -44,25 +39,8 @@ usage() {
   echo "  --profile NAME  Use .dotter/NAME.toml instead of the detected profile"
   echo "  --no-packages   Skip pkg install on Termux (packages: setup/packages/termux.txt)"
   echo "  --no-deploy     Only install dotter and the local config"
+  echo "  --no-tools      Skip setup/tools/ (${TOOLS[*]})"
   echo "  --force         Re-download dotter and overwrite .dotter/local.toml"
-}
-
-# Prints the packages listed in setup/packages/<name>.txt, skipping comments
-read_packages() {
-  sed -e 's/#.*//' -e 's/[[:space:]]*$//' "$PACKAGES_DIR/$1.txt" | grep -v '^$'
-}
-
-# Prints one of: termux, fedora, linux, macos
-detect_env() {
-  if [ -n "$TERMUX_VERSION" ] || [[ "$PREFIX" == *com.termux* ]]; then
-    echo "termux"
-  elif [ "$(uname -s)" = "Darwin" ]; then
-    echo "macos"
-  elif [ -f /etc/os-release ] && grep -q '^ID=fedora' /etc/os-release; then
-    echo "fedora"
-  else
-    echo "linux"
-  fi
 }
 
 # Prints the dotter release asset for this machine, or nothing if unsupported
@@ -303,6 +281,14 @@ enable_termux_sshd() {
   fi
 }
 
+# Runs setup/tools/<name>.sh for every tool in TOOLS, a failing one doesn't stop the install
+install_tools() {
+  local tool
+  for tool in "${TOOLS[@]}"; do
+    bash "$DOTFILES_DIR/setup/tools/$tool.sh" || log_warn "setup/tools/$tool.sh failed."
+  done
+}
+
 # Writes .dotter/local.toml from the selected profile. A generated file is
 # regenerated on every run so profile changes reach already-installed machines;
 # a hand-written local.toml (no marker) is kept unless --force is passed
@@ -336,6 +322,7 @@ main() {
   local profile=""
   local install_packages=1
   local deploy=1
+  local tools=1
   FORCE=0
 
   while [ $# -gt 0 ]; do
@@ -346,6 +333,7 @@ main() {
         ;;
       --no-packages) install_packages=0 ;;
       --no-deploy) deploy=0 ;;
+      --no-tools) tools=0 ;;
       --force) FORCE=1 ;;
       -h | --help)
         usage
@@ -376,7 +364,7 @@ main() {
   if [ "$ENV" = "termux" ] && [ "$install_packages" = "1" ]; then
     install_termux_packages
   elif [ "$ENV" = "fedora" ]; then
-    log_info "For system packages on Fedora, see setup/setup.sh"
+    log_info "For system packages on Fedora, see setup/fedora.sh"
   fi
 
   install_dotter
@@ -392,6 +380,11 @@ main() {
     (cd "$DOTFILES_DIR" && "$DOTTER_BIN" deploy)
     setup_ssh_config
     bash "$DOTFILES_DIR/agent-statusline/install.sh" || log_warn "agent-statusline/install.sh failed."
+  fi
+
+  # After the deploy: tools like yazi need their config in place (yazi plugins)
+  if [ "$tools" = "1" ]; then
+    install_tools
   fi
 
   if command -v ssh-keygen >/dev/null; then

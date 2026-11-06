@@ -5,7 +5,7 @@ set -euo pipefail
 # RSYNC Backup Script
 # =============================================================================
 # A performant and maintainable rsync-based backup solution.
-# Syncs ~/dev and ~/.dotfiles to every backup drive.
+# Syncs ~/dev, the dotfiles repo and the Obsidian vault to every backup drive.
 #
 # Features:
 # - Parallel syncing for better performance
@@ -27,7 +27,14 @@ readonly LOGDIR="${HOME}/log"
 LOGFILE=""
 LOGFILE="${LOGDIR}/rsync_$(date '+%Y%m%d').log"
 readonly LOGFILE
-readonly RSYNC_EXCLUDE="${HOME}/.config/scripts/rsync_exclude.txt"
+# dotter symlinks this script into ~/.config/scripts, resolve it to find the repo
+SCRIPT_DIR=""
+SCRIPT_DIR="$(dirname "$(readlink -f "$0")")"
+readonly SCRIPT_DIR
+DOTFILES_DIR=""
+DOTFILES_DIR="$(dirname "$SCRIPT_DIR")"
+readonly DOTFILES_DIR
+readonly RSYNC_EXCLUDE="${SCRIPT_DIR}/rsync_exclude.txt"
 readonly LOG_RETENTION_DAYS=7
 
 # Backup drives. Required ones count as a failure when they aren't mounted,
@@ -39,7 +46,7 @@ readonly OPTIONAL_DRIVES=("/run/media/$(id -un)/Storage")
 # "full" copies everything, ignoring .gitignore files
 readonly SYNC_SOURCES=(
   "${HOME}/dev/ dev"
-  "${HOME}/.dotfiles/ dotfiles"
+  "${DOTFILES_DIR}/ dotfiles"
   # Lives on /mnt/backup; its .gitignore skips settings, PDFs and EPUBs
   "/mnt/backup/documents/obsidian/ obsidian full"
 )

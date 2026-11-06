@@ -1,4 +1,4 @@
-# GNOME Shell extensions, installed by setup/setup.sh from extensions.gnome.org
+# GNOME Shell extensions, installed by setup/fedora.sh from extensions.gnome.org
 # One UUID per line, `#` starts a comment. Ones shipped by Fedora are only enabled
 
 appindicatorsupport@rgcjonas.gmail.com

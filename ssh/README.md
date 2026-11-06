@@ -18,7 +18,7 @@ default MagicDNS names:
   - generates `~/.ssh/id_ed25519` if there is none (asks for an optional passphrase)
   - on Termux: installs `openssh` + `termux-services`, starts `sshd` and enables it on every Termux launch. On an
     already paired phone (`~/.ssh/authorized_keys` exists) it turns off `sshd` password login
-- `setup/setup.sh` (PC): installs Tailscale and `openssh-server`, enables `tailscaled`, enables `sshd` with password
+- `setup/fedora.sh` (PC): installs Tailscale and `openssh-server`, enables `tailscaled`, enables `sshd` with password
   login disabled (`/etc/ssh/sshd_config.d/10-keys-only.conf`).
 - `pair-phone` (fish function, run on the PC): exchanges the keys in both directions, tests the login and turns off
   password login on the phone.
@@ -51,7 +51,7 @@ Never in git: private keys, `authorized_keys`, `known_hosts`. On the PC they com
 
 ### Fresh PC
 
-1. Run `sudo ~/.dotfiles/setup/setup.sh` (see `setup/README.md`). Restoring the backup brings back `~/.ssh`.
+1. Run `sudo ~/dotfiles/setup/fedora.sh` (see `setup/README.md`). Restoring the backup brings back `~/.ssh`.
 2. Log in to Tailscale:
    ```sh
    sudo tailscale up
