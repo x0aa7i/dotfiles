@@ -67,4 +67,5 @@ keybind = alt+r=reload_config
 
 cursor-opacity = 0
 cursor-text = cell-foreground
+custom-shader-animation = true
 custom-shader = ./shaders/cursor-glide.glsl

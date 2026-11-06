@@ -6,9 +6,9 @@
 //     custom-shader  = "./shaders/cursor_glide.glsl"
 
 // --- CONFIGURATION ---
-const float DURATION       = 0.08;  // seconds for one glide
+const float DURATION       = 0.12;  // seconds for one glide
 const float AA             = 1.0;   // edge antialiasing in pixels
-const float MAX_DISTANCE_X = 40.0;  // max horizontal distance (in cells) to glide; snap if exceeded
+const float MAX_DISTANCE_X = 60.0;  // max horizontal distance (in cells) to glide; snap if exceeded
 const float MAX_DISTANCE_Y = 5.0;   // max vertical distance (in lines) to glide; snap if exceeded
 
 // sRGB -> linear: uniforms arrive as sRGB, iChannel0 and the output are linear.
@@ -37,7 +37,11 @@ void mainImage(out vec4 fragColor, in vec2 fragCoord) {
     fragColor = tex;
 
     // Immediately stop rendering when cursor is hidden (e.g. yazi, lazygit, TUI tools)
-    if (iCursorVisible == 0) return;
+    if (iCursorVisible == 0 || iFocus == 0) return;
+
+    // This shader draws a block cursor; don't misrepresent other cursor styles.
+    if (iCurrentCursorStyle == CURSORSTYLE_BLOCK_HOLLOW ||
+        iCurrentCursorStyle == CURSORSTYLE_LOCK) return;
 
     vec4 cur  = iCurrentCursor;
     vec4 prev = iPreviousCursor;
