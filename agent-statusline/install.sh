@@ -24,6 +24,7 @@ set_json_statusline() {
     return
   fi
 
+  mkdir -p "$(dirname "$settings")"
   if [ ! -s "$settings" ]; then
     echo '{}' >"$settings"
   fi
@@ -58,6 +59,11 @@ main() {
   # shellcheck disable=SC2088 # the tilde is stored literally, Claude Code expands it
   set_json_statusline 'Claude Code' "$HOME/.claude/statusline.sh" "$HOME/.claude/settings.json" \
     '~/.claude/statusline.sh'
+
+  # shellcheck disable=SC2088 # the tilde is stored literally, Antigravity expands it
+  set_json_statusline 'Antigravity' "$HOME/.gemini/antigravity-cli/statusline.sh" \
+    "$HOME/.gemini/antigravity-cli/settings.json" \
+    '~/.gemini/antigravity-cli/statusline.sh'
 }
 
 main "$@"

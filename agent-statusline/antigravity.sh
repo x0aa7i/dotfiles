@@ -14,14 +14,14 @@ IFS=$'\x1f' read -r mode model effort dir subagents_count artifacts queued ctx_p
     (.mode // ""),
     (.model.display_name // .model.id // ""),
     (.model.effort // ""),
-    (.workspace.current_dir // .cwd // ""),
-    ([.subagents[]? | select(.status == "running")] | length | tostring),
-    ((.artifacts // "") | tostring),
-    ((.queued_messages // "") | tostring),
-    ((.context_window.used_percentage // "") | tostring),
-    ((.context_window.context_window_size // "") | tostring),
-    ((.context_window.current_usage // .context_window.total_input_tokens // "") | tostring),
-    ((.cost.total_cost_usd // .usage.cost // "") | tostring)
+    (.workspace.current_dir // .current_dir // .cwd // ""),
+    ((.subagents_count // .total_subagent_count // ([.subagents[]? | select(.status == null or .status == "running")] | length)) | tostring),
+    (if .artifact_count != null then (.artifact_count | tostring) elif (.artifacts | type) == "array" then (.artifacts | length | tostring) elif (.artifacts | type) == "number" then (.artifacts | tostring) else "" end),
+    (if (.queued_messages | type) == "array" then (.queued_messages | length | tostring) elif (.queued_messages | type) == "number" then (.queued_messages | tostring) else "" end),
+    (if .context_window.used_percentage != null then (.context_window.used_percentage | tostring) elif (.context_window.context_window_size != null and .context_window.context_window_size > 0 and (.context_window.current_usage != null or .context_window.total_input_tokens != null)) then (((.context_window.current_usage // .context_window.total_input_tokens) * 100 / .context_window.context_window_size) | round | tostring) else "" end),
+    ((.context_window.context_window_size // .context_window.context_size // "") | tostring),
+    ((.context_window.current_usage // .context_window.total_input_tokens // .context_window.input_tokens // "") | tostring),
+    ((.cost.total_usd // .cost.total_cost_usd // .usage.cost // "") | tostring)
   ] | join("\u001f")' 2>/dev/null
 )
 
@@ -55,7 +55,7 @@ done < <(
           if $b != null then
             [
               "5h",
-              (if $b.remaining_fraction != null then (($b.remaining_fraction * 100) | round | tostring) else "" end),
+              (if $b.remaining_fraction != null then (($b.remaining_fraction * 100) | round | tostring) elif $b.remaining_percentage != null then ($b.remaining_percentage | round | tostring) else "" end),
               ($b.remaining_amount // "" | tostring),
               ($b.reset_in_seconds // "" | tostring)
             ]
@@ -66,7 +66,7 @@ done < <(
           if $b != null then
             [
               "7d",
-              (if $b.remaining_fraction != null then (($b.remaining_fraction * 100) | round | tostring) else "" end),
+              (if $b.remaining_fraction != null then (($b.remaining_fraction * 100) | round | tostring) elif $b.remaining_percentage != null then ($b.remaining_percentage | round | tostring) else "" end),
               ($b.remaining_amount // "" | tostring),
               ($b.reset_in_seconds // "" | tostring)
             ]
@@ -77,7 +77,7 @@ done < <(
             .quota | to_entries[0] |
             [
               "rem",
-              (if .value.remaining_fraction != null then ((.value.remaining_fraction * 100) | round | tostring) else "" end),
+              (if .value.remaining_fraction != null then ((.value.remaining_fraction * 100) | round | tostring) elif .value.remaining_percentage != null then (.value.remaining_percentage | round | tostring) else "" end),
               (.value.remaining_amount // "" | tostring),
               (.value.reset_in_seconds // "" | tostring)
             ]
@@ -99,8 +99,8 @@ done < <(
 
 add_part "$(seg_cost "$cost")"
 
-[ -n "$subagents_count" ] && [ "$subagents_count" -gt 0 ] && add_part "${cyan}🤖 $subagents_count${rst}"
-[ -n "$artifacts" ] && [ "$artifacts" -gt 0 ] && add_part "${dim}📄 $artifacts${rst}"
-[ -n "$queued" ] && [ "$queued" -gt 0 ] && add_part "${yellow}✉️ $queued${rst}"
+[ -n "$subagents_count" ] && [ "$subagents_count" -gt 0 ] 2>/dev/null && add_part "${cyan}🤖 $subagents_count${rst}"
+[ -n "$artifacts" ] && [ "$artifacts" -gt 0 ] 2>/dev/null && add_part "${dim}📄 $artifacts${rst}"
+[ -n "$queued" ] && [ "$queued" -gt 0 ] 2>/dev/null && add_part "${yellow}✉️ $queued${rst}"
 
 print_parts
