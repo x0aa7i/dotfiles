@@ -119,7 +119,11 @@ return {
       frontmatter = {
         enabled = function(fname)
           -- Disable frontmatter for template files
-          if fname and fname:find("60%-system/templates") then
+          if fname and (
+            fname:find("60%-system/templates")
+            or fname:match("[/\\]AGENTS%.md$")
+            or fname == "AGENTS.md"
+          ) then
             return false
           end
           return true
