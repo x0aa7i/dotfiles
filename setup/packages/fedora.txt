@@ -41,6 +41,7 @@ tailscale
 openssh-server
 fuse-sshfs
 
-# Applications / system utilities
+# Applications / system utilities (ghostty comes from Terra)
+ghostty
 syncthing
 nginx
