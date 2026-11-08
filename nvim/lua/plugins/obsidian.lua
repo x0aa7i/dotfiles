@@ -22,6 +22,33 @@ return {
       ("BufReadPre %s/**.md"):format(vault_path),
       ("BufNewFile %s/**.md"):format(vault_path),
     },
+    init = function()
+      LazyVim.on_very_lazy(function()
+        Snacks.toggle({
+          name = "Obsidian Frontmatter (Global)",
+          get = function()
+            return vim.g.obsidian_frontmatter ~= false
+          end,
+          set = function(state)
+            vim.g.obsidian_frontmatter = state
+          end,
+        }):map("<leader>uo")
+
+        Snacks.toggle({
+          name = "Obsidian Frontmatter (Buffer)",
+          get = function()
+            local b = vim.b.obsidian_frontmatter
+            if b ~= nil then
+              return b
+            end
+            return vim.g.obsidian_frontmatter ~= false
+          end,
+          set = function(state)
+            vim.b.obsidian_frontmatter = state
+          end,
+        }):map("<leader>uO")
+      end)
+    end,
     cmd = { "Obsidian" },
     keys = {
       { "<leader>o<space>", "<cmd>Obsidian quick_switch<CR>", desc = "Find Note" },
@@ -118,12 +145,20 @@ return {
       },
       frontmatter = {
         enabled = function(fname)
+          local b = vim.b.obsidian_frontmatter
+          if b ~= nil then
+            if not b then
+              return false
+            end
+          elseif vim.g.obsidian_frontmatter == false then
+            return false
+          end
+
           -- Disable frontmatter for template files
-          if fname and (
-            fname:find("60%-system/templates")
-            or fname:match("[/\\]AGENTS%.md$")
-            or fname == "AGENTS.md"
-          ) then
+          if
+            fname
+            and (fname:find("60%-system/templates") or fname:match("[/\\]AGENTS%.md$") or fname == "AGENTS.md")
+          then
             return false
           end
           return true
