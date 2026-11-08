@@ -17,7 +17,9 @@ set -gx fish_prompt_pwd_dir_length 0 # show the full path instead of the first l
 
 # pnpm
 set -gx PNPM_HOME "$HOME/.local/share/pnpm"
-fish_add_path "$PNPM_HOME/bin"
+if test "$PATH[1]" != "$PNPM_HOME/bin"
+  set -gx PATH "$PNPM_HOME/bin" $PATH
+end
 # pnpm end
 
 # Aliases
