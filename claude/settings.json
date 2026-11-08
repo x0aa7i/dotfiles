@@ -1,0 +1,15 @@
+{
+  "statusLine": {
+    "type": "command",
+    "command": "~/.claude/statusline.sh"
+  },
+  "tui": "fullscreen",
+  "theme": "auto",
+  "model": "sonnet",
+  "syncClaudeAiPlugins": false,
+  "syncClaudeAiSkills": false,
+  "attribution": {
+    "commit": "",
+    "pr": ""
+  }
+}
