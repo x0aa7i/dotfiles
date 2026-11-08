@@ -8,7 +8,8 @@ so it can be cloned anywhere (`~/dotfiles` here).
 | [`../install.sh`]     | user    | Any machine (Fedora, Termux), first time and whenever you want to re-apply   |
 | `tools/<name>.sh`     | user    | Run by `install.sh`, or alone to update one tool                             |
 | `fedora.sh`           | `sudo`  | Once, after a fresh Fedora install. Calls `install.sh` at the end            |
-| `backup.sh`           | user    | Before formatting, writes what `fedora.sh` restores                          |
+| `backup.sh`           | user    | Before formatting, writes what `fedora.sh` and `restore.sh` restore          |
+| `restore.sh`          | user/`sudo` | Restores backup anytime (home files, Syncthing identity, crontab, dev, fstab)|
 | `lib.sh`              | —       | Shared helpers (`log_*`, `detect_env`, `read_packages`, `gh_latest_tag`, …)  |
 
 `scripts/` (deployed to `~/.config/scripts`) only holds what runs day to day, like `rsync.sh`.
@@ -67,6 +68,19 @@ Run it **before** formatting. It needs both `/mnt/backup` and `/mnt/media` mount
 - `crontab.txt`, `dconf.ini` (GNOME settings) and `fstab.bak`
 - `inventory/`: dnf, Flatpak, `~/.local/bin`, cargo, uv, npm, bun and GNOME extension lists, to reinstall what
   `fedora.sh` doesn't cover
+
+### restore.sh
+
+Run it to restore data exported by `backup.sh`. It can be run standalone anytime (safe to re-run if drives had mount issues initially) or is called by `fedora.sh`:
+
+- Restores `home.tar.gz`: SSH keys, `gh` config, Syncthing identity, fonts, fish history, zoxide database, `.aicommits`, etc.
+- Restores the crontab and `/etc/fstab` drive mounts (`/mnt/backup`, `/mnt/media`)
+- Restores `~/dev` from `<drive>/dev` with correct file modes and git executable bits
+
+```bash
+./setup/restore.sh                  # auto-detects backup from /run/media or /mnt
+./setup/restore.sh /path/to/backup  # explicit path
+```
 
 ### fedora.sh
 

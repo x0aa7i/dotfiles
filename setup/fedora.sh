@@ -126,117 +126,11 @@ install_flatpaks() {
   flatpak install -y --noninteractive flathub "${flatpaks[@]}"
 }
 
-# --- 6. Restore backed up data (Non-root user context) ---
-# Matches the layout written by backup.sh
+# --- 6. Restore backed up data (Delegates to setup/restore.sh) ---
 restore_backup() {
   local username="$1"
   local backup_path="$2"
-  local user_home
-  user_home="$(getent passwd "$username" | cut -d: -f6)"
-
-  if [[ ! -d "$backup_path" ]]; then
-    log_err "Backup path '$backup_path' does not exist. Skipping restoration."
-    return 1
-  fi
-
-  log_info "Restoring data from backup at $backup_path..."
-
-  # 1. SSH keys, gh, Syncthing identity, fonts, shell history, home configs.
-  # Restored before install.sh, so it neither generates a new SSH key nor gives
-  # Syncthing a new device ID
-  if [[ -f "$backup_path/home.tar.gz" ]]; then
-    log_info "   - Restoring home files (SSH keys, Syncthing, fonts, configs)..."
-    sudo -u "$username" tar -xzpf "$backup_path/home.tar.gz" -C "$user_home"
-    [[ -d "$user_home/.ssh" ]] && chmod 700 "$user_home/.ssh"
-    sudo -u "$username" fc-cache -f >/dev/null 2>&1 || true
-  fi
-
-  # 2. A fresh https clone of the dotfiles can't push, switch it to SSH
-  local origin
-  origin="$(sudo -u "$username" git -C "$DOTFILES_DIR" remote get-url origin 2>/dev/null || true)"
-  if [[ "$origin" == https://github.com/* && -f "$user_home/.ssh/id_ed25519" ]]; then
-    log_info "   - Switching the dotfiles remote to SSH..."
-    sudo -u "$username" git -C "$DOTFILES_DIR" remote set-url origin "git@github.com:${origin#https://github.com/}"
-  fi
-
-  # 3. Drive mounts under /mnt (scripts/rsync.sh needs /mnt/media and /mnt/backup)
-  if [[ -f "$backup_path/fstab.bak" ]]; then
-    restore_mounts "$backup_path/fstab.bak"
-  fi
-
-  # 4. Crontab (runs scripts/rsync.sh), unless the user already has one
-  if [[ -s "$backup_path/crontab.txt" ]] && ! crontab -u "$username" -l >/dev/null 2>&1; then
-    log_info "   - Restoring crontab..."
-    crontab -u "$username" "$backup_path/crontab.txt"
-  fi
-
-  if [[ -f "$backup_path/dconf.ini" ]]; then
-    log_warn "   - Full GNOME settings saved at $backup_path/dconf.ini, load more with: dconf load / < dconf.ini"
-  fi
-}
-
-# Appends the old fstab's /mnt/* entries whose disk is still attached. They are not
-# mounted now, since the backup is usually being read from one of those drives
-restore_mounts() {
-  local old_fstab="$1"
-  local device mountpoint rest dev_path added=0
-
-  while read -r device mountpoint rest; do
-    [[ "$device" == \#* || "$mountpoint" != /mnt/* ]] && continue
-    grep -qE "^[^#]*[[:space:]]$mountpoint[[:space:]]" /etc/fstab && continue
-
-    dev_path="$device"
-    [[ "$device" == UUID=* ]] && dev_path="/dev/disk/by-uuid/${device#UUID=}"
-    if [[ ! -e "$dev_path" ]]; then
-      log_warn "   - $device for $mountpoint is not attached, skipping it."
-      continue
-    fi
-
-    log_info "   - Adding $mountpoint to /etc/fstab..."
-    mkdir -p "$mountpoint"
-    printf '%s %s %s\n' "$device" "$mountpoint" "$rest" >>/etc/fstab
-    added=1
-  done <"$old_fstab"
-
-  if [[ "$added" == 1 ]]; then
-    systemctl daemon-reload
-    log_warn "   - New mounts are active after the reboot."
-  fi
-}
-
-# --- 6b. Restore ~/dev from the drive copy made by scripts/rsync.sh ---
-# NTFS/exFAT copies have every file at 777 and core.filemode off, so the modes
-# are reset to 644/755 and the executable bits come back from each git index
-restore_dev() {
-  local username="$1"
-  local src="$2"
-  local user_home
-  user_home="$(getent passwd "$username" | cut -d: -f6)"
-  local dest="$user_home/dev"
-
-  if [[ ! -d "$src" ]]; then
-    log_warn "No ~/dev copy at $src, skipping."
-    return
-  fi
-  if [[ -n "$(ls -A "$dest" 2>/dev/null)" ]]; then
-    log_warn "$dest is not empty, not restoring it."
-    return
-  fi
-
-  log_info "Restoring $dest from $src..."
-  sudo -u "$username" rsync -rtp --chmod=D755,F644 "$src/" "$dest/"
-
-  local git_dir repo entry
-  while IFS= read -r -d '' git_dir; do
-    repo="$(dirname "$git_dir")"
-    sudo -u "$username" git -C "$repo" config core.filemode true
-    while IFS= read -r -d '' entry; do
-      if [[ "$entry" == 100755* ]]; then
-        chmod +x "$repo/${entry#*$'\t'}" 2>/dev/null || true
-      fi
-    done < <(sudo -u "$username" git -C "$repo" ls-files -s -z)
-    find "$git_dir/hooks" -type f ! -name '*.sample' -exec chmod +x {} + 2>/dev/null || true
-  done < <(find "$dest" -name node_modules -prune -o -name .git -type d -print0 -prune)
+  "$SETUP_DIR/restore.sh" "$username" "$backup_path"
 }
 
 # --- 7. Configure System Services ---
@@ -345,21 +239,19 @@ main() {
   install_rpm_packages
   install_flatpaks
 
-  # Ask user for backup location to restore. On a fresh install the drive is
-  # automounted under /run/media/<user>/, not at its old /mnt/media fstab path
+  # Ask user for backup location to restore
   local backup_src="" default_src
-  default_src="$(compgen -G "/run/media/$real_user/*/fedora_migration_backup" | head -1 || true)"
-  default_src="${default_src:-/mnt/media/fedora_migration_backup}"
+  default_src="$(find_default_backup "$real_user" || true)"
   echo -e "\n============================================================="
   read -p "Would you like to restore data from a backup directory? [y/N]: " answer
   if [[ "$answer" =~ ^[Yy]$ ]]; then
-    read -p "Enter backup source path [$default_src]: " backup_src
+    read -p "Enter backup source path [${default_src:-none}]: " backup_src
     backup_src="${backup_src:-$default_src}"
-    restore_backup "$real_user" "$backup_src" || true
-    # rsync.sh keeps ~/dev next to the backup folder, at <drive>/dev
-    restore_dev "$real_user" "$(dirname "$backup_src")/dev"
+    if ! "$SETUP_DIR/restore.sh" "$real_user" "$backup_src"; then
+      log_warn "Restore encountered issues. You can re-run './setup/restore.sh' later once drives are mounted."
+    fi
   else
-    log_info "Skipping data restore step."
+    log_info "Skipping data restore step. You can run './setup/restore.sh' later once drives are mounted."
   fi
 
   configure_services "$real_user"

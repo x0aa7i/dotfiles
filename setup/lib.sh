@@ -59,14 +59,43 @@ backup_file() {
   fi
 }
 
-# Runs a command as the target user with access to their systemd user session (needs root)
+# Runs a command as the target user with access to their systemd user session
 run_as_user() {
   local username="$1"
   shift
-  local uid
-  uid="$(id -u "$username")"
-  sudo -u "$username" -H env \
-    XDG_RUNTIME_DIR="/run/user/$uid" \
-    DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$uid/bus" \
+  if [[ $EUID -eq 0 ]]; then
+    local uid
+    uid="$(id -u "$username")"
+    sudo -u "$username" -H env \
+      XDG_RUNTIME_DIR="/run/user/$uid" \
+      DBUS_SESSION_BUS_ADDRESS="unix:path=/run/user/$uid/bus" \
+      "$@"
+  else
     "$@"
+  fi
+}
+
+# Finds a migration backup directory across /run/media and /mnt mounts
+find_default_backup() {
+  local user="$1"
+  local candidate
+
+  for candidate in /run/media/"$user"/*/fedora_migration_backup; do
+    if [[ -d "$candidate" ]]; then
+      echo "$candidate"
+      return 0
+    fi
+  done
+
+  if [[ -d /mnt/backup/fedora_migration_backup ]]; then
+    echo "/mnt/backup/fedora_migration_backup"
+    return 0
+  fi
+
+  if [[ -d /mnt/media/fedora_migration_backup ]]; then
+    echo "/mnt/media/fedora_migration_backup"
+    return 0
+  fi
+
+  return 1
 }
