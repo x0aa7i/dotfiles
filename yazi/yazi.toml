@@ -2,6 +2,7 @@
 ratio = [2, 3, 4]
 show_hidden = true
 show_symlink = true
+mouse_events = ["click", "scroll"]
 
 [[plugin.prepend_fetchers]]
 url   = "*"
