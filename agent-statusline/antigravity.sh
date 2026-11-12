@@ -11,7 +11,7 @@ source "$(dirname "$(readlink -f "$0")")/lib.sh"
 
 IFS=$'\x1f' read -r mode model effort dir subagents_count artifacts queued ctx_pct ctx_size ctx_used cost < <(
   printf '%s' "$input" | jq -r '[
-    (.mode // ""),
+    (.cycle_mode // .mode // ""),
     (.model.display_name // .model.id // ""),
     (.model.effort // ""),
     (.workspace.current_dir // .current_dir // .cwd // ""),
@@ -25,7 +25,7 @@ IFS=$'\x1f' read -r mode model effort dir subagents_count artifacts queued ctx_p
   ] | join("\u001f")' 2>/dev/null
 )
 
-[ -n "$mode" ] && add_part "${bold}${yellow}[$mode]${rst}"
+add_part "$(seg_mode "$mode")"
 
 add_part "$(seg_model "$model" "$effort")"
 add_part "$(seg_loc "$dir")"

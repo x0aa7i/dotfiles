@@ -43,6 +43,11 @@ secs_until() {
   return 0
 }
 
+seg_mode() { # mode
+  [ -n "$1" ] || return 0
+  printf '%s[%s]%s' "${bold}${yellow}" "$1" "$rst"
+}
+
 seg_model() { # name [effort]
   [ -n "$1" ] || return 0
   local out="${bold}${blue}$1${rst}"
