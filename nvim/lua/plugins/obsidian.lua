@@ -165,7 +165,6 @@ return {
         end,
         func = function(note)
           local out = {
-            aliases = note.aliases,
             tags = note.tags,
             created = os.date("%Y-%m-%d %H:%M"),
           }
@@ -174,6 +173,10 @@ return {
             for k, v in pairs(note.metadata) do
               out[k] = v
             end
+          end
+
+          if note.aliases == nil or vim.tbl_isempty(note.aliases) then
+            out.aliases = nil
           end
 
           out.modified = os.date("%Y-%m-%d %H:%M")
