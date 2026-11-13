@@ -88,6 +88,7 @@ Run it with `sudo` **after** a fresh Fedora install. It will:
 
 - Apply performance tweaks to DNF
 - Enable RPM repositories (RPM Fusion, Docker, Terra, Tailscale)
+- Swap Fedora's restricted `ffmpeg-free` for full `ffmpeg` from RPM Fusion
 - Install RPMs from `packages/fedora.txt` and Flatpaks from `packages/flatpak.txt`
 - Make Flathub the only Flatpak remote: unfiltered, with Fedora's own `fedora` remote removed and any app from it
   reinstalled from Flathub

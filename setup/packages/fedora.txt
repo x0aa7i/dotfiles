@@ -45,3 +45,4 @@ fuse-sshfs
 ghostty
 syncthing
 nginx
+ffmpeg

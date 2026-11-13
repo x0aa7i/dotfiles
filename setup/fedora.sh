@@ -86,6 +86,12 @@ add_repos() {
 
 # --- 3. Install RPM Packages ---
 install_rpm_packages() {
+  # Swap Fedora's restricted ffmpeg-free with full ffmpeg from RPM Fusion
+  if rpm -q ffmpeg-free >/dev/null 2>&1; then
+    log_info "Swapping ffmpeg-free for full ffmpeg (RPM Fusion)..."
+    dnf swap -y ffmpeg-free ffmpeg --allowerasing
+  fi
+
   log_info "Installing RPM packages from packages/fedora.txt..."
   local -a packages
   mapfile -t packages < <(read_packages fedora)
