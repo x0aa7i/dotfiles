@@ -7,7 +7,7 @@
 # deploys the dotfiles. Then sets up what the dotfiles need at user level:
 # starship, fish as the login shell, the shipped systemd user services, an SSH
 # key plus the shared ~/.ssh/config.d include, the agent status lines
-# (agent-statusline/install.sh), the tools in TOOLS (setup/tools/, e.g. yazi
+# (ai/statusline/install.sh), the tools in TOOLS (setup/tools/, e.g. yazi
 # and its plugins) and sshd autostart on Termux.
 #
 # Runs as the normal user (no sudo) and is safe to re-run: re-running also
@@ -370,12 +370,11 @@ main() {
     [ "$ENV" = "termux" ] && backup_termux_defaults
     prepare_ssh_dirs
     # Symlinked dirs that a fresh clone lacks (gitignored or empty), dotter fails on missing sources
-    mkdir -p "$DOTFILES_DIR/.agents/skills" \
-      "$DOTFILES_DIR/opencode/"{agents,commands,skills}
+    mkdir -p "$DOTFILES_DIR/ai/agents/skills"
     log_info "Deploying dotfiles..."
     (cd "$DOTFILES_DIR" && "$DOTTER_BIN" deploy)
     setup_ssh_config
-    bash "$DOTFILES_DIR/agent-statusline/install.sh" || log_warn "agent-statusline/install.sh failed."
+    bash "$DOTFILES_DIR/ai/statusline/install.sh" || log_warn "ai/statusline/install.sh failed."
   fi
 
   # After the deploy: tools like yazi need their config in place (yazi plugins)

@@ -1,6 +1,6 @@
 #!/bin/bash
 # Registers the status line scripts with the agents that use them. dotter only deploys the
-# scripts (see [agent-statusline.files] in .dotter/global.toml); the agents also need their
+# scripts (see [agent-statusline.files] in .dotter/global.toml; sources are in ai/statusline/); the agents also need their
 # settings to point at them. Those settings files are rewritten by the agents themselves, so
 # they stay local and only the status line key is merged in.
 #

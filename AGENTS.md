@@ -131,7 +131,11 @@ Strict adherence to formatting is required. Use the following tools:
   - `functions/`: Autoloaded fish functions.
   - `conf.d/`: Initialization scripts.
 - `wezterm/` / `ghostty/` / `kitty/`: Terminal configs.
-- `opencode/`: OpenCode config and plugins.
+- `ai/`: Everything for the coding agents, deployed by the `ai`, `claude` and `agent-statusline` dotter packages.
+  - `agents/`: Skills and the skills lockfile, deployed to `~/.agents` (skills also linked into `~/.claude` and `~/.gemini`).
+  - `claude/`: Claude Code `settings.json`.
+  - `statusline/`: Status line scripts for Claude Code and Antigravity, registered by `statusline/install.sh`.
+  - `mcp/`: `servers.json` is the single list of MCP servers, `sync.sh` pushes it into Claude Code, Codex and agy (run by `.dotter/post_deploy.sh`).
 - `setup/`: Install, provisioning and backup scripts, tool installers and package lists.
 - `scripts/`: Day-to-day scripts deployed to `~/.config/scripts` (`rsync.sh`).
 - `yazi/`: Yazi config and plugins.
