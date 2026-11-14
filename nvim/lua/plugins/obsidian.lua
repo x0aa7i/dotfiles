@@ -5,7 +5,13 @@ return {
     "obsidian-nvim/obsidian.nvim",
     version = "*", -- recommended, use latest release instead of latest commit
     lazy = true,
-    ft = "markdown",
+    cond = function()
+      return vim.fn.isdirectory(vault_path) == 1
+    end,
+    event = {
+      ("BufReadPre %s/**.md"):format(vault_path),
+      ("BufNewFile %s/**.md"):format(vault_path),
+    },
     dependencies = {
       "nvim-lua/plenary.nvim",
       {
@@ -17,10 +23,6 @@ return {
           },
         },
       },
-    },
-    event = {
-      ("BufReadPre %s/**.md"):format(vault_path),
-      ("BufNewFile %s/**.md"):format(vault_path),
     },
     init = function()
       LazyVim.on_very_lazy(function()
