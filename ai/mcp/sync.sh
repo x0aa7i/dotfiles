@@ -100,9 +100,12 @@ if ! command -v jq >/dev/null 2>&1; then
   exit 1
 fi
 
-while IFS=$'\t' read -r name command args_json env_json; do
+while IFS= read -r name; do
+  command="$(jq -r --arg n "$name" '.[$n].command' "$SERVERS_FILE")"
+  args_json="$(jq -c --arg n "$name" '.[$n].args // []' "$SERVERS_FILE")"
+  env_json="$(jq -c --arg n "$name" '.[$n].env // {}' "$SERVERS_FILE")"
   add_server "$name" "$command" "$args_json" "$env_json"
-done < <(jq -r 'to_entries[] | [.key, .value.command, (.value.args // [] | tojson), (.value.env // {} | tojson)] | @tsv' "$SERVERS_FILE")
+done < <(jq -r 'keys[]' "$SERVERS_FILE")
 
 # Servers synced last time that are no longer in the file
 if [ -f "$STATE_FILE" ]; then

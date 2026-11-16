@@ -24,11 +24,14 @@
     "type": "command",
     "command": "~/.claude/statusline.sh"
   },
-  "tui": "fullscreen",
-  "theme": "auto",
   "modelSettings": {
     "claude-sonnet-5-5": {
       "autoCompactWindow": 400000
     }
+  },
+  "tui": "fullscreen",
+  "theme": "auto",
+  "env": {
+    "ENABLE_CLAUDEAI_MCP_SERVERS": "false"
   }
 }

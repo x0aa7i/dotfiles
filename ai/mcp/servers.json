@@ -1,10 +1,20 @@
 {
   "awwwards": {
-    "command": "npx",
-    "args": ["-y", "awwwards-mcp"]
+    "command": "sh",
+    "args": [
+      "-c",
+      "exec npx -y --prefix \"$HOME\" awwwards-mcp"
+    ],
+    "env": {
+      "AWWWARDS_MCP_PROFILE": "core"
+    }
   },
   "figcraft": {
     "command": "figcraft-cli",
-    "args": ["mcp", "--attach", "7979"]
+    "args": [
+      "mcp",
+      "--attach",
+      "7979"
+    ]
   }
 }
