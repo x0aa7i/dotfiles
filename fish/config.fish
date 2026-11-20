@@ -12,6 +12,7 @@ fish_config theme choose tokyonight
 fish_add_path ~/.local/bin
 
 set -gx EDITOR nvim
+set -gx ZIGGITY_CONFIG "$HOME/.config/ziggity/config.ini"
 set -gx fish_prompt_pwd_dir_length 0 # show the full path instead of the first letter of the directory
 # nvm use v20.11.1 --silent
 
@@ -38,7 +39,6 @@ alias pnpx="pnpm dlx"
 alias dev="pnpm run dev"
 
 alias c="clear"
-alias lg="lazygit"
 
 alias oc="opencode"
 

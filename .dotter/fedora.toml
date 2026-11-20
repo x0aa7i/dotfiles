@@ -2,6 +2,7 @@ packages = [
   "agent-statusline",
   "ai",
   "claude",
+  "eget",
   "fish",
   "foot",
   "ghostty",
@@ -19,4 +20,5 @@ packages = [
   "wezterm",
   "yazi",
   "zed",
+  "ziggity",
 ]

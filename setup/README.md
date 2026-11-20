@@ -32,17 +32,14 @@ from the matching profile and deploys, then sets up starship, fish as the login 
 
 ## Tools
 
-`tools/<name>.sh` installs or updates one tool in `~/.local/bin`, keeping the previous binary as `.bak`.
+`tools/<name>.sh` installs or updates one tool in `~/.local/bin`.
 `install.sh` runs the ones listed in its `TOOLS` array after the deploy, so re-running it also updates them.
 
-- **`yazi.sh`**: latest yazi and ya release (skipped on Termux, where `pkg` provides them), then `ya pkg install`
-  for the plugins and flavor in `yazi/package.toml`. `yazi/init.lua` requires those plugins, so yazi fails at
-  startup without them. Pass `--no-plugins` to skip that step.
-- **`nvim.sh`**: the Neovim AppImage (`--nightly`, the default, or `--stable`). Not in `TOOLS`, since Neovim comes
-  from dnf/pkg. Run it by hand to put a newer build in front of it on `$PATH`.
+- **`eget.sh`**: latest `eget` binary, then runs `eget -D` to install or upgrade all GitHub tools listed in
+  `eget/eget.toml` (e.g. `neovim`, `yazi`, `ziggity`, `eget`). Also runs `ya pkg install` to sync yazi plugins
+  and flavors. Pass `--no-sync` to skip syncing tools.
 
-To add a tool, write `tools/<name>.sh` (source `../lib.sh`, compare versions, download only when they differ) and
-add `<name>` to `TOOLS` in `install.sh` if it should run on every install.
+To add any tool from GitHub, add `["owner/repo"]` to `eget/eget.toml` and run `eget -D`.
 
 ## Package Lists
 

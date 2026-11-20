@@ -24,7 +24,7 @@ jq
 
 # Editor & toolchains
 neovim
-# yazi: installed and updated in ~/.local/bin by setup/tools/yazi.sh (run by install.sh)
+# yazi: installed and updated in ~/.local/bin by eget (setup/tools/eget.sh)
 nodejs
 gcc
 make

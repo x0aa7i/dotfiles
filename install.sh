@@ -31,7 +31,7 @@ NERD_FONT_FILE="LilexNerdFontMono-Medium.ttf"
 USER_SERVICES=(syncthing.service)
 
 # setup/tools/<name>.sh scripts run after the deploy (install or update a tool)
-TOOLS=(yazi)
+TOOLS=(eget)
 
 usage() {
   sed -n '/^# Usage:/s/^# //p' "$0"

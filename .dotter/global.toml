@@ -53,6 +53,12 @@ default_target_type = "symbolic"
 [lazygit.files]
 "lazygit" = { target = "~/.config/lazygit", type = "symbolic", recurse = false }
 
+[ziggity.files]
+"ziggity" = { target = "~/.config/ziggity", type = "symbolic", recurse = false }
+
+[eget.files]
+"eget" = { target = "~/.config/eget", type = "symbolic", recurse = false }
+
 [mpv.files]
 "mpv" = { target = "~/.config/mpv", type = "symbolic", recurse = false }
 

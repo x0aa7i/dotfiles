@@ -1,4 +1,5 @@
 packages = [
+  "eget",
   "fish",
   "git",
   "lazygit",
@@ -7,4 +8,5 @@ packages = [
   "starship",
   "termux",
   "yazi",
+  "ziggity",
 ]

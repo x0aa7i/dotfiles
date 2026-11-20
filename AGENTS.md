@@ -21,7 +21,7 @@ systemd user services (Syncthing) and the tools in its `TOOLS` array. Everything
 `setup/` (see `setup/README.md`):
 
 - `setup/lib.sh`: shared helpers (`log_*`, `detect_env`, `read_packages`, `gh_latest_tag`, `run_as_user`).
-- `setup/tools/<name>.sh`: install or update one tool in `~/.local/bin` (`yazi.sh` also runs `ya pkg install`).
+- `setup/tools/<name>.sh`: install or update tools in `~/.local/bin` (`eget.sh` syncs GitHub tools and runs `ya pkg install`).
 - `setup/fedora.sh`: one-time Fedora provisioning (repos, RPMs, Flatpaks, backup restore), run with `sudo`.
   It calls `install.sh` at the end.
 - `setup/backup.sh`: pre-format backup that `fedora.sh` restores.

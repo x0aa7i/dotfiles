@@ -1,0 +1,15 @@
+[global]
+target = "~/.local/bin"
+upgrade_only = true
+
+["zyedidia/eget"]
+
+["simoarpe/ziggity"]
+
+["sxyazi/yazi"]
+asset_filters = ["musl", "zip", "^deb"]
+all = true
+
+["neovim/neovim"]
+asset_filters = ["appimage", "^arm64", "^zsync"]
+target = "~/.local/bin/nvim"
