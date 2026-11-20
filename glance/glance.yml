@@ -1,0 +1,337 @@
+server:
+  host: 0.0.0.0
+  port: 8083
+  assets-path: /app/config/assets
+
+document:
+  head: |
+    <script>
+    // Make links and images follow the address the dashboard was opened with
+    // (phone, LAN IP, Tailscale IP, hostname) instead of hardcoded "localhost".
+    (function () {
+      var host = location.hostname;
+      if (host === 'localhost' || host === '127.0.0.1') return;
+      var re = /^(https?:\/\/)(localhost|127\.0\.0\.1)(?=[:\/]|$)/;
+      function fixNode(el) {
+        if (!el || !el.getAttribute) return;
+        var attr = el.tagName === 'A' ? 'href' : (el.tagName === 'IMG' ? 'src' : null);
+        if (attr) {
+          var v = el.getAttribute(attr);
+          if (v && re.test(v)) el.setAttribute(attr, v.replace(re, '$1' + host));
+        }
+      }
+      function fixTree(root) {
+        if (!root || !root.querySelectorAll) return;
+        fixNode(root);
+        root.querySelectorAll('a[href], img[src]').forEach(fixNode);
+      }
+      new MutationObserver(function (mutations) {
+        for (var i = 0; i < mutations.length; i++) {
+          var added = mutations[i].addedNodes;
+          for (var j = 0; j < added.length; j++) {
+            if (added[j].nodeType === 1) fixTree(added[j]);
+          }
+        }
+      }).observe(document.documentElement, { childList: true, subtree: true });
+      document.addEventListener('DOMContentLoaded', function () { fixTree(document); });
+    })();
+    </script>
+
+branding:
+  hide-footer: true
+  app-name: Personal Dashboard
+
+theme:
+  background-color: 255 16 9
+  primary-color: 262 78 74
+  positive-color: 152 58 55
+  negative-color: 355 78 64
+  contrast-multiplier: 1.15
+  custom-css-file: /assets/custom.css
+  presets:
+    mocha:
+      background-color: 240 21 15
+      primary-color: 217 92 83
+      positive-color: 115 54 76
+      negative-color: 347 70 65
+      contrast-multiplier: 1.2
+    teal-city:
+      background-color: 225 14 15
+      primary-color: 157 47 65
+      contrast-multiplier: 1.1
+    gruvbox:
+      background-color: 0 0 16
+      primary-color: 43 59 81
+      positive-color: 61 66 44
+      negative-color: 6 96 59
+    latte:
+      light: true
+      background-color: 220 23 95
+      primary-color: 220 91 54
+      positive-color: 109 58 40
+      negative-color: 347 87 44
+
+pages:
+  # ══════════════════════════════════════════
+  # PAGE 1: HOME & OPS
+  # ══════════════════════════════════════════
+  - name: Home
+    columns:
+      # ── LEFT: Environment & Host System ──
+      - size: small
+        widgets:
+          - type: clock
+            hour-format: 24h
+
+          - type: weather
+            location: Rabat, Morocco
+            units: metric
+            hour-format: 24h
+            cache: 1h
+
+          - type: monitor
+            title: Host Services
+            cache: 1m
+            sites:
+              - title: Syncthing
+                url: http://localhost:8384
+                check-url: http://localhost:8384/rest/noauth/health
+                icon: sh:syncthing
+              - title: Glance Dashboard
+                url: http://localhost:8083
+                check-url: http://localhost:8083/
+                icon: sh:glance
+
+          - type: server-stats
+            servers:
+              - type: local
+                name: Host Server
+                hide-swap: true
+                hide-mountpoints-by-default: true
+                mountpoints:
+                  "/host":
+                    name: System (/)
+                    hide: false
+                  "/host/mnt/backup":
+                    name: Backup (/mnt/backup)
+                    hide: false
+
+      # ── CENTER: Search & Quick Access Bookmarks ──
+      - size: full
+        widgets:
+          - type: search
+            search-engine: duckduckgo
+            autofocus: false
+            placeholder: Search web… (!yt = YouTube, !gh = GitHub, !r = Reddit, !w = Wikipedia)
+            bangs:
+              - title: YouTube
+                shortcut: "!yt"
+                url: https://www.youtube.com/results?search_query={QUERY}
+              - title: GitHub
+                shortcut: "!gh"
+                url: https://github.com/search?q={QUERY}
+              - title: Reddit
+                shortcut: "!r"
+                url: https://www.reddit.com/search/?q={QUERY}
+              - title: Wikipedia
+                shortcut: "!w"
+                url: https://en.wikipedia.org/wiki/Special:Search?search={QUERY}
+
+          - type: bookmarks
+            groups:
+              - title: Quick Access
+                links:
+                  - title: GitHub
+                    url: https://github.com
+                    icon: si:github
+                    description: Repositories & Activity
+                  - title: YouTube
+                    url: https://www.youtube.com
+                    icon: si:youtube
+                    description: Video streaming
+                  - title: Twitch
+                    url: https://www.twitch.tv
+                    icon: si:twitch
+                    description: Live streams
+                  - title: ArtCraft
+                    url: https://getartcraft.com
+                    icon: si:rust
+                    description: Creative Tools Suite
+                  - title: storytold GitHub
+                    url: https://github.com/storytold
+                    icon: si:github
+                    description: Source Repositories
+
+      # ── RIGHT: Calendar, Ops & Core Releases ──
+      - size: small
+        widgets:
+          - type: calendar
+            first-day-of-week: monday
+
+          - type: bookmarks
+            groups:
+              - title: Ops & System
+                links:
+                  - title: Syncthing Web UI
+                    url: http://localhost:8384
+                    icon: sh:syncthing
+                    description: File & Folder Sync
+                  - title: Tailscale Admin
+                    url: https://login.tailscale.com/admin/machines
+                    icon: si:tailscale
+                    description: Mesh Network & Node Management
+
+          - type: releases
+            title: Core Tool Releases
+            cache: 6h
+            collapse-after: 2
+            repositories:
+              - syncthing/syncthing
+              - glanceapp/glance
+
+  # ══════════════════════════════════════════
+  # PAGE 2: TECH & AI
+  # ══════════════════════════════════════════
+  - name: Tech & AI
+    columns:
+      # ── LEFT: Trending Reddit & Tool Releases ──
+      - size: small
+        widgets:
+          - type: reddit
+            title: AI & Tech Trends
+            subreddit: artificial+technology
+            sort: hot
+            limit: 6
+            collapse-after: 3
+            cache: 1h
+
+          - type: releases
+            title: Frontier Releases
+            cache: 6h
+            collapse-after: 2
+            repositories:
+              - oven-sh/bun
+              - astral-sh/uv
+              - anthropics/anthropic-sdk-python
+
+      # ── CENTER: Primary Tech Discussions ──
+      - size: full
+        widgets:
+          - type: hacker-news
+            limit: 8
+            collapse-after: 4
+            cache: 30m
+
+          - type: lobsters
+            limit: 8
+            collapse-after: 4
+            cache: 30m
+
+      # ── RIGHT: AI Insights & Engineering Feeds ──
+      - size: small
+        widgets:
+          - type: rss
+            title: AI & Tech News
+            limit: 8
+            collapse-after: 4
+            cache: 3h
+            feeds:
+              - url: https://simonwillison.net/atom/everything/
+                title: Simon Willison (AI)
+              - url: https://feeds.arstechnica.com/arstechnica/index
+                title: Ars Technica
+              - url: https://www.theverge.com/rss/index.xml
+                title: The Verge
+
+          - type: rss
+            title: Engineering Blogs
+            limit: 8
+            collapse-after: 4
+            cache: 4h
+            feeds:
+              - url: https://svelte.dev/blog/rss.xml
+                title: Svelte
+              - url: https://blog.rust-lang.org/feed.xml
+                title: Rust
+              - url: https://github.blog/changelog/feed/
+                title: GitHub Changelog
+
+  # ══════════════════════════════════════════
+  # PAGE 3: DESIGN & CREATIVE
+  # ══════════════════════════════════════════
+  - name: Design & Creative
+    columns:
+      # ── LEFT: Inspiration & Design Bookmarks ──
+      - size: small
+        widgets:
+          - type: bookmarks
+            groups:
+              - title: Visual & UI Inspiration
+                links:
+                  - title: Mobbin
+                    url: https://mobbin.com
+                    icon: si:safari
+                    description: Mobile & Web UI flows
+                  - title: Godly
+                    url: https://godly.website
+                    icon: si:safari
+                    description: Modern web interactions
+                  - title: Hoverstat.es
+                    url: https://hoverstat.es
+                    icon: si:safari
+                    description: Alternative interactive design
+              - title: Typography & Publishing
+                links:
+                  - title: Fontshare
+                    url: https://www.fontshare.com
+                    icon: si:fontbase
+                    description: Free quality fonts
+                  - title: Google Fonts
+                    url: https://fonts.google.com
+                    icon: si:google
+                    description: Web typography
+                  - title: Typst
+                    url: https://typst.app
+                    icon: si:typst
+                    description: Modern typesetting
+
+      # ── CENTER: UI & Creative Engineering Blogs ──
+      - size: full
+        widgets:
+          - type: rss
+            title: UI & Creative Engineering
+            limit: 10
+            collapse-after: 5
+            cache: 4h
+            feeds:
+              - url: https://www.joshwcomeau.com/rss.xml
+                title: Josh W. Comeau
+              - url: https://ishadeed.com/feed.xml
+                title: Ahmad Shadeed
+              - url: https://sidebar.io/feed.xml
+                title: Sidebar.io (Daily 5)
+
+      # ── RIGHT: ArtCraft & Tooling Radar ──
+      - size: small
+        widgets:
+          - type: releases
+            title: ArtCraft & Tooling Releases
+            cache: 6h
+            collapse-after: 3
+            repositories:
+              - storytold/artcraft
+              - storytold/craft-launcher
+              - storytold/figcraft
+
+          - type: bookmarks
+            groups:
+              - title: Creative Suite
+                links:
+                  - title: ArtCraft
+                    url: https://getartcraft.com
+                    icon: si:rust
+                    description: Creative Tools Suite
+                  - title: storytold GitHub
+                    url: https://github.com/storytold
+                    icon: si:github
+                    description: Source Repositories

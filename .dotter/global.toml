@@ -83,3 +83,8 @@ default_target_type = "symbolic"
 [agent-statusline.files]
 "ai/statusline/claude.sh" = "~/.claude/statusline.sh"
 "ai/statusline/antigravity.sh" = "~/.gemini/antigravity-cli/statusline.sh"
+
+[glance.files]
+"glance" = { target = "~/.config/glance", type = "symbolic", recurse = false }
+"systemd/glance.container" = "~/.config/containers/systemd/glance.container"
+

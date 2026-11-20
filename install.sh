@@ -28,7 +28,7 @@ NERD_FONT_URL="https://github.com/ryanoasis/nerd-fonts/releases/latest/download/
 NERD_FONT_FILE="LilexNerdFontMono-Medium.ttf"
 
 # User services enabled when their unit exists (besides the ones in systemd/user/)
-USER_SERVICES=(syncthing.service)
+USER_SERVICES=(syncthing.service glance.service)
 
 # setup/tools/<name>.sh scripts run after the deploy (install or update a tool)
 TOOLS=(eget pen-figcraft)

@@ -7,6 +7,7 @@ packages = [
   "foot",
   "ghostty",
   "git",
+  "glance",
   "herdr",
   "kitty",
   "lazygit",

@@ -1,0 +1,19 @@
+[Unit]
+Description=Glance Personal Dashboard
+After=network-online.target
+
+[Container]
+Image=docker.io/glanceapp/glance:latest
+ContainerName=glance
+Network=host
+Environment=TZ=Africa/Casablanca
+Volume=%h/.config/glance:/app/config:z
+Volume=/etc/localtime:/etc/localtime:ro
+Volume=/:/host:ro
+Volume=/mnt/backup:/host/mnt/backup:ro
+
+[Service]
+Restart=always
+
+[Install]
+WantedBy=default.target
