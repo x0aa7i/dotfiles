@@ -64,3 +64,8 @@ Logs are stored in `~/log/rsync_YYYYMMDD.log`. Check these for sync status and a
 The script uses `~/.config/scripts/rsync_exclude.txt` for exclude patterns.
 
 To exclude a directory from being synced, create a `.rsyncignore` file in that directory (similar to `.gitignore`).
+
+## pen-figcraft
+
+Moved to its own repo, `~/dev/tools/pen-figcraft` (`pen-figcraft --help`), linked into `~/.local/bin` by
+`setup/tools/pen-figcraft.sh`. The fish functions `to-fig` and `to-pen` wrap it.
