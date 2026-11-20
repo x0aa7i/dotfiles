@@ -2,7 +2,7 @@
 .dotter/cache.toml
 .dotter/cache
 dotter
-ai/agents/skills
+ai/agents/skills/*
 .dotter/cargo
 fish/fish_variables
 fish/conf.d/fish_frozen_*.fish
