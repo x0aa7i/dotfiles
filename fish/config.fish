@@ -102,10 +102,6 @@ end
 set --export BUN_INSTALL "$HOME/.bun"
 fish_add_path $BUN_INSTALL/bin
 
-# dprint
-set -x DPRINT_INSTALL "$HOME/.dprint"
-fish_add_path $DPRINT_INSTALL/bin
-
 # pyenv
 set -gx PYENV_ROOT $HOME/.pyenv
 test -d $PYENV_ROOT/bin; and fish_add_path $PYENV_ROOT/bin

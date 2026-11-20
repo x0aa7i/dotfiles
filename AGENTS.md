@@ -51,11 +51,10 @@ Strict adherence to formatting is required. Use the following tools:
 - **Lua (Neovim/WezTerm/etc.)**:
   - Format: `stylua --config-path nvim/stylua.toml .`
   - Lint: Handled via Neovim LSP or manual check with `stylua --check`.
-- **General (TS, JSON, MD, TOML, YAML)**:
-  - Format: `dprint fmt --config nvim/rules/dprint.json`
-  - Check: `dprint check --config nvim/rules/dprint.json`
-- **JavaScript/TypeScript**:
-  - Format/Check: `prettier --write .` or `prettier --check .` (Config: `nvim/rules/.prettierrc.json`)
+- **General (JS, TS, JSON, MD, YAML, TOML, CSS, HTML)**: oxfmt is the default.
+  - Format: `oxfmt <paths>`
+  - Check: `oxfmt --check <paths>`
+- **Prettier (legacy)**: being migrated to oxfmt. Only where oxfmt is not set up yet, with `nvim/rules/.prettierrc.json`.
 - **Markdown**:
   - Lint: `markdownlint --config nvim/rules/.markdownlint.json`
 

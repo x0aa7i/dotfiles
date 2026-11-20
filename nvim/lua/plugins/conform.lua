@@ -3,15 +3,6 @@ return {
     "stevearc/conform.nvim",
     opts = {
       formatters = {
-        dprint = {
-          prepend_args = function(self, ctx)
-            local has_dprint = self.cwd(self, ctx)
-            if not has_dprint then
-              return { "-c", vim.fn.stdpath("config") .. "/rules/dprint.json" }
-            end
-            return {}
-          end,
-        },
         prettierd = {
           require_cwd = false,
           env = {
@@ -34,7 +25,7 @@ return {
         ["css"] = { "oxfmt", "prettierd", stop_after_first = true },
         ["json"] = { "oxfmt", "prettierd", stop_after_first = true },
         ["yaml"] = { "oxfmt", "prettierd", stop_after_first = true },
-        ["toml"] = { "taplo", "dprint", stop_after_first = true },
+        ["toml"] = { "oxfmt", "taplo", stop_after_first = true },
         ["typst"] = { "typstyle" },
       },
     },
