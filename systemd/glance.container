@@ -7,7 +7,8 @@ Image=docker.io/glanceapp/glance:latest
 ContainerName=glance
 Network=host
 Environment=TZ=Africa/Casablanca
-Volume=%h/.config/glance:/app/config:z
+# The real folder: :z relabels for SELinux and does not follow the ~/.config/glance symlink
+Volume=%h/dotfiles/glance:/app/config:z
 Volume=/etc/localtime:/etc/localtime:ro
 Volume=/:/host:ro
 Volume=/mnt/backup:/host/mnt/backup:ro
